@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider             = "prisma-client-py"
+  recursive_type_depth = -1 // 5
+  interface            = "asyncio"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Comic {
+  id             String    @id
+  name           String
+  url            String
+  genre          Json
+  content        String?
+  translatorTeam Json
+  anotherName    String[]
+  source         Json
+  author         Json
+  postedBy       Json
+  status         String
+  chapters       Chapter[]
+  createdDate    DateTime  @default(now())
+  updatedDate    DateTime  @default(now())
+}
+
+model Chapter {
+  id          String   @id
+  name        String
+  url         String
+  comic       Comic    @relation(fields: [comicId], references: [id])
+  comicId     String
+  images      String[]
+  createdDate String
+  updatedDate DateTime @default(now())
+}
+
+model HistoryUrl {
+  url String
+  id  String @id @default(uuid())
+}
+
+model PendingUrl {
+  url String
+  id  String @id @default(uuid())
+}
