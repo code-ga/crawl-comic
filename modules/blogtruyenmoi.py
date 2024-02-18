@@ -1,5 +1,5 @@
 import asyncio
-from typing import Tuple
+from typing import Optional, Tuple
 from aiohttp import ClientSession
 from bs4 import SoupStrainer, Tag
 from typings.comic import Chapter, Comic
@@ -85,13 +85,20 @@ def parseComicHtmlPage(html: str, comic_url: str):
     return result
 
 
-async def fetchComic(comic_url: str) -> Tuple[Comic, list[str]]:
+async def fetchComic(
+    comic_url: str, html: Optional[str] = None
+) -> Tuple[Comic, list[str]]:
     print(f"fetching comic: {comic_url}")
-    async with ClientSession() as session, session.get(comic_url) as response:
-        html = await response.text()
-        await PendingUrlModel.prisma().delete_many(where={"url": {"equals": comic_url}})
-        await HistoryUrlModel.prisma().create({"url": comic_url})
+    if html:
         return (parseComicHtmlPage(html, comic_url), [])
+    else:
+        async with ClientSession() as session, session.get(comic_url) as response:
+            html = await response.text()
+            await PendingUrlModel.prisma().delete_many(
+                where={"url": {"equals": comic_url}}
+            )
+            await HistoryUrlModel.prisma().create({"url": comic_url})
+            return (parseComicHtmlPage(html, comic_url), [])
 
 
 async def crawlAllLinksInHTML(html: str) -> list[str]:
@@ -140,6 +147,7 @@ async def fetchChapters(url: str) -> Tuple[Comic, list[str]]:
 
 async def fullFetchComic(
     comic_url: str,
+    html: Optional[str] = None,
 ) -> Tuple[Comic, list[str]]:
     """
     Fetches the comic and all its chapters with images.
@@ -154,7 +162,7 @@ async def fullFetchComic(
     """
     pendingUrl: list[str] = []
     # because we fetch all link of page at outer function
-    comic, _ = await fetchComic(comic_url)
+    comic, _ = await fetchComic(comic_url, html)
     await comic.commitToDB()
     for chapter in comic.chapters:
         image_url, chapPendingUrl = await fetchChapters(chapter.url)

@@ -54,6 +54,7 @@ async def crawlAllComics(start_url: str = "https://blogtruyenmoi.com/"):
                 asyncio.create_task(
                     fullFetchComic(
                         current_url,
+                        html,
                     )
                 )
 
