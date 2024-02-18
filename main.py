@@ -51,7 +51,8 @@ async def crawlAllComics(start_url: str = "https://blogtruyenmoi.com/"):
         ) as response:
             html = await response.text()
             if isComicPage(html):
-                asyncio.create_task(
+                # asyncio.create_task
+                (
                     fullFetchComic(
                         current_url,
                         html,

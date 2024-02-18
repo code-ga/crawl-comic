@@ -164,6 +164,7 @@ async def fullFetchComic(
     # because we fetch all link of page at outer function
     comic, _ = await fetchComic(comic_url, html)
     await comic.commitToDB()
+    await asyncio.sleep(1)
     for chapter in comic.chapters:
         image_url, chapPendingUrl = await fetchChapters(chapter.url)
         chapter.setImages(image_url)
