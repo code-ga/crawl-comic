@@ -52,11 +52,9 @@ async def crawlAllComics(start_url: str = "https://blogtruyenmoi.com/"):
             html = await response.text()
             if isComicPage(html):
                 # asyncio.create_task
-                (
-                    fullFetchComic(
-                        current_url,
-                        html,
-                    )
+                await fullFetchComic(
+                    current_url,
+                    html,
                 )
 
             await PendingUrlModel.prisma().create_many(
