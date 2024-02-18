@@ -159,11 +159,13 @@ class ComicInfo:
 class Comic(ComicInfo):
     chapters: list[Chapter]
     chapters_ids: list[str]
+    chapters_urls: list[str]
 
     def __init__(self, name, url):
         super().__init__(name, url)
         self.chapters = []
         self.chapters_ids = []
+        self.chapters_urls = []
 
     def addChapter(self, chapter: Chapter):
         """
@@ -174,6 +176,7 @@ class Comic(ComicInfo):
         """
         self.chapters.append(chapter)
         self.chapters_ids.append(chapter.id)
+        self.chapters_urls.append(chapter.url)
         self.changed = True
 
     async def commitToDB(self):
@@ -186,6 +189,7 @@ class Comic(ComicInfo):
         result = super().toDict().copy()
         result.pop("chapters")
         result.pop("chapters_ids")
+        result.pop("chapters_urls")
         result.pop("changed")
         return result
 

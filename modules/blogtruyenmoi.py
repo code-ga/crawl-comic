@@ -1,4 +1,4 @@
-import time
+import asyncio
 from typing import Tuple
 from aiohttp import ClientSession
 from bs4 import SoupStrainer, Tag
@@ -13,10 +13,10 @@ BASE_URL = "https://blogtruyenmoi.com"
 
 
 def filterLink(link: str):
-    if link.startswith("/"):
-        return BASE_URL + link
     if link.startswith("//id.blogtruyenmoi.com"):
         return "https:" + link  # id.blogtruyenmoi.com
+    if link.startswith("/"):
+        return BASE_URL + link
     return None
 
 
@@ -85,28 +85,35 @@ def parseComicHtmlPage(html: str, comic_url: str):
     return result
 
 
-async def fetchComic(session: ClientSession, comic_url: str) -> Tuple[Comic, list[str]]:
-    async with session.get(comic_url) as response:
+async def fetchComic(comic_url: str) -> Tuple[Comic, list[str]]:
+    print(f"fetching comic: {comic_url}")
+    async with ClientSession() as session, session.get(comic_url) as response:
         html = await response.text()
-
         await PendingUrlModel.prisma().delete_many(where={"url": {"equals": comic_url}})
         await HistoryUrlModel.prisma().create({"url": comic_url})
-        return (parseComicHtmlPage(html, comic_url), crawlAllLinksInHTML(html))
+        return (parseComicHtmlPage(html, comic_url), [])
 
 
-def crawlAllLinksInHTML(html: str) -> list[str]:
+async def crawlAllLinksInHTML(html: str) -> list[str]:
     pendingUrl = []
     for link in CustomBeautifulSoup(html, "html.parser", parse_only=SoupStrainer("a")):
         if link.has_attr("href"):
             link = filterLink(link["href"])
             if link:
+                if (
+                    await HistoryUrlModel.prisma().find_first(
+                        where={"url": {"equals": link}}
+                    )
+                    is not None
+                ):
+                    continue
                 pendingUrl.append(link)
     return pendingUrl
 
 
-async def fetchChapters(session: ClientSession, url: str):
-    print(url)
-    async with session.get(url) as response:
+async def fetchChapters(url: str) -> Tuple[Comic, list[str]]:
+    print(f"fetching chapters: {url}")
+    async with ClientSession() as session, session.get(url) as response:
         html = await response.text()
         soup = CustomBeautifulSoup(html, "html.parser")
         images_tags = soup.select("#content")[0].select("img")
@@ -116,29 +123,24 @@ async def fetchChapters(session: ClientSession, url: str):
         for url in images_url:
             file_name, file = await upload.get_file(url)
             while file is None:
-                time.sleep(1)
+                await asyncio.sleep(1)
                 file_name, file = await upload.get_file(url)
             resp = await upload.send_to_guilded(file_name=file_name, file=file)
             while resp["success"] is not True:
-                time.sleep(1)
-                print("retrying upload")
+                await asyncio.sleep(1)
+                print(f"retrying upload: {url}")
                 resp = await upload.send_to_guilded(file_name=file_name, file=file)
             print(f"upload success: {resp['url']}")
             result.append(resp["url"])
-            time.sleep(1)
-        await PendingUrlModel.prisma().create_many(
-            data=[{"url": url} for url in crawlAllLinksInHTML(html)],
-            skip_duplicates=True,
-        )
+            await asyncio.sleep(1)
         await PendingUrlModel.prisma().delete_many(where={"url": {"equals": url}})
         await HistoryUrlModel.prisma().create({"url": url})
-        return result
+        return result, await crawlAllLinksInHTML(html)
 
 
 async def fullFetchComic(
-    session: ClientSession,
     comic_url: str,
-):
+) -> Tuple[Comic, list[str]]:
     """
     Fetches the comic and all its chapters with images.
 
@@ -150,60 +152,29 @@ async def fullFetchComic(
     Returns:
     - Comic object with chapters and their images
     """
-    step = 0
-    comic, pendingUrl = await fetchComic(session, comic_url)
-    await PendingUrlModel.prisma().create_many(
-        data=[{"url": url} for url in pendingUrl], skip_duplicates=True
-    )
+    pendingUrl: list[str] = []
+    # because we fetch all link of page at outer function
+    comic, _ = await fetchComic(comic_url)
     await comic.commitToDB()
-    step += 1
     for chapter in comic.chapters:
-        image_url = await fetchChapters(session, chapter.url)
+        image_url, chapPendingUrl = await fetchChapters(chapter.url)
         chapter.setImages(image_url)
         print(f"{chapter.name} - {chapter.url}")
         await chapter.commitToDB()
-        step += 1
-        time.sleep(2)
-    return comic
+        await asyncio.sleep(1)
+        pendingUrl.extend(chapPendingUrl)
+        # pendingUrl = [...pendingUrl, ...chapPendingUrl]
+    await comic.commitToDB()
+    # remove chapter url out of pending url
+    pendingUrl = [u for u in pendingUrl if u not in comic.chapters_urls]
+    await PendingUrlModel.prisma().create_many(
+        data=[{"url": u} for u in pendingUrl],
+        skip_duplicates=True,
+    )
+    print(f"fetch completed: {comic.name} - {comic_url}")
+
+    return comic, pendingUrl
 
 
 def isComicPage(html: str):
     return True if "Thêm vào bookmark" in html else False
-
-
-async def crawlAllComics(
-    session: ClientSession, start_url: str = "https://blogtruyenmoi.com/"
-):
-    current_url = start_url
-    while True:
-        print(f"in time crawl: {current_url}")
-        if (
-            await HistoryUrlModel.prisma().find_first(
-                where={"url": {"equals": current_url}}
-            )
-            is not None
-        ):
-            await PendingUrlModel.prisma().delete_many(
-                where={"url": {"equals": current_url}}
-            )
-            current_url = await PendingUrlModel.prisma().find_first()
-            if current_url is None:
-                break
-            current_url = current_url.url
-            continue
-        async with session.get(current_url) as response:
-            html = await response.text()
-            if isComicPage(html):
-                await (await fullFetchComic(session, current_url)).commitToDB()
-            await PendingUrlModel.prisma().create_many(
-                data=[{"url": u} for u in crawlAllLinksInHTML(html)],
-            )
-            await PendingUrlModel.prisma().delete_many(
-                where={"url": {"equals": current_url}}
-            )
-            await HistoryUrlModel.prisma().create({"url": current_url})
-            current_url = await PendingUrlModel.prisma().find_first()
-            if current_url is None:
-                break
-            current_url = current_url.url
-            time.sleep(1)
