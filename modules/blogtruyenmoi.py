@@ -124,25 +124,25 @@ async def fetchChapters(url: str) -> Tuple[Comic, list[str]]:
         html = await response.text()
         soup = CustomBeautifulSoup(html, "html.parser")
         images_tags = soup.select("#content")[0].select("img")
-        result: list[str] = []
+        # result: list[str] = []
         images_url = [img["src"] for img in images_tags]
         # upload image to guilded
-        for url in images_url:
-            file_name, file = await upload.get_file(url)
-            while file is None:
-                await asyncio.sleep(1)
-                file_name, file = await upload.get_file(url)
-            resp = await upload.send_to_guilded(file_name=file_name, file=file)
-            while resp["success"] is not True:
-                await asyncio.sleep(1)
-                print(f"retrying upload: {url}")
-                resp = await upload.send_to_guilded(file_name=file_name, file=file)
-            print(f"upload success: {resp['url']}")
-            result.append(resp["url"])
-            await asyncio.sleep(1)
+        # for url in images_url:
+        #     file_name, file = await upload.get_file(url)
+        #     while file is None:
+        #         await asyncio.sleep(1)
+        #         file_name, file = await upload.get_file(url)
+        #     resp = await upload.send_to_guilded(file_name=file_name, file=file)
+        #     while resp["success"] is not True:
+        #         await asyncio.sleep(1)
+        #         print(f"retrying upload: {url}")
+        #         resp = await upload.send_to_guilded(file_name=file_name, file=file)
+        #     print(f"upload success: {resp['url']}")
+        #     result.append(resp["url"])
+        #     await asyncio.sleep(1)
         await PendingUrlModel.prisma().delete_many(where={"url": {"equals": url}})
         await HistoryUrlModel.prisma().create({"url": url})
-        return result, await crawlAllLinksInHTML(html)
+        return images_url, await crawlAllLinksInHTML(html)
 
 
 async def fullFetchComic(
