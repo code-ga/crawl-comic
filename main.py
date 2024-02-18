@@ -31,7 +31,6 @@ async def main():
 async def crawlAllComics(start_url: str = "https://blogtruyenmoi.com/"):
     current_url = start_url
     while True:
-        print(f"in time crawl: {current_url}")
         if (
             await HistoryUrlModel.prisma().find_first(
                 where={"url": {"equals": current_url}}
@@ -46,6 +45,7 @@ async def crawlAllComics(start_url: str = "https://blogtruyenmoi.com/"):
                 break
             current_url = current_url.url
             continue
+        print(f"in time crawl: {current_url}")
         async with aiohttp.ClientSession() as session, session.get(
             current_url
         ) as response:
@@ -70,7 +70,7 @@ async def crawlAllComics(start_url: str = "https://blogtruyenmoi.com/"):
             if current_url is None:
                 break
             current_url = current_url.url
-            await asyncio.sleep(1)
+            # await asyncio.sleep(1)
 
 
 if __name__ == "__main__":
