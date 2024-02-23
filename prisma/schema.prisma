@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  // Corresponds to the cargo alias created earlier
+  provider = "cargo prisma"
+  // The location to generate the client. Is relative to the position of the schema
+  output   = "../src/prisma.rs"
+}
+
+generator clearDbClient {
+  // Corresponds to the cargo alias created earlier
+  provider = "cargo prisma"
+  // The location to generate the client. Is relative to the position of the schema
+  output   = "../src/bin/prisma_client.rs"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Comic {
+  id             String    @id
+  name           String
+  url            String
+  genre          Json      @default("{}")
+  content        String?
+  translatorTeam Json      @default("{}")
+  anotherName    String[]
+  source         Json      @default("{}")
+  author         Json      @default("{}")
+  postedBy       Json      @default("{}")
+  status         String
+  chapters       Chapter[]
+  createdDate    DateTime  @default(now())
+  updatedDate    DateTime  @default(now())
+}
+
+model Chapter {
+  id          String   @id
+  name        String
+  url         String
+  comic       Comic    @relation(fields: [comicId], references: [id])
+  comicId     String
+  images      String[]
+  createdDate String
+  updatedDate DateTime @default(now())
+}
+
+model Urls {
+  url         String   @unique
+  id          String   @id @default(uuid())
+  fetched     Boolean  @default(false)
+  fetching    Boolean  @default(false)
+  createdDate DateTime @default(now())
+  // @@index([url])
+  // @@unique([url])
+}
