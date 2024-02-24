@@ -21,9 +21,9 @@ datasource db {
 }
 
 model Comic {
-  id             String    @id
-  name           String
-  url            String
+  id             String    @id @default(uuid())
+  name           String    @default("")
+  url            String    @unique
   genre          Json      @default("{}")
   content        String?
   translatorTeam Json      @default("{}")
@@ -31,16 +31,16 @@ model Comic {
   source         Json      @default("{}")
   author         Json      @default("{}")
   postedBy       Json      @default("{}")
-  status         String
+  status         String    @default("")
   chapters       Chapter[]
   createdDate    DateTime  @default(now())
   updatedDate    DateTime  @default(now())
 }
 
 model Chapter {
-  id          String   @id
+  id          String   @id @default(uuid())
   name        String
-  url         String
+  url         String   @unique
   comic       Comic    @relation(fields: [comicId], references: [id])
   comicId     String
   images      String[]
@@ -56,4 +56,13 @@ model Urls {
   createdDate DateTime @default(now())
   // @@index([url])
   // @@unique([url])
+}
+
+model Proxy {
+  host     String
+  port     String
+  username String
+  password String
+  auth     String
+  id       String @id @default(uuid())
 }

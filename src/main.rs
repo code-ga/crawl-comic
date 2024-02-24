@@ -21,8 +21,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("spawn {}", i);
         let tx = main_tx.clone();
         let rx = worker_rx.clone();
+        let proxy = util::get_proxy(&client).await;
+
         let worker = tokio::spawn(async move {
-            modules::blogtruyenmoi::thread_worker(tx, rx, i).await;
+            modules::blogtruyenmoi::thread_worker(tx, rx, i, proxy.clone()).await;
         });
 
         workers.push(types::Worker {
@@ -43,12 +45,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 // spawn new worker and replace old
                 let tx = main_tx.clone();
                 let rx = worker_rx.clone();
+                let proxy = util::get_proxy(&client).await;
                 let worker = tokio::spawn(async move {
-                    modules::blogtruyenmoi::thread_worker(tx, rx, id).await;
+                    modules::blogtruyenmoi::thread_worker(tx, rx, id, proxy.clone()).await;
                 });
                 workers[id].join_handle = worker;
             }
             ThreadMessage::Retry(url) => {
+                tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
                 worker_tx
                     .send(types::thread_message::ThreadMessage::Start(url))
                     .await
@@ -81,8 +85,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let pending_url = {
                         let tmp = pending_urls.pop();
                         if tmp.is_none() {
-                            tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-
+                            // tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
                             pending_urls = util::get_pending_urls(
                                 &client,
                                 num_of_threads - worker_rx.len(),
@@ -93,7 +96,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                         tmp.unwrap()
                     };
-                    tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+                    tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
                     worker_tx
                         .send(types::thread_message::ThreadMessage::Start(
                             pending_url.to_string(),
