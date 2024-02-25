@@ -32,6 +32,7 @@ model Comic {
   author         Json      @default("{}")
   postedBy       Json      @default("{}")
   status         String    @default("")
+  thumbnail      String?
   chapters       Chapter[]
   createdDate    DateTime  @default(now())
   updatedDate    DateTime  @default(now())
@@ -53,6 +54,7 @@ model Urls {
   id          String   @id @default(uuid())
   fetched     Boolean  @default(false)
   fetching    Boolean  @default(false)
+  comicId     String?
   createdDate DateTime @default(now())
   // @@index([url])
   // @@unique([url])
