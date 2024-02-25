@@ -1,4 +1,5 @@
 use prisma::PrismaClient;
+use rand::Rng;
 
 use types::thread_message::ThreadMessage;
 
@@ -10,7 +11,9 @@ mod util;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client: PrismaClient = PrismaClient::_builder().build().await.unwrap();
     let num_of_threads = 10;
-    let init_url = "https://blogtruyenmoi.com".to_string();
+    let init_url =
+        "https://blogtruyenmoi.com/ajax/Search/AjaxLoadListManga?key=tatca&orderBy=3&p=1"
+            .to_string();
     // worker to main channel
     let (main_tx, main_rx) = async_channel::bounded::<ThreadMessage>(num_of_threads);
     // main to worker channel
@@ -52,7 +55,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 workers[id].join_handle = worker;
             }
             ThreadMessage::Retry(url) => {
-                tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+                let wait_time = rand::thread_rng().gen_range(1..5);
+                tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                 worker_tx
                     .send(types::thread_message::ThreadMessage::Start(url))
                     .await
@@ -72,7 +76,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .unwrap();
                 }
 
-                tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+                let wait_time = rand::thread_rng().gen_range(1..5);
+                tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                 // sleep 1s
                 let mut pending_urls = util::get_pending_urls(
                     &client,
@@ -96,7 +101,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                         tmp.unwrap()
                     };
-                    tokio::time::sleep(tokio::time::Duration::from_secs(2)).await;
+                    let wait_time = rand::thread_rng().gen_range(1..5);
+                    tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                     worker_tx
                         .send(types::thread_message::ThreadMessage::Start(
                             pending_url.to_string(),

@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use rand::Rng;
 use regex::Regex;
 use tokio::sync::Mutex;
 // use lazy_static::lazy_static;
@@ -88,7 +89,8 @@ pub async fn parse_comic_page(
     let  chapter_regex = Regex::new(r#"<p\s+id="chapter-(\d+)">\s+<span\s+class="title">\s+<a\s+id="\w+_\d+"\s+href="(.+)"\s+title=".+>(.+)<\/a>\s+<\/span>\s+<span\s+class="publishedDate">(.+)<\/span>"#).unwrap();
     for cap in chapter_regex.captures_iter(page) {
         // println!("{} {}", cap[1].to_string(), cap[2].to_string());
-        tokio::time::sleep(std::time::Duration::from_secs(4)).await;
+        let wait = rand::thread_rng().gen_range(3..5);
+        tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
         // let id = cap[1].to_string();
         let mut url = format!("https://blogtruyenmoi.com{}", cap[2].to_string())
             .trim()
@@ -139,7 +141,8 @@ pub async fn parse_comic_page(
             fetch_chapter_page(&url, &title, &date, &comic_id, &client, proxy.clone()).await;
         let mut tries = 0;
         while pending_url.is_none() {
-            tokio::time::sleep(std::time::Duration::from_secs(4)).await;
+            let wait_time = rand::thread_rng().gen_range(1..5);
+            tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
             pending_url =
                 fetch_chapter_page(&url, &title, &date, &comic_id, &client, proxy.clone()).await;
             // println!("retry {}", url);
@@ -162,6 +165,9 @@ async fn fetch_chapter_page(
     client: &PrismaClient,
     proxy: Option<prisma::proxy::Data>,
 ) -> Option<Vec<String>> {
+    // TODO: enable this sleep code if rate limit is fixed
+    let wait_time = rand::thread_rng().gen_range(1..5);
+    tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
     println!("fetching chapter {}", url);
     {
         let tmp = client
@@ -277,15 +283,33 @@ async fn fetch_chapter_page(
 }
 
 pub fn process_url(url: &str) -> Option<String> {
-    if url.starts_with("//id.blogtruyenmoi.com") {
-        return Some(format!("https:{}", url).trim().to_string());
+    let url = url.trim();
+    // if url.starts_with("//id.blogtruyenmoi.com") {
+    //     return Some(format!("https:{}", url).trim().to_string());
+    // }
+    if url.starts_with("/c") {
+        return None;
+    }
+    if url.starts_with("javascript:LoadListMangaPage(") {
+        // javascript:LoadListMangaPage(2) -> https://blogtruyenmoi.com/ajax/Search/AjaxLoadListManga?key=tatca&orderBy=3&p=2
+        let re = Regex::new(r#"LoadListMangaPage\((\d+)\)"#).unwrap();
+        let cap = re.captures(url).unwrap();
+        let page = cap[1].to_string();
+        return Some(format!(
+            "https://blogtruyenmoi.com/ajax/Search/AjaxLoadListManga?key=tatca&orderBy=3&p={}",
+            page
+        ));
     }
     if url.starts_with("/") {
-        return Some(
-            format!("https://blogtruyenmoi.com{}", url)
-                .trim()
-                .to_string(),
-        );
+        let comic_regex = Regex::new(r#"/\d+/.+"#).unwrap();
+        if comic_regex.is_match(url) {
+            return Some(
+                format!("https://blogtruyenmoi.com{}", url)
+                    .trim()
+                    .to_string(),
+            );
+        }
+        return None;
     }
     // if url.starts_with("https://vlogtruyen11.net") {
     //     return Some(url.to_string());
@@ -323,7 +347,8 @@ pub async fn thread_worker(
         let job = rx.recv().await.unwrap();
         match job {
             ThreadMessage::Start(url) => {
-                tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                let wait_time = rand::thread_rng().gen_range(1..5);
+                tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                 {
                     let tmp = client
                         .lock()
@@ -406,10 +431,10 @@ pub async fn thread_worker(
                     }
                     tmp.unwrap()
                 };
-                dbg!(&html);
+                // dbg!(&html);
                 // println!("worker {} fetched {}", worker_id, url);
                 let mut result = Vec::new();
-                let re = Regex::new(r#"href="([^"]+)"#).unwrap();
+                let re = Regex::new(r#"href=["|']([^"']+)"#).unwrap();
                 for cap in re.captures_iter(&html) {
                     // dbg!(&cap[1]);
                     let url = process_url(&cap[1]);
@@ -418,7 +443,8 @@ pub async fn thread_worker(
                     }
                 }
                 if is_comic_page(&html) {
-                    tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+                    let wait_time = rand::thread_rng().gen_range(1..5);
+                    tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                     // only chapter pending url because we had fetch comic page pending url before
                     let pending_url_comic = {
                         let tmp =

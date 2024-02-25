@@ -10,7 +10,10 @@ pub async fn get_pending_urls(
         ._batch((
             client.urls().update_many(
                 vec![prisma::urls::url::equals(now_fetched_url.clone())],
-                vec![prisma::urls::fetched::set(true)],
+                vec![
+                    prisma::urls::fetched::set(true),
+                    prisma::urls::fetching::set(false),
+                ],
             ),
             client
                 .urls()
