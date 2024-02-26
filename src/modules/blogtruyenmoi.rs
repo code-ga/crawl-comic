@@ -84,6 +84,8 @@ pub async fn parse_comic_page(
     };
 
     let comic_id = comic_exec.id.to_string();
+
+    let mut chapters = vec![];
     // regex for a chapter
     let  chapter_regex = Regex::new(r#"<p\s+id="chapter-(\d+)">\s+<span\s+class="title">\s+<a\s+id="\w+_\d+"\s+href="(.+)"\s+title=".+>(.+)<\/a>\s+<\/span>\s+<span\s+class="publishedDate">(.+)<\/span>"#).unwrap();
     for cap in chapter_regex.captures_iter(page) {
@@ -131,22 +133,30 @@ pub async fn parse_comic_page(
                 continue;
             }
         }
-        let chapter = client
-            .chapter()
-            .create(
-                title.to_string(),
-                url.to_string(),
-                prisma::comic::UniqueWhereParam::IdEquals(comic_id.to_string()),
-                date.to_string(),
-                vec![],
-            )
-            .exec()
-            .await;
-        if chapter.is_err() {
-            continue;
-        }
+        // let chapter = client
+        //     .chapter()
+        //     .create(
+        //         title.to_string(),
+        //         url.to_string(),
+        //         prisma::comic::UniqueWhereParam::IdEquals(comic_id.to_string()),
+        //         date.to_string(),
+        //         vec![],
+        //     )
+        //     .exec()
+        //     .await;
+        // if chapter.is_err() {
+        //     continue;
+        // }
+        chapters.push(prisma::chapter::create_unchecked(
+            title.to_string(),
+            url.to_string(),
+            comic_id.to_string(),
+            date.to_string(),
+            vec![],
+        ));
         result.push(url.to_string());
     }
+    client.chapter().create_many(chapters).exec().await.unwrap();
     Some(result)
 }
 
