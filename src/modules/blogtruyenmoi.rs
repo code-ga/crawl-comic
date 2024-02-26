@@ -142,7 +142,7 @@ async fn fetch_chapter_page(
     {
         let tmp = client
             .urls()
-            .find_first(vec![prisma::urls::url::equals(url.clone())])
+            .find_first(vec![prisma::urls::url::equals(url.to_string().clone())])
             .exec()
             .await;
         if tmp.is_err() {
@@ -152,7 +152,7 @@ async fn fetch_chapter_page(
             client
                 .urls()
                 .create(
-                    url.clone(),
+                    url.to_string().clone(),
                     vec![
                         prisma::urls::fetched::set(false),
                         prisma::urls::fetching::set(true),
