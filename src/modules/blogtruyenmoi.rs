@@ -115,6 +115,7 @@ pub async fn parse_comic_page(
         // }
         // // combine pending url with result
         // result.extend(pending_url.unwrap().clone());
+        println!("found chapter url {}", url);
         let chapter = client
             .chapter()
             .create(
