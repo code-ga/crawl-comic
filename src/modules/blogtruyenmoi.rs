@@ -203,8 +203,8 @@ async fn fetch_chapter_page(
         }
     }
     // TODO: enable this sleep code if rate limit is fixed
-    let wait_time = rand::thread_rng().gen_range(1..5);
-    tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
+    // let wait_time = rand::thread_rng().gen_range(1..3);
+    // tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
     println!("fetching chapter {}", url);
     let mut result = Vec::new();
 
@@ -357,7 +357,7 @@ pub async fn thread_worker(
         let job = rx.recv().await.unwrap();
         match job {
             ThreadMessage::Start(url) => {
-                let wait_time = rand::thread_rng().gen_range(1..5);
+                let wait_time = rand::thread_rng().gen_range(1..10);
                 tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                 {
                     let tmp = client

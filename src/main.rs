@@ -15,9 +15,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "https://blogtruyenmoi.com/ajax/Search/AjaxLoadListManga?key=tatca&orderBy=3&p=1"
             .to_string();
     // worker to main channel
-    let (main_tx, main_rx) = async_channel::bounded::<ThreadMessage>(num_of_threads);
+    let (main_tx, main_rx) = async_channel::bounded::<ThreadMessage>(num_of_threads + 5);
     // main to worker channel
-    let (worker_tx, worker_rx) = async_channel::bounded::<ThreadMessage>(num_of_threads);
+    let (worker_tx, worker_rx) = async_channel::bounded::<ThreadMessage>(num_of_threads + 5);
     // let rx = Arc::new(Mutex::new(worker_rx));
     let mut workers = Vec::new();
     for i in 0..num_of_threads {
@@ -81,7 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 // sleep 1s
                 let mut pending_urls = util::get_pending_urls(
                     &client,
-                    num_of_threads - worker_rx.len(),
+                    num_of_threads + 5 - worker_rx.len(),
                     comic_url.clone(),
                 )
                 .await;
@@ -93,7 +93,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             // tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
                             pending_urls = util::get_pending_urls(
                                 &client,
-                                num_of_threads - worker_rx.len(),
+                                num_of_threads + 5 - worker_rx.len(),
                                 comic_url.clone(),
                             )
                             .await;
@@ -101,8 +101,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                         tmp.unwrap()
                     };
-                    let wait_time = rand::thread_rng().gen_range(1..5);
-                    tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
+                    // let wait_time = rand::thread_rng().gen_range(1..5);
+                    // tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                     worker_tx
                         .send(types::thread_message::ThreadMessage::Start(
                             pending_url.to_string(),
