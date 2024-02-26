@@ -116,6 +116,21 @@ pub async fn parse_comic_page(
         // // combine pending url with result
         // result.extend(pending_url.unwrap().clone());
         println!("found chapter url {}", url);
+        {
+            let tmp = client
+                .chapter()
+                .find_first(vec![prisma::chapter::url::equals(url.to_string())])
+                .exec()
+                .await;
+            if tmp.is_err() {
+                continue;
+            }
+            if tmp.unwrap().is_some() {
+                println!("chapter {} already exists", url);
+                result.push(url.to_string());
+                continue;
+            }
+        }
         let chapter = client
             .chapter()
             .create(
@@ -128,7 +143,7 @@ pub async fn parse_comic_page(
             .exec()
             .await;
         if chapter.is_err() {
-            return None;
+            continue;
         }
         result.push(url.to_string());
     }
@@ -470,6 +485,11 @@ pub async fn thread_worker(
                     };
                     result.extend(pending_url_comic.clone());
                 }
+                result = result
+                    .into_iter()
+                    .collect::<std::collections::HashSet<_>>()
+                    .into_iter()
+                    .collect();
                 {
                     let tmp = client
                         .lock()
