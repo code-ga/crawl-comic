@@ -88,8 +88,8 @@ pub async fn parse_comic_page(
     let  chapter_regex = Regex::new(r#"<p\s+id="chapter-(\d+)">\s+<span\s+class="title">\s+<a\s+id="\w+_\d+"\s+href="(.+)"\s+title=".+>(.+)<\/a>\s+<\/span>\s+<span\s+class="publishedDate">(.+)<\/span>"#).unwrap();
     for cap in chapter_regex.captures_iter(page) {
         // println!("{} {}", cap[1].to_string(), cap[2].to_string());
-        let wait = rand::thread_rng().gen_range(3..5);
-        tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
+        // let wait = rand::thread_rng().gen_range(3..5);
+        // tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
         // let id = cap[1].to_string();
         let mut url = format!("https://blogtruyenmoi.com{}", cap[2].to_string())
             .trim()
