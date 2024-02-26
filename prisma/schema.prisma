@@ -54,7 +54,6 @@ model Urls {
   id          String   @id @default(uuid())
   fetched     Boolean  @default(false)
   fetching    Boolean  @default(false)
-  comicId     String?
   createdDate DateTime @default(now())
   // @@index([url])
   // @@unique([url])
