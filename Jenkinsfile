@@ -14,7 +14,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'cargo build --release'
-                archiveArtifacts artifacts: 'target/release/*', fingerprint: true
+                archiveArtifacts artifacts: 'target/release/crawl-comic-worker*', fingerprint: true
             }
         }
     }
