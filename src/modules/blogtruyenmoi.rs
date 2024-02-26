@@ -99,43 +99,6 @@ pub async fn parse_comic_page(
         }
         let title = cap[3].to_string().trim().to_string();
         let date = cap[4].to_string();
-        {
-            let tmp = client
-                .urls()
-                .find_first(vec![prisma::urls::url::equals(url.clone())])
-                .exec()
-                .await;
-            if tmp.is_err() {
-                return None;
-            }
-            if tmp.unwrap().is_none() {
-                client
-                    .urls()
-                    .create(
-                        url.clone(),
-                        vec![
-                            prisma::urls::fetched::set(false),
-                            prisma::urls::fetching::set(true),
-                        ],
-                    )
-                    .exec()
-                    .await
-                    .unwrap();
-            } else {
-                client
-                    .urls()
-                    .update_many(
-                        vec![prisma::urls::url::equals(url.to_string())],
-                        vec![
-                            prisma::urls::fetched::set(false),
-                            prisma::urls::fetching::set(true),
-                        ],
-                    )
-                    .exec()
-                    .await
-                    .unwrap();
-            }
-        }
         // let mut pending_url =
         //     fetch_chapter_page(&url, &title, &date, &comic_id, &client, proxy.clone()).await;
         // let mut tries = 0;
@@ -176,6 +139,43 @@ async fn fetch_chapter_page(
     client: &PrismaClient,
     proxy: Option<prisma::proxy::Data>,
 ) -> Option<Vec<String>> {
+    {
+        let tmp = client
+            .urls()
+            .find_first(vec![prisma::urls::url::equals(url.clone())])
+            .exec()
+            .await;
+        if tmp.is_err() {
+            return None;
+        }
+        if tmp.unwrap().is_none() {
+            client
+                .urls()
+                .create(
+                    url.clone(),
+                    vec![
+                        prisma::urls::fetched::set(false),
+                        prisma::urls::fetching::set(true),
+                    ],
+                )
+                .exec()
+                .await
+                .unwrap();
+        } else {
+            client
+                .urls()
+                .update_many(
+                    vec![prisma::urls::url::equals(url.to_string())],
+                    vec![
+                        prisma::urls::fetched::set(false),
+                        prisma::urls::fetching::set(true),
+                    ],
+                )
+                .exec()
+                .await
+                .unwrap();
+        }
+    }
     // TODO: enable this sleep code if rate limit is fixed
     let wait_time = rand::thread_rng().gen_range(1..5);
     tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
