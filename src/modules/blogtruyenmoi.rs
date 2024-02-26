@@ -18,7 +18,6 @@ pub async fn parse_comic_page(
     page: &str,
     url: &str,
     client: Arc<Mutex<PrismaClient>>,
-    proxy: Option<prisma::proxy::Data>,
 ) -> Option<Vec<String>> {
     let client = client.lock().await;
     {
@@ -137,31 +136,43 @@ pub async fn parse_comic_page(
                     .unwrap();
             }
         }
-        let mut pending_url =
-            fetch_chapter_page(&url, &title, &date, &comic_id, &client, proxy.clone()).await;
-        let mut tries = 0;
-        while pending_url.is_none() {
-            let wait_time = rand::thread_rng().gen_range(1..5);
-            tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
-            pending_url =
-                fetch_chapter_page(&url, &title, &date, &comic_id, &client, proxy.clone()).await;
-            // println!("retry {}", url);
-            if tries > 10 {
-                break;
-            }
-            tries += 1;
+        // let mut pending_url =
+        //     fetch_chapter_page(&url, &title, &date, &comic_id, &client, proxy.clone()).await;
+        // let mut tries = 0;
+        // while pending_url.is_none() {
+        //     let wait_time = rand::thread_rng().gen_range(1..5);
+        //     tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
+        //     pending_url =
+        //         fetch_chapter_page(&url, &title, &date, &comic_id, &client, proxy.clone()).await;
+        //     // println!("retry {}", url);
+        //     if tries > 10 {
+        //         break;
+        //     }
+        //     tries += 1;
+        // }
+        // // combine pending url with result
+        // result.extend(pending_url.unwrap().clone());
+        let chapter = client
+            .chapter()
+            .create(
+                title.to_string(),
+                url.to_string(),
+                prisma::comic::UniqueWhereParam::IdEquals(comic_id.to_string()),
+                date.to_string(),
+                vec![],
+            )
+            .exec()
+            .await;
+        if chapter.is_err() {
+            return None;
         }
-        // combine pending url with result
-        result.extend(pending_url.unwrap().clone());
+        result.push(url.to_string());
     }
     Some(result)
 }
 
 async fn fetch_chapter_page(
     url: &str,
-    title: &str,
-    date: &str,
-    comic_id: &str,
     client: &PrismaClient,
     proxy: Option<prisma::proxy::Data>,
 ) -> Option<Vec<String>> {
@@ -169,33 +180,6 @@ async fn fetch_chapter_page(
     let wait_time = rand::thread_rng().gen_range(1..5);
     tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
     println!("fetching chapter {}", url);
-    {
-        let tmp = client
-            .chapter()
-            .find_first(vec![prisma::chapter::url::equals(url.to_string())])
-            .exec()
-            .await;
-        if tmp.is_err() {
-            return None;
-        }
-        let tmp = tmp.unwrap();
-        if tmp.is_none() {
-            let chapter = client
-                .chapter()
-                .create(
-                    title.to_string(),
-                    url.to_string(),
-                    prisma::comic::UniqueWhereParam::IdEquals(comic_id.to_string()),
-                    date.to_string(),
-                    vec![],
-                )
-                .exec()
-                .await;
-            if chapter.is_err() {
-                return None;
-            }
-        }
-    }
     let mut result = Vec::new();
 
     let mut http_client = reqwest::ClientBuilder::new();
@@ -288,7 +272,7 @@ pub fn process_url(url: &str) -> Option<String> {
     //     return Some(format!("https:{}", url).trim().to_string());
     // }
     if url.starts_with("/c") {
-        return None;
+        return Some(format!("https://blogtruyenmoi.com{}", url));
     }
     if url.starts_with("javascript:LoadListMangaPage(") {
         // javascript:LoadListMangaPage(2) -> https://blogtruyenmoi.com/ajax/Search/AjaxLoadListManga?key=tatca&orderBy=3&p=2
@@ -393,6 +377,36 @@ pub async fn thread_worker(
                         continue;
                     }
                 };
+                if url.starts_with("https://blogtruyenmoi.com/c") {
+                    // fetch chap
+                    let client = client.lock().await;
+                    let tmp = fetch_chapter_page(&url, &client, proxy.clone()).await;
+                    if tmp.is_none() {
+                        tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                    }
+                    if tmp.is_some() {
+                        tx.send(ThreadMessage::Done(tmp.unwrap(), url.clone(), false))
+                            .await
+                            .unwrap();
+                    }
+                    {
+                        let tmp = client
+                            .urls()
+                            .update_many(
+                                vec![prisma::urls::url::equals(url.clone())],
+                                vec![
+                                    prisma::urls::fetched::set(true),
+                                    prisma::urls::fetching::set(false),
+                                ],
+                            )
+                            .exec()
+                            .await;
+                        if tmp.is_err() {
+                            tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                        }
+                    }
+                    continue;
+                }
                 println!("worker {} fetching {}", worker_id, url);
 
                 let mut rep = http_client
@@ -447,8 +461,7 @@ pub async fn thread_worker(
                     tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                     // only chapter pending url because we had fetch comic page pending url before
                     let pending_url_comic = {
-                        let tmp =
-                            parse_comic_page(&html, &url, client.clone(), proxy.clone()).await;
+                        let tmp = parse_comic_page(&html, &url, client.clone()).await;
                         if tmp.is_none() {
                             tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
                         }
