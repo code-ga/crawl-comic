@@ -2,7 +2,7 @@ pipeline {
     agent { 
         docker {
             image 'rust:latest'
-            args '-v $HOME/.cargo:/root/.cargo -u root' 
+            args '-u root' 
         }    
     }
     stages {
