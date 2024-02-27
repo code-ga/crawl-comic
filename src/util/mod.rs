@@ -31,7 +31,10 @@ pub async fn get_pending_urls(
             .urls()
             .update_many(
                 vec![prisma::urls::url::equals(u.url.clone())],
-                vec![prisma::urls::fetching::set(true)],
+                vec![
+                    prisma::urls::fetching::set(true),
+                    prisma::urls::fetched::set(false),
+                ],
             )
             .exec()
             .await

@@ -258,6 +258,9 @@ async fn fetch_chapter_page(
     let mut images_urls = vec![];
     for cap in images_url_regex.captures_iter(&html) {
         let url = cap[1].to_string();
+        if !url.starts_with("http") {
+            continue;
+        }
         images_urls.push(url);
     }
     client
@@ -294,9 +297,10 @@ async fn fetch_chapter_page(
 
 pub fn process_url(url: &str) -> Option<String> {
     let url = url.trim();
-    // if url.starts_with("//id.blogtruyenmoi.com") {
-    //     return Some(format!("https:{}", url).trim().to_string());
-    // }
+    if url.starts_with("//id.blogtruyenmoi.com") {
+        // return Some(format!("https:{}", url).trim().to_string());
+        return None;
+    }
     if url.starts_with("/c") {
         return Some(format!("https://blogtruyenmoi.com{}", url));
     }
@@ -394,7 +398,10 @@ pub async fn thread_worker(
                         .urls()
                         .update_many(
                             vec![prisma::urls::url::equals(url.clone())],
-                            vec![prisma::urls::fetching::set(true)],
+                            vec![
+                                prisma::urls::fetching::set(true),
+                                prisma::urls::fetched::set(false),
+                            ],
                         )
                         .exec()
                         .await;
@@ -507,7 +514,10 @@ pub async fn thread_worker(
                         .urls()
                         .update_many(
                             vec![prisma::urls::url::equals(url.clone())],
-                            vec![prisma::urls::fetched::set(true)],
+                            vec![
+                                prisma::urls::fetched::set(true),
+                                prisma::urls::fetching::set(false),
+                            ],
                         )
                         .exec()
                         .await;
