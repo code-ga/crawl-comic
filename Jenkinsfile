@@ -14,8 +14,10 @@ pipeline {
 
         stage('Build') {
             steps {
-                sh 'cargo prisma generate && cargo build --release --bin crawl-comic-worker'
-                archiveArtifacts artifacts: 'target/release/crawl-comic-worker*'
+                sh 'cargo prisma generate && cargo build --release --bin prisma && cargo build --release --bin crawl-comic-worker'
+                archiveArtifacts artifacts: 'target/release/crawl-comic-worker'
+                archiveArtifacts artifacts: 'target/release/prisma'
+                archiveArtifacts artifacts: 'prisma/'
             }
         }
     }
