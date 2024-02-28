@@ -379,6 +379,7 @@ pub async fn thread_worker(
                         .await;
                     if tmp.is_err() {
                         tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                        continue;
                     }
                     if tmp.unwrap().is_some() {
                         // already fetched emit done
@@ -416,6 +417,7 @@ pub async fn thread_worker(
                     let tmp = fetch_chapter_page(&url, &client, proxy.clone()).await;
                     if tmp.is_none() {
                         tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                        continue;
                     }
                     if tmp.is_some() {
                         tx.send(ThreadMessage::Done(tmp.unwrap(), url.clone(), false))
@@ -436,6 +438,7 @@ pub async fn thread_worker(
                             .await;
                         if tmp.is_err() {
                             tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                            continue;
                         }
                     }
                     continue;
@@ -475,6 +478,7 @@ pub async fn thread_worker(
                     let tmp = resp.unwrap().text().await;
                     if tmp.is_err() {
                         tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                        continue;
                     }
                     tmp.unwrap()
                 };
@@ -497,6 +501,7 @@ pub async fn thread_worker(
                         let tmp = parse_comic_page(&html, &url, client.clone()).await;
                         if tmp.is_none() {
                             tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                            continue;
                         }
                         tmp.unwrap()
                     };
@@ -523,6 +528,7 @@ pub async fn thread_worker(
                         .await;
                     if tmp.is_err() {
                         tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                        continue;
                     }
                 }
                 tx.send(ThreadMessage::Done(result, url, false))
