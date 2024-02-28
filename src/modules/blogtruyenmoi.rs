@@ -378,7 +378,7 @@ pub async fn thread_worker(
                         .exec()
                         .await;
                     if tmp.is_err() {
-                        if i_tries < 10 {
+                         {
                             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                 .await
                                 .unwrap();
@@ -411,7 +411,7 @@ pub async fn thread_worker(
                         .exec()
                         .await;
                     if tmp.is_err() {
-                        if i_tries < 10 {
+                         {
                             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                 .await
                                 .unwrap();
@@ -424,7 +424,7 @@ pub async fn thread_worker(
                     let client = client.lock().await;
                     let tmp = fetch_chapter_page(&url, &client, proxy.clone()).await;
                     if tmp.is_none() {
-                        if i_tries < 10 {
+                         {
                             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                 .await
                                 .unwrap();
@@ -449,7 +449,7 @@ pub async fn thread_worker(
                             .exec()
                             .await;
                         if tmp.is_err() {
-                            if i_tries < 10 {
+                             {
                                 tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                     .await
                                     .unwrap();
@@ -472,7 +472,7 @@ pub async fn thread_worker(
                 }
                 let resp = rep.send().await;
                 if resp.is_err() {
-                    if i_tries < 10 {
+                     {
                         tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                             .await
                             .unwrap();
@@ -485,7 +485,7 @@ pub async fn thread_worker(
                     if resp.as_ref().unwrap().status().as_u16().eq(&429) {
                         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                     }
-                    if i_tries < 10 {
+                     {
                         tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                             .await
                             .unwrap();
@@ -501,7 +501,7 @@ pub async fn thread_worker(
                 let html = {
                     let tmp = resp.unwrap().text().await;
                     if tmp.is_err() {
-                        if i_tries < 10 {
+                         {
                             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                 .await
                                 .unwrap();
@@ -528,7 +528,7 @@ pub async fn thread_worker(
                     let pending_url_comic = {
                         let tmp = parse_comic_page(&html, &url, client.clone()).await;
                         if tmp.is_none() {
-                            if i_tries < 10 {
+                             {
                                 tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                     .await
                                     .unwrap();
@@ -559,7 +559,7 @@ pub async fn thread_worker(
                         .exec()
                         .await;
                     if tmp.is_err() {
-                        if i_tries < 10 {
+                         {
                             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                 .await
                                 .unwrap();

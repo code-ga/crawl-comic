@@ -54,6 +54,7 @@ model Urls {
   id          String   @id @default(uuid())
   fetched     Boolean  @default(false)
   fetching    Boolean  @default(false)
+  isError     Boolean  @default(false)
   createdDate DateTime @default(now())
   // @@index([url])
   // @@unique([url])

@@ -57,6 +57,53 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             ThreadMessage::Retry(url, i) => {
                 let wait_time = rand::thread_rng().gen_range(1..5);
                 tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
+                if i >= 10 {
+                    client
+                        .urls()
+                        .update_many(
+                            vec![prisma::urls::url::equals(url.to_string())],
+                            vec![
+                                prisma::urls::is_error::set(true),
+                                prisma::urls::fetched::set(true),
+                            ],
+                        )
+                        .exec()
+                        .await
+                        .unwrap();
+                    let mut pending_urls = util::get_pending_urls(
+                        &client,
+                        num_of_threads + 5 - worker_rx.len(),
+                        url.clone(),
+                    )
+                    .await;
+                    // dbg!(&pending_urls);
+                    while !worker_rx.is_full() {
+                        let pending_url = {
+                            let tmp = pending_urls.pop();
+                            if tmp.is_none() {
+                                // tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+                                pending_urls = util::get_pending_urls(
+                                    &client,
+                                    num_of_threads + 5 - worker_rx.len(),
+                                    url.clone(),
+                                )
+                                .await;
+                                continue;
+                            }
+                            tmp.unwrap()
+                        };
+                        // let wait_time = rand::thread_rng().gen_range(1..5);
+                        // tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
+                        worker_tx
+                            .send(types::thread_message::ThreadMessage::Start(
+                                pending_url.to_string(),
+                                0,
+                            ))
+                            .await
+                            .unwrap();
+                    }
+                    continue;
+                }
                 worker_tx
                     .send(types::thread_message::ThreadMessage::Start(url, i + 1))
                     .await
