@@ -360,7 +360,7 @@ pub async fn thread_worker(
     loop {
         let job = rx.recv().await.unwrap();
         match job {
-            ThreadMessage::Start(url) => {
+            ThreadMessage::Start(url, i_tries) => {
                 let wait_time = rand::thread_rng().gen_range(1..10);
                 tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                 {
@@ -378,7 +378,11 @@ pub async fn thread_worker(
                         .exec()
                         .await;
                     if tmp.is_err() {
-                        tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                        if i_tries < 10 {
+                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                .await
+                                .unwrap();
+                        }
                         continue;
                     }
                     if tmp.unwrap().is_some() {
@@ -407,7 +411,11 @@ pub async fn thread_worker(
                         .exec()
                         .await;
                     if tmp.is_err() {
-                        tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                        if i_tries < 10 {
+                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                .await
+                                .unwrap();
+                        }
                         continue;
                     }
                 };
@@ -416,7 +424,11 @@ pub async fn thread_worker(
                     let client = client.lock().await;
                     let tmp = fetch_chapter_page(&url, &client, proxy.clone()).await;
                     if tmp.is_none() {
-                        tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                        if i_tries < 10 {
+                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                .await
+                                .unwrap();
+                        }
                         continue;
                     }
                     if tmp.is_some() {
@@ -437,7 +449,11 @@ pub async fn thread_worker(
                             .exec()
                             .await;
                         if tmp.is_err() {
-                            tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                            if i_tries < 10 {
+                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                    .await
+                                    .unwrap();
+                            }
                             continue;
                         }
                     }
@@ -456,7 +472,11 @@ pub async fn thread_worker(
                 }
                 let resp = rep.send().await;
                 if resp.is_err() {
-                    tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                    if i_tries < 10 {
+                        tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                            .await
+                            .unwrap();
+                    }
                     continue;
                 }
                 if resp.as_ref().unwrap().status().is_success() == false
@@ -465,7 +485,11 @@ pub async fn thread_worker(
                     if resp.as_ref().unwrap().status().as_u16().eq(&429) {
                         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                     }
-                    tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                    if i_tries < 10 {
+                        tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                            .await
+                            .unwrap();
+                    }
                     println!(
                         "worker {} failed {} status : {}",
                         worker_id,
@@ -477,7 +501,11 @@ pub async fn thread_worker(
                 let html = {
                     let tmp = resp.unwrap().text().await;
                     if tmp.is_err() {
-                        tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                        if i_tries < 10 {
+                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                .await
+                                .unwrap();
+                        }
                         continue;
                     }
                     tmp.unwrap()
@@ -500,7 +528,11 @@ pub async fn thread_worker(
                     let pending_url_comic = {
                         let tmp = parse_comic_page(&html, &url, client.clone()).await;
                         if tmp.is_none() {
-                            tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                            if i_tries < 10 {
+                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                    .await
+                                    .unwrap();
+                            }
                             continue;
                         }
                         tmp.unwrap()
@@ -527,7 +559,11 @@ pub async fn thread_worker(
                         .exec()
                         .await;
                     if tmp.is_err() {
-                        tx.send(ThreadMessage::Retry(url.clone())).await.unwrap();
+                        if i_tries < 10 {
+                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                .await
+                                .unwrap();
+                        }
                         continue;
                     }
                 }

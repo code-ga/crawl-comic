@@ -1,7 +1,7 @@
 #[derive(Debug, Clone)]
 pub enum ThreadMessage {
-    Start(String),
+    Start(String,i32),
     Done(Vec<String>, String, bool),
     Stop(usize),
-    Retry(String),
+    Retry(String,i32),
 }

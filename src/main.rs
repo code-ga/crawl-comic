@@ -37,7 +37,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     worker_tx
-        .send(types::thread_message::ThreadMessage::Start(init_url))
+        .send(types::thread_message::ThreadMessage::Start(init_url, 0))
         .await
         .unwrap();
 
@@ -54,11 +54,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 });
                 workers[id].join_handle = worker;
             }
-            ThreadMessage::Retry(url) => {
+            ThreadMessage::Retry(url, i) => {
                 let wait_time = rand::thread_rng().gen_range(1..5);
                 tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                 worker_tx
-                    .send(types::thread_message::ThreadMessage::Start(url))
+                    .send(types::thread_message::ThreadMessage::Start(url, i + 1))
                     .await
                     .unwrap();
             }
@@ -106,6 +106,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     worker_tx
                         .send(types::thread_message::ThreadMessage::Start(
                             pending_url.to_string(),
+                            0,
                         ))
                         .await
                         .unwrap();
