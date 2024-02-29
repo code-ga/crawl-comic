@@ -1,5 +1,5 @@
 use crate::prisma::{self, PrismaClient};
-use rand::seq::SliceRandom;
+use rand::{seq::SliceRandom, Rng};
 
 pub async fn get_pending_urls(
     client: &PrismaClient,
@@ -69,7 +69,18 @@ pub async fn filters_urls(url: String, client: &PrismaClient) -> Option<String> 
 }
 
 pub async fn get_proxy(client: &PrismaClient) -> Option<prisma::proxy::Data> {
-    let proxies = client.proxy().find_many(vec![]).exec().await.unwrap();
+    let proxies_count = client.proxy().count(vec![]).exec().await.unwrap();
+    let mut skip_proxies = rand::thread_rng().gen_range(0..(proxies_count));
+    if skip_proxies == proxies_count {
+        skip_proxies -= 1;
+    }
+    let proxies = client
+        .proxy()
+        .find_many(vec![])
+        .skip(skip_proxies)
+        .exec()
+        .await
+        .unwrap();
     if proxies.is_empty() {
         return None;
     }

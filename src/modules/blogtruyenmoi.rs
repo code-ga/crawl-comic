@@ -211,21 +211,20 @@ async fn fetch_chapter_page(
     let mut http_client = reqwest::ClientBuilder::new();
     if proxy.is_some() {
         let proxy = proxy.clone().unwrap();
-        http_client = http_client
-            .proxy(reqwest::Proxy::all(format!("http://{}:{}", proxy.host, proxy.port)).unwrap());
+        http_client = http_client.proxy(reqwest::Proxy::all(proxy.url.to_string()).unwrap());
     }
     let http_client = http_client.build().unwrap();
-    let mut req = http_client
+    let req = http_client
         .get(url)
         .header("User-Agent", "Mozilla/5.0")
         .header("Referrer", "https://blogtruyenmoi.com/");
     if proxy.is_some() {
         // proxy auth
-        let proxy = proxy.clone().unwrap();
-        req = req.header(
-            "Proxy-Authorization",
-            format!("{}:{}", proxy.username, proxy.password),
-        );
+        let _proxy = proxy.clone().unwrap();
+        // req = req.header(
+        //     "Proxy-Authorization",
+        //     format!("{}:{}", proxy.username, proxy.password),
+        // );
     }
     let resp = req.send().await;
     if resp.is_err() {
@@ -338,7 +337,6 @@ pub async fn thread_worker(
     tx: async_channel::Sender<ThreadMessage>,
     rx: async_channel::Receiver<ThreadMessage>,
     worker_id: usize,
-    proxy: Option<prisma::proxy::Data>,
 ) {
     let client: PrismaClient = {
         let tmp = PrismaClient::_builder().build().await;
@@ -347,13 +345,6 @@ pub async fn thread_worker(
         }
         tmp.unwrap()
     };
-    let mut http_client = reqwest::ClientBuilder::new();
-    if proxy.is_some() {
-        let proxy = proxy.clone().unwrap();
-        http_client = http_client
-            .proxy(reqwest::Proxy::all(format!("http://{}:{}", proxy.host, proxy.port)).unwrap());
-    }
-    let http_client = http_client.build().unwrap();
 
     let client = Arc::new(Mutex::new(client));
 
@@ -378,7 +369,7 @@ pub async fn thread_worker(
                         .exec()
                         .await;
                     if tmp.is_err() {
-                         {
+                        {
                             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                 .await
                                 .unwrap();
@@ -411,7 +402,7 @@ pub async fn thread_worker(
                         .exec()
                         .await;
                     if tmp.is_err() {
-                         {
+                        {
                             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                 .await
                                 .unwrap();
@@ -419,12 +410,24 @@ pub async fn thread_worker(
                         continue;
                     }
                 };
+
+                let (http_client, proxy) = {
+                    let client = client.lock().await;
+                    let proxy = crate::util::get_proxy(&client).await;
+                    let mut http_client = reqwest::ClientBuilder::new();
+                    if proxy.is_some() {
+                        let proxy = proxy.clone().unwrap();
+                        http_client =
+                            http_client.proxy(reqwest::Proxy::all(proxy.url.to_string()).unwrap());
+                    }
+                    (http_client.build().unwrap(), proxy)
+                };
                 if url.starts_with("https://blogtruyenmoi.com/c") {
                     // fetch chap
                     let client = client.lock().await;
                     let tmp = fetch_chapter_page(&url, &client, proxy.clone()).await;
                     if tmp.is_none() {
-                         {
+                        {
                             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                 .await
                                 .unwrap();
@@ -449,7 +452,7 @@ pub async fn thread_worker(
                             .exec()
                             .await;
                         if tmp.is_err() {
-                             {
+                            {
                                 tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                     .await
                                     .unwrap();
@@ -461,18 +464,18 @@ pub async fn thread_worker(
                 }
                 println!("worker {} fetching {}", worker_id, url);
 
-                let mut rep = http_client
+                let rep = http_client
                     .get(url.clone())
                     .header("User-Agent", "Mozilla/5.0")
                     .header("Referrer", "https://blogtruyenmoi.com/");
                 if proxy.is_some() {
-                    let proxy = proxy.clone().unwrap();
+                    let _proxy = proxy.clone().unwrap();
                     // dbg!(&proxy);
-                    rep = rep.header("Proxy-Authorization", proxy.auth);
+                    // rep = rep.header("Proxy-Authorization", proxy.auth);
                 }
                 let resp = rep.send().await;
                 if resp.is_err() {
-                     {
+                    {
                         tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                             .await
                             .unwrap();
@@ -485,7 +488,7 @@ pub async fn thread_worker(
                     if resp.as_ref().unwrap().status().as_u16().eq(&429) {
                         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                     }
-                     {
+                    {
                         tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                             .await
                             .unwrap();
@@ -501,7 +504,7 @@ pub async fn thread_worker(
                 let html = {
                     let tmp = resp.unwrap().text().await;
                     if tmp.is_err() {
-                         {
+                        {
                             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                 .await
                                 .unwrap();
@@ -528,7 +531,7 @@ pub async fn thread_worker(
                     let pending_url_comic = {
                         let tmp = parse_comic_page(&html, &url, client.clone()).await;
                         if tmp.is_none() {
-                             {
+                            {
                                 tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                     .await
                                     .unwrap();
@@ -559,7 +562,7 @@ pub async fn thread_worker(
                         .exec()
                         .await;
                     if tmp.is_err() {
-                         {
+                        {
                             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                 .await
                                 .unwrap();

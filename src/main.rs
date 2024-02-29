@@ -4,7 +4,7 @@ use rand::Rng;
 use types::thread_message::ThreadMessage;
 
 mod modules;
-mod prisma;
+pub mod prisma;
 mod types;
 mod util;
 #[tokio::main]
@@ -24,10 +24,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         println!("spawn {}", i);
         let tx = main_tx.clone();
         let rx = worker_rx.clone();
-        let proxy = util::get_proxy(&client).await;
-
         let worker = tokio::spawn(async move {
-            modules::blogtruyenmoi::thread_worker(tx, rx, i, proxy.clone()).await;
+            modules::blogtruyenmoi::thread_worker(tx, rx, i).await;
         });
 
         workers.push(types::Worker {
@@ -48,9 +46,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 // spawn new worker and replace old
                 let tx = main_tx.clone();
                 let rx = worker_rx.clone();
-                let proxy = util::get_proxy(&client).await;
                 let worker = tokio::spawn(async move {
-                    modules::blogtruyenmoi::thread_worker(tx, rx, id, proxy.clone()).await;
+                    modules::blogtruyenmoi::thread_worker(tx, rx, id).await;
                 });
                 workers[id].join_handle = worker;
             }
