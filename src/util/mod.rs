@@ -71,7 +71,7 @@ pub async fn filters_urls(url: String, client: &PrismaClient) -> Option<String> 
 pub async fn get_proxy(client: &PrismaClient) -> Option<prisma::proxy::Data> {
     let proxies_count = client.proxy().count(vec![]).exec().await.unwrap();
     let mut skip_proxies = if proxies_count == 0 {
-        0
+        return None;
     } else {
         rand::thread_rng().gen_range(0..(proxies_count))
     };
