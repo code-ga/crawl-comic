@@ -85,5 +85,6 @@ pub async fn get_proxy(client: &PrismaClient) -> Option<prisma::proxy::Data> {
         .exec()
         .await
         .unwrap();
+    // dbg!(&proxies);
     return proxies;
 }
