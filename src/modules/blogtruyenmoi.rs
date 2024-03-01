@@ -284,7 +284,7 @@ async fn fetch_chapter_page(
         .exec()
         .await
         .unwrap();
-    let re = Regex::new(r#"href="([^"]+)"#).unwrap();
+    let re = Regex::new(r#"src="([^"]+)"#).unwrap();
     for cap in re.captures_iter(&html) {
         // dbg!(&cap[1]);
         let url = process_url(&cap[1]);
