@@ -254,7 +254,7 @@ async fn fetch_chapter_page(
         tmp.unwrap()
     };
 
-    let images_url_regex = Regex::new(r#"<img\s+src="(.+)"\s+/>"#).unwrap();
+    let images_url_regex = Regex::new(r#"src="([^"]+)"#).unwrap();
     let mut images_urls = vec![];
     for cap in images_url_regex.captures_iter(&html) {
         let url = cap[1].to_string();
@@ -284,7 +284,7 @@ async fn fetch_chapter_page(
         .exec()
         .await
         .unwrap();
-    let re = Regex::new(r#"src="([^"]+)"#).unwrap();
+    let re = Regex::new(r#"href="([^"]+)"#).unwrap();
     for cap in re.captures_iter(&html) {
         // dbg!(&cap[1]);
         let url = process_url(&cap[1]);
