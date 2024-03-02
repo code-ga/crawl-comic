@@ -1,5 +1,5 @@
 use crate::prisma::{self, PrismaClient};
-use rand::{seq::SliceRandom, Rng};
+use rand::Rng;
 
 pub async fn get_pending_urls(
     client: &PrismaClient,
@@ -21,7 +21,8 @@ pub async fn get_pending_urls(
                     prisma::urls::fetching::equals(false),
                     prisma::urls::fetched::equals(false),
                 ])
-                .take(num_of_url.try_into().unwrap()),
+                .take(num_of_url.try_into().unwrap())
+                .order_by(prisma::urls::created_date::order(prisma_client_rust::Direction::Asc)),
         ))
         .await
         .unwrap();
