@@ -211,8 +211,13 @@ async fn fetch_chapter_page(
     let mut http_client = reqwest::ClientBuilder::new();
     if proxy.is_some() {
         let proxy = proxy.clone().unwrap();
-        http_client = http_client
-            .proxy(reqwest::Proxy::all(proxy.url.to_string().trim().to_string()).unwrap());
+        http_client = http_client.proxy({
+            let proxy = reqwest::Proxy::all(proxy.url.to_string().trim().to_string());
+            if proxy.is_err() {
+                return None;
+            }
+            proxy.unwrap()
+        });
     }
     let http_client = http_client.build().unwrap();
     let req = http_client
@@ -419,9 +424,17 @@ pub async fn thread_worker(
                     if proxy.is_some() {
                         let proxy = proxy.clone().unwrap();
                         println!("using proxy {}", proxy.url);
-                        http_client = http_client.proxy(
-                            reqwest::Proxy::all(proxy.url.to_string().trim().to_string()).unwrap(),
-                        );
+                        http_client = http_client.proxy({
+                            let proxy =
+                                reqwest::Proxy::all(proxy.url.to_string().trim().to_string());
+                            if proxy.is_err() {
+                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                    .await
+                                    .unwrap();
+                                continue;
+                            }
+                            proxy.unwrap()
+                        });
                     }
                     (http_client.build().unwrap(), proxy)
                 };
