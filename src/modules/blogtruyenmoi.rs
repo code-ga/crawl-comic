@@ -391,31 +391,6 @@ pub async fn thread_worker(
                         continue;
                     }
                 };
-                // TODO: will remove to performance
-                {
-                    // update fetched
-                    let tmp = client
-                        .lock()
-                        .await
-                        .urls()
-                        .update_many(
-                            vec![prisma::urls::url::equals(url.clone())],
-                            vec![
-                                prisma::urls::fetching::set(true),
-                                prisma::urls::fetched::set(false),
-                            ],
-                        )
-                        .exec()
-                        .await;
-                    if tmp.is_err() {
-                        {
-                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
-                                .await
-                                .unwrap();
-                        }
-                        continue;
-                    }
-                };
 
                 let (http_client, proxy) = {
                     let client = client.lock().await;
