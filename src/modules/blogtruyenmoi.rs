@@ -301,7 +301,7 @@ async fn fetch_chapter_page(
 }
 
 pub fn process_url(url: &str) -> Option<String> {
-    let url = url.trim();
+    let url = url.trim().to_string();
     if url.starts_with("//id.blogtruyenmoi.com") {
         // return Some(format!("https:{}", url).trim().to_string());
         return None;
@@ -312,7 +312,7 @@ pub fn process_url(url: &str) -> Option<String> {
     if url.starts_with("javascript:LoadListMangaPage(") {
         // javascript:LoadListMangaPage(2) -> https://blogtruyenmoi.com/ajax/Search/AjaxLoadListManga?key=tatca&orderBy=3&p=2
         let re = Regex::new(r#"LoadListMangaPage\((\d+)\)"#).unwrap();
-        let cap = re.captures(url).unwrap();
+        let cap = re.captures(&url).unwrap();
         let page = cap[1].to_string();
         return Some(format!(
             "https://blogtruyenmoi.com/ajax/Search/AjaxLoadListManga?key=tatca&orderBy=3&p={}",
@@ -321,7 +321,7 @@ pub fn process_url(url: &str) -> Option<String> {
     }
     if url.starts_with("/") {
         let comic_regex = Regex::new(r#"/\d+/.+"#).unwrap();
-        if comic_regex.is_match(url) {
+        if comic_regex.is_match(&url) {
             return Some(
                 format!("https://blogtruyenmoi.com{}", url)
                     .trim()
