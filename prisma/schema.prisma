@@ -62,7 +62,7 @@ model Urls {
 
 model Proxy {
   url      String
-  username String @default("")
-  password String @default("")
+  username String?
+  password String?
   id       String @id @default(uuid())
 }
