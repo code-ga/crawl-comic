@@ -1,0 +1,54 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextIndex", "fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Chapter {
+  id          String   @id
+  name        String
+  url         String   @unique
+  comicId     String
+  images      String[]
+  createdDate String
+  updatedDate DateTime @default(now())
+  Comic       Comic    @relation(fields: [comicId], references: [id])
+}
+
+model Comic {
+  id             String    @id
+  name           String    @default("")
+  url            String    @unique
+  genre          Json      @default("{}")
+  content        String?
+  translatorTeam Json      @default("{}")
+  anotherName    String[]
+  source         Json      @default("{}")
+  author         Json      @default("{}")
+  postedBy       Json      @default("{}")
+  status         String    @default("")
+  thumbnail      String?
+  createdDate    DateTime  @default(now())
+  updatedDate    DateTime  @default(now())
+  Chapter        Chapter[]
+}
+
+model Proxy {
+  id       String  @id
+  url      String
+  password String?
+  username String?
+}
+
+model Urls {
+  url         String   @unique
+  id          String   @id
+  fetched     Boolean  @default(false)
+  fetching    Boolean  @default(false)
+  createdDate DateTime @default(now())
+  isError     Boolean  @default(false)
+}
