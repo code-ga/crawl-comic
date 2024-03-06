@@ -23,7 +23,7 @@ pipeline {
         stage('Build and Push Docker Image') {
             steps {
                 script {
-		            dir("./server/") {
+		            dir("./be/") {
                         sh "docker build -t tritranduc11/crawling-comic-ui-api ."
 		                sh "docker push tritranduc11/crawling-comic-ui-api"
 		            }
