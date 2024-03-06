@@ -1,4 +1,4 @@
-FROM oven/bun AS build # tag it as build
+FROM oven/bun AS build
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY src ./src
 # compile everything to a binary called cli which includes the bun runtime
 RUN bun build ./src/index.ts --compile --outfile cli
 
-FROM ubuntu:22.04 # use a smaller image without bun
+FROM ubuntu:22.04
 
 WORKDIR /app
 
