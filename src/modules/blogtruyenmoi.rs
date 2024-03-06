@@ -20,19 +20,19 @@ pub async fn parse_comic_page(
     client: Arc<Mutex<PrismaClient>>,
 ) -> Option<Vec<String>> {
     let client = client.lock().await;
-    {
-        let tmp = client
-            .comic()
-            .find_first(vec![prisma::comic::url::equals(url.to_string())])
-            .exec()
-            .await;
-        if tmp.is_err() {
-            return None;
-        }
-        if tmp.unwrap().is_some() {
-            return Some(Vec::new());
-        }
-    }
+    // {
+    //     let tmp = client
+    //         .comic()
+    //         .find_first(vec![prisma::comic::url::equals(url.to_string())])
+    //         .exec()
+    //         .await;
+    //     if tmp.is_err() {
+    //         return None;
+    //     }
+    //     if tmp.unwrap().is_some() {
+    //         return Some(Vec::new());
+    //     }
+    // }
     // println!("fetching comic page {}", url);
     let mut result = Vec::new();
     // fetch all urls from page
@@ -343,7 +343,7 @@ pub async fn thread_worker(
                     let mut http_client = reqwest::ClientBuilder::new();
                     if proxy.is_some() {
                         let proxy = proxy.clone().unwrap();
-                        println!("using proxy {}", proxy.url);
+                        println!("using proxy {} - {}", proxy.id, proxy.url);
                         http_client = http_client.proxy({
                             let client_proxy =
                                 reqwest::Proxy::all(proxy.url.to_string().trim().to_string());

@@ -101,6 +101,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                     continue;
                 }
+                println!("retry {}", url);
                 worker_tx
                     .send(types::thread_message::ThreadMessage::Start(url, i + 1))
                     .await
