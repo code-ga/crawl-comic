@@ -1,0 +1,40 @@
+pipeline {
+    agent {
+        label 'docker'
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+	stage('Login docker'){
+            environment {
+                DOCKER_LOGIN_INFO = credentials("ShartubeImageToken")
+            }
+            steps {
+                sh ('echo $DOCKER_LOGIN_INFO_PSW | docker login -u $DOCKER_LOGIN_INFO_USR --password-stdin')
+                echo 'Login Completed'
+            }
+            
+        }
+
+        stage('Build and Push Docker Image') {
+            steps {
+                script {
+		   dir("./server/") {
+                      sh "docker build -t tritranduc11/crawling-comic-ui-api ."
+		      sh "docker push tritranduc11/crawling-comic-ui-api"
+		}
+                }
+            }
+        }
+
+        stage('Verify') {
+            steps {
+                sh 'echo $REGISTRY_BUILD_OUTPUT_DIGEST'
+            }
+        }
+    }
+}
