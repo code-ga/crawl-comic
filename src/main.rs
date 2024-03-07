@@ -135,7 +135,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     let pending_url = {
                         let tmp = pending_urls.pop();
                         if tmp.is_none() {
-                            // tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+                            let wait_time = rand::thread_rng().gen_range(1..5);
+                            tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                             pending_urls = util::get_pending_urls(
                                 &client,
                                 num_of_threads + 5 - worker_rx.len(),
@@ -146,8 +147,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                         tmp.unwrap()
                     };
-                    // let wait_time = rand::thread_rng().gen_range(1..5);
-                    // tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                     worker_tx
                         .send(types::thread_message::ThreadMessage::Start(
                             pending_url.to_string(),
