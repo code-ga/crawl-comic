@@ -87,3 +87,15 @@ export const apiRouter =
                 id: t.String()
             })
         })
+        .get("/stats", async () => {
+            return {
+                comic: await prisma.comic.count(),
+                chapter: await prisma.chapter.count({
+                    where: {
+                        images: {
+                            isEmpty: false
+                        }
+                    }
+                })
+            }
+        })
