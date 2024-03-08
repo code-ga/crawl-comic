@@ -1,17 +1,10 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  // Corresponds to the cargo alias created earlier
   provider = "cargo prisma"
-  // The location to generate the client. Is relative to the position of the schema
   output   = "../src/prisma.rs"
 }
 
 generator clearDbClient {
-  // Corresponds to the cargo alias created earlier
   provider = "cargo prisma"
-  // The location to generate the client. Is relative to the position of the schema
   output   = "../src/bin/prisma_client.rs"
 }
 
@@ -21,32 +14,33 @@ datasource db {
 }
 
 model Comic {
-  id             String    @id @default(uuid())
-  name           String    @default("")
-  url            String    @unique
-  genre          Json      @default("{}")
-  content        String?
-  translatorTeam Json      @default("{}")
-  anotherName    String[]
-  source         Json      @default("{}")
-  author         Json      @default("{}")
-  postedBy       Json      @default("{}")
-  status         String    @default("")
-  thumbnail      String?
-  chapters       Chapter[]
-  createdDate    DateTime  @default(now())
-  updatedDate    DateTime  @default(now())
+  id              String    @id @default(uuid())
+  name            String    @default("")
+  url             String    @unique
+  genre           Json      @default("{}")
+  content         String?
+  translatorTeam  Json      @default("{}")
+  anotherName     String[]
+  source          Json      @default("{}")
+  author          Json      @default("{}")
+  postedBy        Json      @default("{}")
+  status          String    @default("")
+  thumbnail       String?
+  createdDate     DateTime  @default(now())
+  updatedDate     DateTime  @default(now())
+  pythonFetchInfo Boolean   @default(false)
+  chapters        Chapter[]
 }
 
 model Chapter {
   id          String   @id @default(uuid())
   name        String
   url         String   @unique
-  comic       Comic    @relation(fields: [comicId], references: [id])
   comicId     String
   images      String[]
   createdDate String
   updatedDate DateTime @default(now())
+  comic       Comic    @relation(fields: [comicId], references: [id])
 }
 
 model Urls {
@@ -54,15 +48,13 @@ model Urls {
   id          String   @id @default(uuid())
   fetched     Boolean  @default(false)
   fetching    Boolean  @default(false)
-  isError     Boolean  @default(false)
   createdDate DateTime @default(now())
-  // @@index([url])
-  // @@unique([url])
+  isError     Boolean  @default(false)
 }
 
 model Proxy {
+  id       String  @id @default(uuid())
   url      String
-  username String?
   password String?
-  id       String @id @default(uuid())
+  username String?
 }

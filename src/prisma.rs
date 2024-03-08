@@ -820,155 +820,6 @@ pub mod comic {
             }
         }
     }
-    pub mod chapters {
-        use super::super::*;
-        use super::_prisma::*;
-        use super::{
-            OrderByParam, SetParam, UncheckedSetParam, UniqueWhereParam, WhereParam, WithParam,
-        };
-        pub const NAME: &str = "chapters";
-        pub struct Fetch(pub chapter::ManyArgs);
-        impl Fetch {
-            pub fn with(mut self, params: impl Into<chapter::WithParam>) -> Self {
-                self.0 = self.0.with(params.into());
-                self
-            }
-            pub fn order_by(mut self, param: chapter::OrderByParam) -> Self {
-                self.0 = self.0.order_by(param);
-                self
-            }
-            pub fn skip(mut self, value: i64) -> Self {
-                self.0 = self.0.skip(value);
-                self
-            }
-            pub fn take(mut self, value: i64) -> Self {
-                self.0 = self.0.take(value);
-                self
-            }
-            pub fn cursor(mut self, value: chapter::UniqueWhereParam) -> Self {
-                self.0 = self.0.cursor(value.into());
-                self
-            }
-        }
-        impl From<Fetch> for WithParam {
-            fn from(Fetch(v): Fetch) -> Self {
-                WithParam::Chapters(v)
-            }
-        }
-        pub fn fetch(params: Vec<chapter::WhereParam>) -> Fetch {
-            Fetch(chapter::ManyArgs::new(params))
-        }
-        pub struct Connect(pub Vec<chapter::UniqueWhereParam>);
-        impl From<Connect> for SetParam {
-            fn from(Connect(v): Connect) -> Self {
-                Self::ConnectChapters(v)
-            }
-        }
-        pub fn connect<T: From<Connect>>(params: Vec<chapter::UniqueWhereParam>) -> T {
-            Connect(params).into()
-        }
-        pub fn disconnect(params: Vec<chapter::UniqueWhereParam>) -> SetParam {
-            SetParam::DisconnectChapters(params)
-        }
-        pub fn set(params: Vec<chapter::UniqueWhereParam>) -> SetParam {
-            SetParam::SetChapters(params)
-        }
-        pub fn some(value: Vec<chapter::WhereParam>) -> WhereParam {
-            WhereParam::ChaptersSome(value)
-        }
-        pub fn every(value: Vec<chapter::WhereParam>) -> WhereParam {
-            WhereParam::ChaptersEvery(value)
-        }
-        pub fn none(value: Vec<chapter::WhereParam>) -> WhereParam {
-            WhereParam::ChaptersNone(value)
-        }
-        pub enum Include {
-            Select(chapter::ManyArgs, Vec<chapter::SelectParam>),
-            Include(chapter::ManyArgs, Vec<chapter::IncludeParam>),
-            Fetch(chapter::ManyArgs),
-        }
-        impl Into<super::IncludeParam> for Include {
-            fn into(self) -> super::IncludeParam {
-                super::IncludeParam::Chapters(self)
-            }
-        }
-        impl Include {
-            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
-                let (args, selections) = match self {
-                    Self::Select(args, selections) => (
-                        args.to_graphql().0,
-                        selections.into_iter().map(|s| s.to_selection()).collect(),
-                    ),
-                    Self::Include(args, selections) => (args.to_graphql().0, {
-                        let mut nested_selections =
-                            <chapter::Types as ::prisma_client_rust::ModelTypes>::scalar_selections(
-                            );
-                        nested_selections.extend(selections.into_iter().map(|s| s.to_selection()));
-                        nested_selections
-                    }),
-                    Self::Fetch(args) => (
-                        args.to_graphql().0,
-                        <chapter::Types as ::prisma_client_rust::ModelTypes>::scalar_selections(),
-                    ),
-                };
-                ::prisma_client_rust::Selection::new(NAME, None, args, selections)
-            }
-            pub fn select(
-                args: chapter::ManyArgs,
-                nested_selections: Vec<chapter::SelectParam>,
-            ) -> Self {
-                Self::Select(args, nested_selections)
-            }
-            pub fn include(
-                args: chapter::ManyArgs,
-                nested_selections: Vec<chapter::IncludeParam>,
-            ) -> Self {
-                Self::Include(args, nested_selections)
-            }
-        }
-        pub enum Select {
-            Select(chapter::ManyArgs, Vec<chapter::SelectParam>),
-            Include(chapter::ManyArgs, Vec<chapter::IncludeParam>),
-            Fetch(chapter::ManyArgs),
-        }
-        impl Into<super::SelectParam> for Select {
-            fn into(self) -> super::SelectParam {
-                super::SelectParam::Chapters(self)
-            }
-        }
-        impl Select {
-            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
-                let (args, selections) = match self {
-                    Self::Select(args, selections) => (
-                        args.to_graphql().0,
-                        selections.into_iter().map(|s| s.to_selection()).collect(),
-                    ),
-                    Self::Include(args, selections) => (args.to_graphql().0, {
-                        let mut nested_selections = vec![];
-                        nested_selections.extend(selections.into_iter().map(|s| s.to_selection()));
-                        nested_selections
-                    }),
-                    Self::Fetch(args) => (
-                        args.to_graphql().0,
-                        <chapter::Types as ::prisma_client_rust::ModelTypes>::scalar_selections(),
-                    ),
-                };
-                ::prisma_client_rust::Selection::new(NAME, None, args, selections)
-            }
-            pub fn select(
-                args: chapter::ManyArgs,
-                nested_selections: Vec<chapter::SelectParam>,
-            ) -> Self {
-                Self::Select(args, nested_selections)
-            }
-            pub fn include(
-                args: chapter::ManyArgs,
-                nested_selections: Vec<chapter::IncludeParam>,
-            ) -> Self {
-                Self::Include(args, nested_selections)
-            }
-        }
-    }
     pub mod created_date {
         use super::super::*;
         use super::_prisma::*;
@@ -1179,6 +1030,212 @@ pub mod comic {
             }
         }
     }
+    pub mod python_fetch_info {
+        use super::super::*;
+        use super::_prisma::*;
+        use super::{
+            OrderByParam, SetParam, UncheckedSetParam, UniqueWhereParam, WhereParam, WithParam,
+        };
+        pub const NAME: &str = "pythonFetchInfo";
+        pub struct Set(pub bool);
+        impl From<Set> for SetParam {
+            fn from(Set(v): Set) -> Self {
+                Self::SetPythonFetchInfo(v)
+            }
+        }
+        impl From<Set> for UncheckedSetParam {
+            fn from(Set(v): Set) -> Self {
+                Self::PythonFetchInfo(v)
+            }
+        }
+        pub fn set<T: From<Set>>(value: bool) -> T {
+            Set(value).into()
+        }
+        pub fn order(direction: ::prisma_client_rust::Direction) -> OrderByParam {
+            OrderByParam::PythonFetchInfo(direction)
+        }
+        pub fn equals(value: bool) -> WhereParam {
+            WhereParam::PythonFetchInfo(_prisma::read_filters::BoolFilter::Equals(value))
+        }
+        ::prisma_client_rust::scalar_where_param_fns!(
+            _prisma::read_filters::BoolFilter,
+            PythonFetchInfo,
+            {
+                fn not(_: bool) -> Not;
+            }
+        );
+        pub struct Include;
+        impl Into<super::IncludeParam> for Include {
+            fn into(self) -> super::IncludeParam {
+                super::IncludeParam::PythonFetchInfo(self)
+            }
+        }
+        impl Include {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                ::prisma_client_rust::sel(NAME)
+            }
+        }
+        pub struct Select;
+        impl Into<super::SelectParam> for Select {
+            fn into(self) -> super::SelectParam {
+                super::SelectParam::PythonFetchInfo(self)
+            }
+        }
+        impl Select {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                ::prisma_client_rust::sel(NAME)
+            }
+        }
+    }
+    pub mod chapters {
+        use super::super::*;
+        use super::_prisma::*;
+        use super::{
+            OrderByParam, SetParam, UncheckedSetParam, UniqueWhereParam, WhereParam, WithParam,
+        };
+        pub const NAME: &str = "chapters";
+        pub struct Fetch(pub chapter::ManyArgs);
+        impl Fetch {
+            pub fn with(mut self, params: impl Into<chapter::WithParam>) -> Self {
+                self.0 = self.0.with(params.into());
+                self
+            }
+            pub fn order_by(mut self, param: chapter::OrderByParam) -> Self {
+                self.0 = self.0.order_by(param);
+                self
+            }
+            pub fn skip(mut self, value: i64) -> Self {
+                self.0 = self.0.skip(value);
+                self
+            }
+            pub fn take(mut self, value: i64) -> Self {
+                self.0 = self.0.take(value);
+                self
+            }
+            pub fn cursor(mut self, value: chapter::UniqueWhereParam) -> Self {
+                self.0 = self.0.cursor(value.into());
+                self
+            }
+        }
+        impl From<Fetch> for WithParam {
+            fn from(Fetch(v): Fetch) -> Self {
+                WithParam::Chapters(v)
+            }
+        }
+        pub fn fetch(params: Vec<chapter::WhereParam>) -> Fetch {
+            Fetch(chapter::ManyArgs::new(params))
+        }
+        pub struct Connect(pub Vec<chapter::UniqueWhereParam>);
+        impl From<Connect> for SetParam {
+            fn from(Connect(v): Connect) -> Self {
+                Self::ConnectChapters(v)
+            }
+        }
+        pub fn connect<T: From<Connect>>(params: Vec<chapter::UniqueWhereParam>) -> T {
+            Connect(params).into()
+        }
+        pub fn disconnect(params: Vec<chapter::UniqueWhereParam>) -> SetParam {
+            SetParam::DisconnectChapters(params)
+        }
+        pub fn set(params: Vec<chapter::UniqueWhereParam>) -> SetParam {
+            SetParam::SetChapters(params)
+        }
+        pub fn some(value: Vec<chapter::WhereParam>) -> WhereParam {
+            WhereParam::ChaptersSome(value)
+        }
+        pub fn every(value: Vec<chapter::WhereParam>) -> WhereParam {
+            WhereParam::ChaptersEvery(value)
+        }
+        pub fn none(value: Vec<chapter::WhereParam>) -> WhereParam {
+            WhereParam::ChaptersNone(value)
+        }
+        pub enum Include {
+            Select(chapter::ManyArgs, Vec<chapter::SelectParam>),
+            Include(chapter::ManyArgs, Vec<chapter::IncludeParam>),
+            Fetch(chapter::ManyArgs),
+        }
+        impl Into<super::IncludeParam> for Include {
+            fn into(self) -> super::IncludeParam {
+                super::IncludeParam::Chapters(self)
+            }
+        }
+        impl Include {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                let (args, selections) = match self {
+                    Self::Select(args, selections) => (
+                        args.to_graphql().0,
+                        selections.into_iter().map(|s| s.to_selection()).collect(),
+                    ),
+                    Self::Include(args, selections) => (args.to_graphql().0, {
+                        let mut nested_selections =
+                            <chapter::Types as ::prisma_client_rust::ModelTypes>::scalar_selections(
+                            );
+                        nested_selections.extend(selections.into_iter().map(|s| s.to_selection()));
+                        nested_selections
+                    }),
+                    Self::Fetch(args) => (
+                        args.to_graphql().0,
+                        <chapter::Types as ::prisma_client_rust::ModelTypes>::scalar_selections(),
+                    ),
+                };
+                ::prisma_client_rust::Selection::new(NAME, None, args, selections)
+            }
+            pub fn select(
+                args: chapter::ManyArgs,
+                nested_selections: Vec<chapter::SelectParam>,
+            ) -> Self {
+                Self::Select(args, nested_selections)
+            }
+            pub fn include(
+                args: chapter::ManyArgs,
+                nested_selections: Vec<chapter::IncludeParam>,
+            ) -> Self {
+                Self::Include(args, nested_selections)
+            }
+        }
+        pub enum Select {
+            Select(chapter::ManyArgs, Vec<chapter::SelectParam>),
+            Include(chapter::ManyArgs, Vec<chapter::IncludeParam>),
+            Fetch(chapter::ManyArgs),
+        }
+        impl Into<super::SelectParam> for Select {
+            fn into(self) -> super::SelectParam {
+                super::SelectParam::Chapters(self)
+            }
+        }
+        impl Select {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                let (args, selections) = match self {
+                    Self::Select(args, selections) => (
+                        args.to_graphql().0,
+                        selections.into_iter().map(|s| s.to_selection()).collect(),
+                    ),
+                    Self::Include(args, selections) => (args.to_graphql().0, {
+                        let mut nested_selections = vec![];
+                        nested_selections.extend(selections.into_iter().map(|s| s.to_selection()));
+                        nested_selections
+                    }),
+                    Self::Fetch(args) => (
+                        args.to_graphql().0,
+                        <chapter::Types as ::prisma_client_rust::ModelTypes>::scalar_selections(),
+                    ),
+                };
+                ::prisma_client_rust::Selection::new(NAME, None, args, selections)
+            }
+            pub fn select(
+                args: chapter::ManyArgs,
+                nested_selections: Vec<chapter::SelectParam>,
+            ) -> Self {
+                Self::Select(args, nested_selections)
+            }
+            pub fn include(
+                args: chapter::ManyArgs,
+                nested_selections: Vec<chapter::IncludeParam>,
+            ) -> Self {
+                Self::Include(args, nested_selections)
+            }
+        }
+    }
     pub fn create(url: String, _params: Vec<SetParam>) -> (String, Vec<SetParam>) {
         (url, _params)
     }
@@ -1186,7 +1243,7 @@ pub mod comic {
         (url, _params)
     }
     #[macro_export]
-    macro_rules ! _select_comic { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: comic :: select ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: comic :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: comic :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: comic :: select ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: comic :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: comic :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { id , name , url , genre , content , translator_team , another_name , source , author , posted_by , status , thumbnail , chapters , created_date , updated_date } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : crate :: prisma :: comic :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: comic :: $ field :: NAME , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: comic :: $ field :: NAME) , + ,] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: comic :: $ field :: NAME => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: $ field :: NAME)) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "name" , "url" , "genre" , "content" , "translatorTeam" , "anotherName" , "source" , "author" , "postedBy" , "status" , "thumbnail" , "chapters" , "createdDate" , "updatedDate"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: comic :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; id) => { String } ; (@ field_type ; name) => { String } ; (@ field_type ; url) => { String } ; (@ field_type ; genre) => { :: prisma_client_rust :: serde_json :: Value } ; (@ field_type ; content) => { Option < String > } ; (@ field_type ; translator_team) => { :: prisma_client_rust :: serde_json :: Value } ; (@ field_type ; another_name) => { Vec < String > } ; (@ field_type ; source) => { :: prisma_client_rust :: serde_json :: Value } ; (@ field_type ; author) => { :: prisma_client_rust :: serde_json :: Value } ; (@ field_type ; posted_by) => { :: prisma_client_rust :: serde_json :: Value } ; (@ field_type ; status) => { String } ; (@ field_type ; thumbnail) => { Option < String > } ; (@ field_type ; chapters : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < chapters :: Data > } ; (@ field_type ; chapters) => { Vec < crate :: prisma :: chapter :: Data > } ; (@ field_type ; created_date) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; updated_date) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Comic" , available relations are "id, name, url, genre, content, translator_team, another_name, source, author, posted_by, status, thumbnail, chapters, created_date, updated_date")) } ; (@ field_module ; chapters : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: chapter :: select ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; id) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: id :: Select) } ; (@ selection_field_to_selection_param ; name) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: name :: Select) } ; (@ selection_field_to_selection_param ; url) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: url :: Select) } ; (@ selection_field_to_selection_param ; genre) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: genre :: Select) } ; (@ selection_field_to_selection_param ; content) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: content :: Select) } ; (@ selection_field_to_selection_param ; translator_team) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: translator_team :: Select) } ; (@ selection_field_to_selection_param ; another_name) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: another_name :: Select) } ; (@ selection_field_to_selection_param ; source) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: source :: Select) } ; (@ selection_field_to_selection_param ; author) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: author :: Select) } ; (@ selection_field_to_selection_param ; posted_by) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: posted_by :: Select) } ; (@ selection_field_to_selection_param ; status) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: status :: Select) } ; (@ selection_field_to_selection_param ; thumbnail) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: thumbnail :: Select) } ; (@ selection_field_to_selection_param ; chapters $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: chapters :: Select :: $ selection_mode (crate :: prisma :: chapter :: ManyArgs :: new (crate :: prisma :: chapter :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: chapter :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; chapters $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: chapters :: Select :: Fetch (crate :: prisma :: chapter :: ManyArgs :: new (crate :: prisma :: chapter :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; created_date) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: created_date :: Select) } ; (@ selection_field_to_selection_param ; updated_date) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: updated_date :: Select) } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: comic :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; name) => { "name" } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; genre) => { "genre" } ; (@ field_serde_name ; content) => { "content" } ; (@ field_serde_name ; translator_team) => { "translatorTeam" } ; (@ field_serde_name ; another_name) => { "anotherName" } ; (@ field_serde_name ; source) => { "source" } ; (@ field_serde_name ; author) => { "author" } ; (@ field_serde_name ; posted_by) => { "postedBy" } ; (@ field_serde_name ; status) => { "status" } ; (@ field_serde_name ; thumbnail) => { "thumbnail" } ; (@ field_serde_name ; chapters) => { "chapters" } ; (@ field_serde_name ; created_date) => { "createdDate" } ; (@ field_serde_name ; updated_date) => { "updatedDate" } ; }
+    macro_rules ! _select_comic { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: comic :: select ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: comic :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: comic :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: comic :: select ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: comic :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: comic :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { id , name , url , genre , content , translator_team , another_name , source , author , posted_by , status , thumbnail , created_date , updated_date , python_fetch_info , chapters } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : crate :: prisma :: comic :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: comic :: $ field :: NAME , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: comic :: $ field :: NAME) , + ,] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: comic :: $ field :: NAME => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: $ field :: NAME)) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "name" , "url" , "genre" , "content" , "translatorTeam" , "anotherName" , "source" , "author" , "postedBy" , "status" , "thumbnail" , "createdDate" , "updatedDate" , "pythonFetchInfo" , "chapters"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: comic :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; id) => { String } ; (@ field_type ; name) => { String } ; (@ field_type ; url) => { String } ; (@ field_type ; genre) => { :: prisma_client_rust :: serde_json :: Value } ; (@ field_type ; content) => { Option < String > } ; (@ field_type ; translator_team) => { :: prisma_client_rust :: serde_json :: Value } ; (@ field_type ; another_name) => { Vec < String > } ; (@ field_type ; source) => { :: prisma_client_rust :: serde_json :: Value } ; (@ field_type ; author) => { :: prisma_client_rust :: serde_json :: Value } ; (@ field_type ; posted_by) => { :: prisma_client_rust :: serde_json :: Value } ; (@ field_type ; status) => { String } ; (@ field_type ; thumbnail) => { Option < String > } ; (@ field_type ; created_date) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; updated_date) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; python_fetch_info) => { bool } ; (@ field_type ; chapters : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < chapters :: Data > } ; (@ field_type ; chapters) => { Vec < crate :: prisma :: chapter :: Data > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Comic" , available relations are "id, name, url, genre, content, translator_team, another_name, source, author, posted_by, status, thumbnail, created_date, updated_date, python_fetch_info, chapters")) } ; (@ field_module ; chapters : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: chapter :: select ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; id) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: id :: Select) } ; (@ selection_field_to_selection_param ; name) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: name :: Select) } ; (@ selection_field_to_selection_param ; url) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: url :: Select) } ; (@ selection_field_to_selection_param ; genre) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: genre :: Select) } ; (@ selection_field_to_selection_param ; content) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: content :: Select) } ; (@ selection_field_to_selection_param ; translator_team) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: translator_team :: Select) } ; (@ selection_field_to_selection_param ; another_name) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: another_name :: Select) } ; (@ selection_field_to_selection_param ; source) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: source :: Select) } ; (@ selection_field_to_selection_param ; author) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: author :: Select) } ; (@ selection_field_to_selection_param ; posted_by) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: posted_by :: Select) } ; (@ selection_field_to_selection_param ; status) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: status :: Select) } ; (@ selection_field_to_selection_param ; thumbnail) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: thumbnail :: Select) } ; (@ selection_field_to_selection_param ; created_date) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: created_date :: Select) } ; (@ selection_field_to_selection_param ; updated_date) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: updated_date :: Select) } ; (@ selection_field_to_selection_param ; python_fetch_info) => { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: python_fetch_info :: Select) } ; (@ selection_field_to_selection_param ; chapters $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: chapters :: Select :: $ selection_mode (crate :: prisma :: chapter :: ManyArgs :: new (crate :: prisma :: chapter :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: chapter :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; chapters $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: comic :: SelectParam > :: into (crate :: prisma :: comic :: chapters :: Select :: Fetch (crate :: prisma :: chapter :: ManyArgs :: new (crate :: prisma :: chapter :: select ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: comic :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; name) => { "name" } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; genre) => { "genre" } ; (@ field_serde_name ; content) => { "content" } ; (@ field_serde_name ; translator_team) => { "translatorTeam" } ; (@ field_serde_name ; another_name) => { "anotherName" } ; (@ field_serde_name ; source) => { "source" } ; (@ field_serde_name ; author) => { "author" } ; (@ field_serde_name ; posted_by) => { "postedBy" } ; (@ field_serde_name ; status) => { "status" } ; (@ field_serde_name ; thumbnail) => { "thumbnail" } ; (@ field_serde_name ; created_date) => { "createdDate" } ; (@ field_serde_name ; updated_date) => { "updatedDate" } ; (@ field_serde_name ; python_fetch_info) => { "pythonFetchInfo" } ; (@ field_serde_name ; chapters) => { "chapters" } ; }
     pub use _select_comic as select;
     pub enum SelectParam {
         Id(id::Select),
@@ -1201,9 +1258,10 @@ pub mod comic {
         PostedBy(posted_by::Select),
         Status(status::Select),
         Thumbnail(thumbnail::Select),
-        Chapters(chapters::Select),
         CreatedDate(created_date::Select),
         UpdatedDate(updated_date::Select),
+        PythonFetchInfo(python_fetch_info::Select),
+        Chapters(chapters::Select),
     }
     impl SelectParam {
         pub fn to_selection(self) -> ::prisma_client_rust::Selection {
@@ -1220,14 +1278,15 @@ pub mod comic {
                 Self::PostedBy(data) => data.to_selection(),
                 Self::Status(data) => data.to_selection(),
                 Self::Thumbnail(data) => data.to_selection(),
-                Self::Chapters(data) => data.to_selection(),
                 Self::CreatedDate(data) => data.to_selection(),
                 Self::UpdatedDate(data) => data.to_selection(),
+                Self::PythonFetchInfo(data) => data.to_selection(),
+                Self::Chapters(data) => data.to_selection(),
             }
         }
     }
     #[macro_export]
-    macro_rules ! _include_comic { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: comic :: include ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: comic :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: comic :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: comic :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: comic :: include ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: comic :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: comic :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: comic :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { chapters } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub id : String , pub name : String , pub url : String , pub genre : :: prisma_client_rust :: serde_json :: Value , pub content : Option < String > , pub translator_team : :: prisma_client_rust :: serde_json :: Value , pub another_name : Vec < String > , pub source : :: prisma_client_rust :: serde_json :: Value , pub author : :: prisma_client_rust :: serde_json :: Value , pub posted_by : :: prisma_client_rust :: serde_json :: Value , pub status : String , pub thumbnail : Option < String > , pub created_date : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , pub updated_date : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , $ (pub $ field : crate :: prisma :: comic :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (id) , stringify ! (name) , stringify ! (url) , stringify ! (genre) , stringify ! (content) , stringify ! (translator_team) , stringify ! (another_name) , stringify ! (source) , stringify ! (author) , stringify ! (posted_by) , stringify ! (status) , stringify ! (thumbnail) , stringify ! (created_date) , stringify ! (updated_date)] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: comic :: $ field :: NAME , & self . $ field) ? ;) * state . serialize_field (crate :: prisma :: comic :: id :: NAME , & self . id) ? ; state . serialize_field (crate :: prisma :: comic :: name :: NAME , & self . name) ? ; state . serialize_field (crate :: prisma :: comic :: url :: NAME , & self . url) ? ; state . serialize_field (crate :: prisma :: comic :: genre :: NAME , & self . genre) ? ; state . serialize_field (crate :: prisma :: comic :: content :: NAME , & self . content) ? ; state . serialize_field (crate :: prisma :: comic :: translator_team :: NAME , & self . translator_team) ? ; state . serialize_field (crate :: prisma :: comic :: another_name :: NAME , & self . another_name) ? ; state . serialize_field (crate :: prisma :: comic :: source :: NAME , & self . source) ? ; state . serialize_field (crate :: prisma :: comic :: author :: NAME , & self . author) ? ; state . serialize_field (crate :: prisma :: comic :: posted_by :: NAME , & self . posted_by) ? ; state . serialize_field (crate :: prisma :: comic :: status :: NAME , & self . status) ? ; state . serialize_field (crate :: prisma :: comic :: thumbnail :: NAME , & self . thumbnail) ? ; state . serialize_field (crate :: prisma :: comic :: created_date :: NAME , & self . created_date) ? ; state . serialize_field (crate :: prisma :: comic :: updated_date :: NAME , & self . updated_date) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , id , name , url , genre , content , translator_team , another_name , source , author , posted_by , status , thumbnail , created_date , updated_date } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: comic :: $ field :: NAME) , + , crate :: prisma :: comic :: id :: NAME , crate :: prisma :: comic :: name :: NAME , crate :: prisma :: comic :: url :: NAME , crate :: prisma :: comic :: genre :: NAME , crate :: prisma :: comic :: content :: NAME , crate :: prisma :: comic :: translator_team :: NAME , crate :: prisma :: comic :: another_name :: NAME , crate :: prisma :: comic :: source :: NAME , crate :: prisma :: comic :: author :: NAME , crate :: prisma :: comic :: posted_by :: NAME , crate :: prisma :: comic :: status :: NAME , crate :: prisma :: comic :: thumbnail :: NAME , crate :: prisma :: comic :: created_date :: NAME , crate :: prisma :: comic :: updated_date :: NAME] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: comic :: $ field :: NAME => Ok (Field :: $ field)) , * , crate :: prisma :: comic :: id :: NAME => Ok (Field :: id) , crate :: prisma :: comic :: name :: NAME => Ok (Field :: name) , crate :: prisma :: comic :: url :: NAME => Ok (Field :: url) , crate :: prisma :: comic :: genre :: NAME => Ok (Field :: genre) , crate :: prisma :: comic :: content :: NAME => Ok (Field :: content) , crate :: prisma :: comic :: translator_team :: NAME => Ok (Field :: translator_team) , crate :: prisma :: comic :: another_name :: NAME => Ok (Field :: another_name) , crate :: prisma :: comic :: source :: NAME => Ok (Field :: source) , crate :: prisma :: comic :: author :: NAME => Ok (Field :: author) , crate :: prisma :: comic :: posted_by :: NAME => Ok (Field :: posted_by) , crate :: prisma :: comic :: status :: NAME => Ok (Field :: status) , crate :: prisma :: comic :: thumbnail :: NAME => Ok (Field :: thumbnail) , crate :: prisma :: comic :: created_date :: NAME => Ok (Field :: created_date) , crate :: prisma :: comic :: updated_date :: NAME => Ok (Field :: updated_date) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut id = None ; let mut name = None ; let mut url = None ; let mut genre = None ; let mut content = None ; let mut translator_team = None ; let mut another_name = None ; let mut source = None ; let mut author = None ; let mut posted_by = None ; let mut status = None ; let mut thumbnail = None ; let mut created_date = None ; let mut updated_date = None ; while let Some (key) = map . next_key () ? { match key { Field :: id => { if id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: id :: NAME)) ; } id = Some (map . next_value () ?) ; } Field :: name => { if name . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: name :: NAME)) ; } name = Some (map . next_value () ?) ; } Field :: url => { if url . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: url :: NAME)) ; } url = Some (map . next_value () ?) ; } Field :: genre => { if genre . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: genre :: NAME)) ; } genre = Some (map . next_value () ?) ; } Field :: content => { if content . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: content :: NAME)) ; } content = Some (map . next_value () ?) ; } Field :: translator_team => { if translator_team . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: translator_team :: NAME)) ; } translator_team = Some (map . next_value () ?) ; } Field :: another_name => { if another_name . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: another_name :: NAME)) ; } another_name = Some (map . next_value () ?) ; } Field :: source => { if source . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: source :: NAME)) ; } source = Some (map . next_value () ?) ; } Field :: author => { if author . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: author :: NAME)) ; } author = Some (map . next_value () ?) ; } Field :: posted_by => { if posted_by . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: posted_by :: NAME)) ; } posted_by = Some (map . next_value () ?) ; } Field :: status => { if status . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: status :: NAME)) ; } status = Some (map . next_value () ?) ; } Field :: thumbnail => { if thumbnail . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: thumbnail :: NAME)) ; } thumbnail = Some (map . next_value () ?) ; } Field :: created_date => { if created_date . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: created_date :: NAME)) ; } created_date = Some (map . next_value () ?) ; } Field :: updated_date => { if updated_date . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: updated_date :: NAME)) ; } updated_date = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: $ field :: NAME)) ? ;) * let id = id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: id :: NAME)) ? ; let name = name . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: name :: NAME)) ? ; let url = url . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: url :: NAME)) ? ; let genre = genre . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: genre :: NAME)) ? ; let content = content . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: content :: NAME)) ? ; let translator_team = translator_team . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: translator_team :: NAME)) ? ; let another_name = another_name . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: another_name :: NAME)) ? ; let source = source . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: source :: NAME)) ? ; let author = author . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: author :: NAME)) ? ; let posted_by = posted_by . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: posted_by :: NAME)) ? ; let status = status . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: status :: NAME)) ? ; let thumbnail = thumbnail . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: thumbnail :: NAME)) ? ; let created_date = created_date . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: created_date :: NAME)) ? ; let updated_date = updated_date . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: updated_date :: NAME)) ? ; Ok (Data { id , name , url , genre , content , translator_team , another_name , source , author , posted_by , status , thumbnail , created_date , updated_date , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "name" , "url" , "genre" , "content" , "translatorTeam" , "anotherName" , "source" , "author" , "postedBy" , "status" , "thumbnail" , "chapters" , "createdDate" , "updatedDate"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: comic :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; chapters : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < chapters :: Data > } ; (@ field_type ; chapters) => { Vec < crate :: prisma :: chapter :: Data > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Comic" , available relations are "chapters")) } ; (@ field_module ; chapters : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: chapter :: include ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; chapters $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: comic :: IncludeParam > :: into (crate :: prisma :: comic :: chapters :: Include :: $ selection_mode (crate :: prisma :: chapter :: ManyArgs :: new (crate :: prisma :: chapter :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: chapter :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; chapters $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: comic :: IncludeParam > :: into (crate :: prisma :: comic :: chapters :: Include :: Fetch (crate :: prisma :: chapter :: ManyArgs :: new (crate :: prisma :: chapter :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: comic :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; name) => { "name" } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; genre) => { "genre" } ; (@ field_serde_name ; content) => { "content" } ; (@ field_serde_name ; translator_team) => { "translatorTeam" } ; (@ field_serde_name ; another_name) => { "anotherName" } ; (@ field_serde_name ; source) => { "source" } ; (@ field_serde_name ; author) => { "author" } ; (@ field_serde_name ; posted_by) => { "postedBy" } ; (@ field_serde_name ; status) => { "status" } ; (@ field_serde_name ; thumbnail) => { "thumbnail" } ; (@ field_serde_name ; chapters) => { "chapters" } ; (@ field_serde_name ; created_date) => { "createdDate" } ; (@ field_serde_name ; updated_date) => { "updatedDate" } ; }
+    macro_rules ! _include_comic { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: comic :: include ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: comic :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: comic :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: comic :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: comic :: include ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: comic :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: comic :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: comic :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { chapters } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub id : String , pub name : String , pub url : String , pub genre : :: prisma_client_rust :: serde_json :: Value , pub content : Option < String > , pub translator_team : :: prisma_client_rust :: serde_json :: Value , pub another_name : Vec < String > , pub source : :: prisma_client_rust :: serde_json :: Value , pub author : :: prisma_client_rust :: serde_json :: Value , pub posted_by : :: prisma_client_rust :: serde_json :: Value , pub status : String , pub thumbnail : Option < String > , pub created_date : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , pub updated_date : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , pub python_fetch_info : bool , $ (pub $ field : crate :: prisma :: comic :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (id) , stringify ! (name) , stringify ! (url) , stringify ! (genre) , stringify ! (content) , stringify ! (translator_team) , stringify ! (another_name) , stringify ! (source) , stringify ! (author) , stringify ! (posted_by) , stringify ! (status) , stringify ! (thumbnail) , stringify ! (created_date) , stringify ! (updated_date) , stringify ! (python_fetch_info)] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: comic :: $ field :: NAME , & self . $ field) ? ;) * state . serialize_field (crate :: prisma :: comic :: id :: NAME , & self . id) ? ; state . serialize_field (crate :: prisma :: comic :: name :: NAME , & self . name) ? ; state . serialize_field (crate :: prisma :: comic :: url :: NAME , & self . url) ? ; state . serialize_field (crate :: prisma :: comic :: genre :: NAME , & self . genre) ? ; state . serialize_field (crate :: prisma :: comic :: content :: NAME , & self . content) ? ; state . serialize_field (crate :: prisma :: comic :: translator_team :: NAME , & self . translator_team) ? ; state . serialize_field (crate :: prisma :: comic :: another_name :: NAME , & self . another_name) ? ; state . serialize_field (crate :: prisma :: comic :: source :: NAME , & self . source) ? ; state . serialize_field (crate :: prisma :: comic :: author :: NAME , & self . author) ? ; state . serialize_field (crate :: prisma :: comic :: posted_by :: NAME , & self . posted_by) ? ; state . serialize_field (crate :: prisma :: comic :: status :: NAME , & self . status) ? ; state . serialize_field (crate :: prisma :: comic :: thumbnail :: NAME , & self . thumbnail) ? ; state . serialize_field (crate :: prisma :: comic :: created_date :: NAME , & self . created_date) ? ; state . serialize_field (crate :: prisma :: comic :: updated_date :: NAME , & self . updated_date) ? ; state . serialize_field (crate :: prisma :: comic :: python_fetch_info :: NAME , & self . python_fetch_info) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , id , name , url , genre , content , translator_team , another_name , source , author , posted_by , status , thumbnail , created_date , updated_date , python_fetch_info } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: comic :: $ field :: NAME) , + , crate :: prisma :: comic :: id :: NAME , crate :: prisma :: comic :: name :: NAME , crate :: prisma :: comic :: url :: NAME , crate :: prisma :: comic :: genre :: NAME , crate :: prisma :: comic :: content :: NAME , crate :: prisma :: comic :: translator_team :: NAME , crate :: prisma :: comic :: another_name :: NAME , crate :: prisma :: comic :: source :: NAME , crate :: prisma :: comic :: author :: NAME , crate :: prisma :: comic :: posted_by :: NAME , crate :: prisma :: comic :: status :: NAME , crate :: prisma :: comic :: thumbnail :: NAME , crate :: prisma :: comic :: created_date :: NAME , crate :: prisma :: comic :: updated_date :: NAME , crate :: prisma :: comic :: python_fetch_info :: NAME] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: comic :: $ field :: NAME => Ok (Field :: $ field)) , * , crate :: prisma :: comic :: id :: NAME => Ok (Field :: id) , crate :: prisma :: comic :: name :: NAME => Ok (Field :: name) , crate :: prisma :: comic :: url :: NAME => Ok (Field :: url) , crate :: prisma :: comic :: genre :: NAME => Ok (Field :: genre) , crate :: prisma :: comic :: content :: NAME => Ok (Field :: content) , crate :: prisma :: comic :: translator_team :: NAME => Ok (Field :: translator_team) , crate :: prisma :: comic :: another_name :: NAME => Ok (Field :: another_name) , crate :: prisma :: comic :: source :: NAME => Ok (Field :: source) , crate :: prisma :: comic :: author :: NAME => Ok (Field :: author) , crate :: prisma :: comic :: posted_by :: NAME => Ok (Field :: posted_by) , crate :: prisma :: comic :: status :: NAME => Ok (Field :: status) , crate :: prisma :: comic :: thumbnail :: NAME => Ok (Field :: thumbnail) , crate :: prisma :: comic :: created_date :: NAME => Ok (Field :: created_date) , crate :: prisma :: comic :: updated_date :: NAME => Ok (Field :: updated_date) , crate :: prisma :: comic :: python_fetch_info :: NAME => Ok (Field :: python_fetch_info) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut id = None ; let mut name = None ; let mut url = None ; let mut genre = None ; let mut content = None ; let mut translator_team = None ; let mut another_name = None ; let mut source = None ; let mut author = None ; let mut posted_by = None ; let mut status = None ; let mut thumbnail = None ; let mut created_date = None ; let mut updated_date = None ; let mut python_fetch_info = None ; while let Some (key) = map . next_key () ? { match key { Field :: id => { if id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: id :: NAME)) ; } id = Some (map . next_value () ?) ; } Field :: name => { if name . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: name :: NAME)) ; } name = Some (map . next_value () ?) ; } Field :: url => { if url . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: url :: NAME)) ; } url = Some (map . next_value () ?) ; } Field :: genre => { if genre . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: genre :: NAME)) ; } genre = Some (map . next_value () ?) ; } Field :: content => { if content . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: content :: NAME)) ; } content = Some (map . next_value () ?) ; } Field :: translator_team => { if translator_team . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: translator_team :: NAME)) ; } translator_team = Some (map . next_value () ?) ; } Field :: another_name => { if another_name . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: another_name :: NAME)) ; } another_name = Some (map . next_value () ?) ; } Field :: source => { if source . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: source :: NAME)) ; } source = Some (map . next_value () ?) ; } Field :: author => { if author . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: author :: NAME)) ; } author = Some (map . next_value () ?) ; } Field :: posted_by => { if posted_by . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: posted_by :: NAME)) ; } posted_by = Some (map . next_value () ?) ; } Field :: status => { if status . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: status :: NAME)) ; } status = Some (map . next_value () ?) ; } Field :: thumbnail => { if thumbnail . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: thumbnail :: NAME)) ; } thumbnail = Some (map . next_value () ?) ; } Field :: created_date => { if created_date . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: created_date :: NAME)) ; } created_date = Some (map . next_value () ?) ; } Field :: updated_date => { if updated_date . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: updated_date :: NAME)) ; } updated_date = Some (map . next_value () ?) ; } Field :: python_fetch_info => { if python_fetch_info . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: python_fetch_info :: NAME)) ; } python_fetch_info = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: comic :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: $ field :: NAME)) ? ;) * let id = id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: id :: NAME)) ? ; let name = name . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: name :: NAME)) ? ; let url = url . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: url :: NAME)) ? ; let genre = genre . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: genre :: NAME)) ? ; let content = content . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: content :: NAME)) ? ; let translator_team = translator_team . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: translator_team :: NAME)) ? ; let another_name = another_name . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: another_name :: NAME)) ? ; let source = source . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: source :: NAME)) ? ; let author = author . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: author :: NAME)) ? ; let posted_by = posted_by . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: posted_by :: NAME)) ? ; let status = status . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: status :: NAME)) ? ; let thumbnail = thumbnail . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: thumbnail :: NAME)) ? ; let created_date = created_date . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: created_date :: NAME)) ? ; let updated_date = updated_date . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: updated_date :: NAME)) ? ; let python_fetch_info = python_fetch_info . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: comic :: python_fetch_info :: NAME)) ? ; Ok (Data { id , name , url , genre , content , translator_team , another_name , source , author , posted_by , status , thumbnail , created_date , updated_date , python_fetch_info , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "name" , "url" , "genre" , "content" , "translatorTeam" , "anotherName" , "source" , "author" , "postedBy" , "status" , "thumbnail" , "createdDate" , "updatedDate" , "pythonFetchInfo" , "chapters"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: comic :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; chapters : $ selection_mode : ident { $ ($ selections : tt) + }) => { Vec < chapters :: Data > } ; (@ field_type ; chapters) => { Vec < crate :: prisma :: chapter :: Data > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Comic" , available relations are "chapters")) } ; (@ field_module ; chapters : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: chapter :: include ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; chapters $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: comic :: IncludeParam > :: into (crate :: prisma :: comic :: chapters :: Include :: $ selection_mode (crate :: prisma :: chapter :: ManyArgs :: new (crate :: prisma :: chapter :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ? , crate :: prisma :: chapter :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; chapters $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: comic :: IncludeParam > :: into (crate :: prisma :: comic :: chapters :: Include :: Fetch (crate :: prisma :: chapter :: ManyArgs :: new (crate :: prisma :: chapter :: include ! (@ filters_to_args ; $ ($ ($ filters) +) ?)) $ ($ (. $ arg ($ ($ arg_params) *)) *) ?) ,) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: comic :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; name) => { "name" } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; genre) => { "genre" } ; (@ field_serde_name ; content) => { "content" } ; (@ field_serde_name ; translator_team) => { "translatorTeam" } ; (@ field_serde_name ; another_name) => { "anotherName" } ; (@ field_serde_name ; source) => { "source" } ; (@ field_serde_name ; author) => { "author" } ; (@ field_serde_name ; posted_by) => { "postedBy" } ; (@ field_serde_name ; status) => { "status" } ; (@ field_serde_name ; thumbnail) => { "thumbnail" } ; (@ field_serde_name ; created_date) => { "createdDate" } ; (@ field_serde_name ; updated_date) => { "updatedDate" } ; (@ field_serde_name ; python_fetch_info) => { "pythonFetchInfo" } ; (@ field_serde_name ; chapters) => { "chapters" } ; }
     pub use _include_comic as include;
     pub enum IncludeParam {
         Id(id::Include),
@@ -1242,9 +1301,10 @@ pub mod comic {
         PostedBy(posted_by::Include),
         Status(status::Include),
         Thumbnail(thumbnail::Include),
-        Chapters(chapters::Include),
         CreatedDate(created_date::Include),
         UpdatedDate(updated_date::Include),
+        PythonFetchInfo(python_fetch_info::Include),
+        Chapters(chapters::Include),
     }
     impl IncludeParam {
         pub fn to_selection(self) -> ::prisma_client_rust::Selection {
@@ -1261,14 +1321,15 @@ pub mod comic {
                 Self::PostedBy(data) => data.to_selection(),
                 Self::Status(data) => data.to_selection(),
                 Self::Thumbnail(data) => data.to_selection(),
-                Self::Chapters(data) => data.to_selection(),
                 Self::CreatedDate(data) => data.to_selection(),
                 Self::UpdatedDate(data) => data.to_selection(),
+                Self::PythonFetchInfo(data) => data.to_selection(),
+                Self::Chapters(data) => data.to_selection(),
             }
         }
     }
     #[macro_export]
-    macro_rules ! _partial_unchecked_comic { ($ struct_name : ident { $ ($ scalar_field : ident) + }) => { :: prisma_client_rust :: macros :: partial_unchecked ! { crate :: prisma :: comic struct $ struct_name { # [serde (rename = "id")] pub id : String , # [serde (rename = "name")] pub name : String , # [serde (rename = "url")] pub url : String , # [serde (rename = "genre")] pub genre : :: prisma_client_rust :: serde_json :: Value , # [serde (rename = "content")] # [serde (default , with = "::prisma_client_rust::serde::double_option")] pub content : Option < String > , # [serde (rename = "translatorTeam")] pub translator_team : :: prisma_client_rust :: serde_json :: Value , # [serde (rename = "anotherName")] pub another_name : Vec < String > , # [serde (rename = "source")] pub source : :: prisma_client_rust :: serde_json :: Value , # [serde (rename = "author")] pub author : :: prisma_client_rust :: serde_json :: Value , # [serde (rename = "postedBy")] pub posted_by : :: prisma_client_rust :: serde_json :: Value , # [serde (rename = "status")] pub status : String , # [serde (rename = "thumbnail")] # [serde (default , with = "::prisma_client_rust::serde::double_option")] pub thumbnail : Option < String > , # [serde (rename = "createdDate")] pub created_date : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , # [serde (rename = "updatedDate")] pub updated_date : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } [$ ($ scalar_field) , +] } } ; }
+    macro_rules ! _partial_unchecked_comic { ($ struct_name : ident { $ ($ scalar_field : ident) + }) => { :: prisma_client_rust :: macros :: partial_unchecked ! { crate :: prisma :: comic struct $ struct_name { # [serde (rename = "id")] pub id : String , # [serde (rename = "name")] pub name : String , # [serde (rename = "url")] pub url : String , # [serde (rename = "genre")] pub genre : :: prisma_client_rust :: serde_json :: Value , # [serde (rename = "content")] # [serde (default , with = "::prisma_client_rust::serde::double_option")] pub content : Option < String > , # [serde (rename = "translatorTeam")] pub translator_team : :: prisma_client_rust :: serde_json :: Value , # [serde (rename = "anotherName")] pub another_name : Vec < String > , # [serde (rename = "source")] pub source : :: prisma_client_rust :: serde_json :: Value , # [serde (rename = "author")] pub author : :: prisma_client_rust :: serde_json :: Value , # [serde (rename = "postedBy")] pub posted_by : :: prisma_client_rust :: serde_json :: Value , # [serde (rename = "status")] pub status : String , # [serde (rename = "thumbnail")] # [serde (default , with = "::prisma_client_rust::serde::double_option")] pub thumbnail : Option < String > , # [serde (rename = "createdDate")] pub created_date : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , # [serde (rename = "updatedDate")] pub updated_date : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , # [serde (rename = "pythonFetchInfo")] pub python_fetch_info : bool } [$ ($ scalar_field) , +] } } ; }
     pub use _partial_unchecked_comic as partial_unchecked;
     #[derive(Debug, Clone, :: serde :: Serialize, :: serde :: Deserialize)]
     pub struct Data {
@@ -1296,14 +1357,16 @@ pub mod comic {
         pub status: String,
         #[serde(rename = "thumbnail")]
         pub thumbnail: Option<String>,
-        #[serde(rename = "chapters")]
-        pub chapters: Option<Vec<super::chapter::Data>>,
         #[serde(rename = "createdDate")]
         pub created_date:
             ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
         #[serde(rename = "updatedDate")]
         pub updated_date:
             ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
+        #[serde(rename = "pythonFetchInfo")]
+        pub python_fetch_info: bool,
+        #[serde(rename = "chapters")]
+        pub chapters: Option<Vec<super::chapter::Data>>,
     }
     impl Data {
         pub fn chapters(
@@ -1352,15 +1415,16 @@ pub mod comic {
         SetPostedBy(::prisma_client_rust::serde_json::Value),
         SetStatus(String),
         SetThumbnail(Option<String>),
-        ConnectChapters(Vec<super::chapter::UniqueWhereParam>),
-        DisconnectChapters(Vec<super::chapter::UniqueWhereParam>),
-        SetChapters(Vec<super::chapter::UniqueWhereParam>),
         SetCreatedDate(
             ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
         ),
         SetUpdatedDate(
             ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
         ),
+        SetPythonFetchInfo(bool),
+        ConnectChapters(Vec<super::chapter::UniqueWhereParam>),
+        DisconnectChapters(Vec<super::chapter::UniqueWhereParam>),
+        SetChapters(Vec<super::chapter::UniqueWhereParam>),
     }
     impl From<SetParam> for (String, ::prisma_client_rust::PrismaValue) {
         fn from(param: SetParam) -> Self {
@@ -1444,6 +1508,18 @@ pub mod comic {
                         .map(|value| ::prisma_client_rust::PrismaValue::String(value))
                         .unwrap_or_else(|| ::prisma_client_rust::PrismaValue::Null),
                 ),
+                SetParam::SetCreatedDate(value) => (
+                    created_date::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::DateTime(value),
+                ),
+                SetParam::SetUpdatedDate(value) => (
+                    updated_date::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::DateTime(value),
+                ),
+                SetParam::SetPythonFetchInfo(value) => (
+                    python_fetch_info::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::Boolean(value),
+                ),
                 SetParam::ConnectChapters(where_params) => (
                     chapters::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::Object(vec![(
@@ -1489,14 +1565,6 @@ pub mod comic {
                         ),
                     )]),
                 ),
-                SetParam::SetCreatedDate(value) => (
-                    created_date::NAME.to_string(),
-                    ::prisma_client_rust::PrismaValue::DateTime(value),
-                ),
-                SetParam::SetUpdatedDate(value) => (
-                    updated_date::NAME.to_string(),
-                    ::prisma_client_rust::PrismaValue::DateTime(value),
-                ),
             }
         }
     }
@@ -1520,6 +1588,7 @@ pub mod comic {
         UpdatedDate(
             ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
         ),
+        PythonFetchInfo(bool),
     }
     impl From<UncheckedSetParam> for SetParam {
         fn from(param: UncheckedSetParam) -> Self {
@@ -1538,6 +1607,7 @@ pub mod comic {
                 UncheckedSetParam::Thumbnail(value) => Self::SetThumbnail(value),
                 UncheckedSetParam::CreatedDate(value) => Self::SetCreatedDate(value),
                 UncheckedSetParam::UpdatedDate(value) => Self::SetUpdatedDate(value),
+                UncheckedSetParam::PythonFetchInfo(value) => Self::SetPythonFetchInfo(value),
             }
         }
     }
@@ -1557,6 +1627,7 @@ pub mod comic {
         Thumbnail(::prisma_client_rust::Direction),
         CreatedDate(::prisma_client_rust::Direction),
         UpdatedDate(::prisma_client_rust::Direction),
+        PythonFetchInfo(::prisma_client_rust::Direction),
     }
     impl Into<(String, ::prisma_client_rust::PrismaValue)> for OrderByParam {
         fn into(self) -> (String, ::prisma_client_rust::PrismaValue) {
@@ -1617,6 +1688,10 @@ pub mod comic {
                     updated_date::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::String(direction.to_string()),
                 ),
+                Self::PythonFetchInfo(direction) => (
+                    python_fetch_info::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::String(direction.to_string()),
+                ),
             }
         }
     }
@@ -1637,11 +1712,12 @@ pub mod comic {
         PostedBy(_prisma::read_filters::JsonFilter),
         Status(_prisma::read_filters::StringFilter),
         Thumbnail(_prisma::read_filters::StringNullableFilter),
+        CreatedDate(_prisma::read_filters::DateTimeFilter),
+        UpdatedDate(_prisma::read_filters::DateTimeFilter),
+        PythonFetchInfo(_prisma::read_filters::BoolFilter),
         ChaptersSome(Vec<super::chapter::WhereParam>),
         ChaptersEvery(Vec<super::chapter::WhereParam>),
         ChaptersNone(Vec<super::chapter::WhereParam>),
-        CreatedDate(_prisma::read_filters::DateTimeFilter),
-        UpdatedDate(_prisma::read_filters::DateTimeFilter),
     }
     impl ::prisma_client_rust::WhereInput for WhereParam {
         fn serialize(self) -> ::prisma_client_rust::SerializedWhereInput {
@@ -1694,6 +1770,9 @@ pub mod comic {
                 Self::PostedBy(value) => (posted_by::NAME, value.into()),
                 Self::Status(value) => (status::NAME, value.into()),
                 Self::Thumbnail(value) => (thumbnail::NAME, value.into()),
+                Self::CreatedDate(value) => (created_date::NAME, value.into()),
+                Self::UpdatedDate(value) => (updated_date::NAME, value.into()),
+                Self::PythonFetchInfo(value) => (python_fetch_info::NAME, value.into()),
                 Self::ChaptersSome(where_params) => (
                     chapters::NAME,
                     ::prisma_client_rust::SerializedWhereValue::Object(vec![(
@@ -1733,8 +1812,6 @@ pub mod comic {
                         ),
                     )]),
                 ),
-                Self::CreatedDate(value) => (created_date::NAME, value.into()),
-                Self::UpdatedDate(value) => (updated_date::NAME, value.into()),
             };
             ::prisma_client_rust::SerializedWhereInput::new(name, value.into())
         }
@@ -1792,6 +1869,7 @@ pub mod comic {
                 ::prisma_client_rust::sel(thumbnail::NAME),
                 ::prisma_client_rust::sel(created_date::NAME),
                 ::prisma_client_rust::sel(updated_date::NAME),
+                ::prisma_client_rust::sel(python_fetch_info::NAME),
             ]
         }
     }
@@ -2086,113 +2164,6 @@ pub mod chapter {
         impl Select {
             pub fn to_selection(self) -> ::prisma_client_rust::Selection {
                 ::prisma_client_rust::sel(NAME)
-            }
-        }
-    }
-    pub mod comic {
-        use super::super::*;
-        use super::_prisma::*;
-        use super::{
-            OrderByParam, SetParam, UncheckedSetParam, UniqueWhereParam, WhereParam, WithParam,
-        };
-        pub const NAME: &str = "comic";
-        pub struct Fetch(pub comic::UniqueArgs);
-        impl Fetch {
-            pub fn with(mut self, params: impl Into<comic::WithParam>) -> Self {
-                self.0 = self.0.with(params.into());
-                self
-            }
-        }
-        impl From<Fetch> for WithParam {
-            fn from(Fetch(v): Fetch) -> Self {
-                WithParam::Comic(v)
-            }
-        }
-        pub fn fetch() -> Fetch {
-            Fetch(comic::UniqueArgs::new())
-        }
-        pub struct Connect(comic::UniqueWhereParam);
-        impl From<Connect> for SetParam {
-            fn from(Connect(v): Connect) -> Self {
-                Self::ConnectComic(v)
-            }
-        }
-        pub fn connect<T: From<Connect>>(value: comic::UniqueWhereParam) -> T {
-            Connect(value).into()
-        }
-        pub fn is(value: Vec<comic::WhereParam>) -> WhereParam {
-            WhereParam::ComicIs(value)
-        }
-        pub fn is_not(value: Vec<comic::WhereParam>) -> WhereParam {
-            WhereParam::ComicIsNot(value)
-        }
-        pub enum Include {
-            Select(Vec<comic::SelectParam>),
-            Include(Vec<comic::IncludeParam>),
-            Fetch,
-        }
-        impl Into<super::IncludeParam> for Include {
-            fn into(self) -> super::IncludeParam {
-                super::IncludeParam::Comic(self)
-            }
-        }
-        impl Include {
-            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
-                let selections = match self {
-                    Self::Select(selections) => {
-                        selections.into_iter().map(|s| s.to_selection()).collect()
-                    }
-                    Self::Include(selections) => {
-                        let mut nested_selections =
-                            <comic::Types as ::prisma_client_rust::ModelTypes>::scalar_selections();
-                        nested_selections.extend(selections.into_iter().map(|s| s.to_selection()));
-                        nested_selections
-                    }
-                    Self::Fetch => {
-                        <comic::Types as ::prisma_client_rust::ModelTypes>::scalar_selections()
-                    }
-                };
-                ::prisma_client_rust::Selection::new("comic", None, [], selections)
-            }
-            pub fn select(nested_selections: Vec<comic::SelectParam>) -> Self {
-                Self::Select(nested_selections)
-            }
-            pub fn include(nested_selections: Vec<comic::IncludeParam>) -> Self {
-                Self::Include(nested_selections)
-            }
-        }
-        pub enum Select {
-            Select(Vec<comic::SelectParam>),
-            Include(Vec<comic::IncludeParam>),
-            Fetch,
-        }
-        impl Into<super::SelectParam> for Select {
-            fn into(self) -> super::SelectParam {
-                super::SelectParam::Comic(self)
-            }
-        }
-        impl Select {
-            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
-                let selections = match self {
-                    Self::Select(selections) => {
-                        selections.into_iter().map(|s| s.to_selection()).collect()
-                    }
-                    Self::Include(selections) => {
-                        let mut nested_selections = vec![];
-                        nested_selections.extend(selections.into_iter().map(|s| s.to_selection()));
-                        nested_selections
-                    }
-                    Self::Fetch => {
-                        <comic::Types as ::prisma_client_rust::ModelTypes>::scalar_selections()
-                    }
-                };
-                ::prisma_client_rust::Selection::new("comic", None, [], selections)
-            }
-            pub fn select(nested_selections: Vec<comic::SelectParam>) -> Self {
-                Self::Select(nested_selections)
-            }
-            pub fn include(nested_selections: Vec<comic::IncludeParam>) -> Self {
-                Self::Include(nested_selections)
             }
         }
     }
@@ -2498,20 +2469,127 @@ pub mod chapter {
             }
         }
     }
+    pub mod comic {
+        use super::super::*;
+        use super::_prisma::*;
+        use super::{
+            OrderByParam, SetParam, UncheckedSetParam, UniqueWhereParam, WhereParam, WithParam,
+        };
+        pub const NAME: &str = "comic";
+        pub struct Fetch(pub comic::UniqueArgs);
+        impl Fetch {
+            pub fn with(mut self, params: impl Into<comic::WithParam>) -> Self {
+                self.0 = self.0.with(params.into());
+                self
+            }
+        }
+        impl From<Fetch> for WithParam {
+            fn from(Fetch(v): Fetch) -> Self {
+                WithParam::Comic(v)
+            }
+        }
+        pub fn fetch() -> Fetch {
+            Fetch(comic::UniqueArgs::new())
+        }
+        pub struct Connect(comic::UniqueWhereParam);
+        impl From<Connect> for SetParam {
+            fn from(Connect(v): Connect) -> Self {
+                Self::ConnectComic(v)
+            }
+        }
+        pub fn connect<T: From<Connect>>(value: comic::UniqueWhereParam) -> T {
+            Connect(value).into()
+        }
+        pub fn is(value: Vec<comic::WhereParam>) -> WhereParam {
+            WhereParam::ComicIs(value)
+        }
+        pub fn is_not(value: Vec<comic::WhereParam>) -> WhereParam {
+            WhereParam::ComicIsNot(value)
+        }
+        pub enum Include {
+            Select(Vec<comic::SelectParam>),
+            Include(Vec<comic::IncludeParam>),
+            Fetch,
+        }
+        impl Into<super::IncludeParam> for Include {
+            fn into(self) -> super::IncludeParam {
+                super::IncludeParam::Comic(self)
+            }
+        }
+        impl Include {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                let selections = match self {
+                    Self::Select(selections) => {
+                        selections.into_iter().map(|s| s.to_selection()).collect()
+                    }
+                    Self::Include(selections) => {
+                        let mut nested_selections =
+                            <comic::Types as ::prisma_client_rust::ModelTypes>::scalar_selections();
+                        nested_selections.extend(selections.into_iter().map(|s| s.to_selection()));
+                        nested_selections
+                    }
+                    Self::Fetch => {
+                        <comic::Types as ::prisma_client_rust::ModelTypes>::scalar_selections()
+                    }
+                };
+                ::prisma_client_rust::Selection::new("comic", None, [], selections)
+            }
+            pub fn select(nested_selections: Vec<comic::SelectParam>) -> Self {
+                Self::Select(nested_selections)
+            }
+            pub fn include(nested_selections: Vec<comic::IncludeParam>) -> Self {
+                Self::Include(nested_selections)
+            }
+        }
+        pub enum Select {
+            Select(Vec<comic::SelectParam>),
+            Include(Vec<comic::IncludeParam>),
+            Fetch,
+        }
+        impl Into<super::SelectParam> for Select {
+            fn into(self) -> super::SelectParam {
+                super::SelectParam::Comic(self)
+            }
+        }
+        impl Select {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                let selections = match self {
+                    Self::Select(selections) => {
+                        selections.into_iter().map(|s| s.to_selection()).collect()
+                    }
+                    Self::Include(selections) => {
+                        let mut nested_selections = vec![];
+                        nested_selections.extend(selections.into_iter().map(|s| s.to_selection()));
+                        nested_selections
+                    }
+                    Self::Fetch => {
+                        <comic::Types as ::prisma_client_rust::ModelTypes>::scalar_selections()
+                    }
+                };
+                ::prisma_client_rust::Selection::new("comic", None, [], selections)
+            }
+            pub fn select(nested_selections: Vec<comic::SelectParam>) -> Self {
+                Self::Select(nested_selections)
+            }
+            pub fn include(nested_selections: Vec<comic::IncludeParam>) -> Self {
+                Self::Include(nested_selections)
+            }
+        }
+    }
     pub fn create(
         name: String,
         url: String,
-        comic: super::comic::UniqueWhereParam,
         created_date: String,
+        comic: super::comic::UniqueWhereParam,
         _params: Vec<SetParam>,
     ) -> (
         String,
         String,
-        super::comic::UniqueWhereParam,
         String,
+        super::comic::UniqueWhereParam,
         Vec<SetParam>,
     ) {
-        (name, url, comic, created_date, _params)
+        (name, url, created_date, comic, _params)
     }
     pub fn create_unchecked(
         name: String,
@@ -2523,17 +2601,17 @@ pub mod chapter {
         (name, url, comic_id, created_date, _params)
     }
     #[macro_export]
-    macro_rules ! _select_chapter { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: chapter :: select ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: chapter :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: chapter :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: chapter :: select ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: chapter :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: chapter :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { id , name , url , comic , comic_id , images , created_date , updated_date } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : crate :: prisma :: chapter :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: chapter :: $ field :: NAME , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: chapter :: $ field :: NAME) , + ,] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: chapter :: $ field :: NAME => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: $ field :: NAME)) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "name" , "url" , "comic" , "comicId" , "images" , "createdDate" , "updatedDate"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: chapter :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; id) => { String } ; (@ field_type ; name) => { String } ; (@ field_type ; url) => { String } ; (@ field_type ; comic : $ selection_mode : ident { $ ($ selections : tt) + }) => { comic :: Data } ; (@ field_type ; comic) => { crate :: prisma :: comic :: Data } ; (@ field_type ; comic_id) => { String } ; (@ field_type ; images) => { Vec < String > } ; (@ field_type ; created_date) => { String } ; (@ field_type ; updated_date) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Chapter" , available relations are "id, name, url, comic, comic_id, images, created_date, updated_date")) } ; (@ field_module ; comic : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: comic :: select ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; id) => { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: id :: Select) } ; (@ selection_field_to_selection_param ; name) => { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: name :: Select) } ; (@ selection_field_to_selection_param ; url) => { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: url :: Select) } ; (@ selection_field_to_selection_param ; comic $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: comic :: Select :: $ selection_mode (crate :: prisma :: comic :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; comic $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: comic :: Select :: Fetch) } } ; (@ selection_field_to_selection_param ; comic_id) => { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: comic_id :: Select) } ; (@ selection_field_to_selection_param ; images) => { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: images :: Select) } ; (@ selection_field_to_selection_param ; created_date) => { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: created_date :: Select) } ; (@ selection_field_to_selection_param ; updated_date) => { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: updated_date :: Select) } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: chapter :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; name) => { "name" } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; comic) => { "comic" } ; (@ field_serde_name ; comic_id) => { "comicId" } ; (@ field_serde_name ; images) => { "images" } ; (@ field_serde_name ; created_date) => { "createdDate" } ; (@ field_serde_name ; updated_date) => { "updatedDate" } ; }
+    macro_rules ! _select_chapter { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: chapter :: select ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: chapter :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: chapter :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: chapter :: select ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: chapter :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: chapter :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { id , name , url , comic_id , images , created_date , updated_date , comic } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : crate :: prisma :: chapter :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: chapter :: $ field :: NAME , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: chapter :: $ field :: NAME) , + ,] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: chapter :: $ field :: NAME => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: $ field :: NAME)) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "name" , "url" , "comicId" , "images" , "createdDate" , "updatedDate" , "comic"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: chapter :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; id) => { String } ; (@ field_type ; name) => { String } ; (@ field_type ; url) => { String } ; (@ field_type ; comic_id) => { String } ; (@ field_type ; images) => { Vec < String > } ; (@ field_type ; created_date) => { String } ; (@ field_type ; updated_date) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; comic : $ selection_mode : ident { $ ($ selections : tt) + }) => { comic :: Data } ; (@ field_type ; comic) => { crate :: prisma :: comic :: Data } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Chapter" , available relations are "id, name, url, comic_id, images, created_date, updated_date, comic")) } ; (@ field_module ; comic : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: comic :: select ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; id) => { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: id :: Select) } ; (@ selection_field_to_selection_param ; name) => { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: name :: Select) } ; (@ selection_field_to_selection_param ; url) => { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: url :: Select) } ; (@ selection_field_to_selection_param ; comic_id) => { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: comic_id :: Select) } ; (@ selection_field_to_selection_param ; images) => { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: images :: Select) } ; (@ selection_field_to_selection_param ; created_date) => { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: created_date :: Select) } ; (@ selection_field_to_selection_param ; updated_date) => { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: updated_date :: Select) } ; (@ selection_field_to_selection_param ; comic $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: comic :: Select :: $ selection_mode (crate :: prisma :: comic :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; comic $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: chapter :: SelectParam > :: into (crate :: prisma :: chapter :: comic :: Select :: Fetch) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: chapter :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; name) => { "name" } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; comic_id) => { "comicId" } ; (@ field_serde_name ; images) => { "images" } ; (@ field_serde_name ; created_date) => { "createdDate" } ; (@ field_serde_name ; updated_date) => { "updatedDate" } ; (@ field_serde_name ; comic) => { "comic" } ; }
     pub use _select_chapter as select;
     pub enum SelectParam {
         Id(id::Select),
         Name(name::Select),
         Url(url::Select),
-        Comic(comic::Select),
         ComicId(comic_id::Select),
         Images(images::Select),
         CreatedDate(created_date::Select),
         UpdatedDate(updated_date::Select),
+        Comic(comic::Select),
     }
     impl SelectParam {
         pub fn to_selection(self) -> ::prisma_client_rust::Selection {
@@ -2541,26 +2619,26 @@ pub mod chapter {
                 Self::Id(data) => data.to_selection(),
                 Self::Name(data) => data.to_selection(),
                 Self::Url(data) => data.to_selection(),
-                Self::Comic(data) => data.to_selection(),
                 Self::ComicId(data) => data.to_selection(),
                 Self::Images(data) => data.to_selection(),
                 Self::CreatedDate(data) => data.to_selection(),
                 Self::UpdatedDate(data) => data.to_selection(),
+                Self::Comic(data) => data.to_selection(),
             }
         }
     }
     #[macro_export]
-    macro_rules ! _include_chapter { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: chapter :: include ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: chapter :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: chapter :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: chapter :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: chapter :: include ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: chapter :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: chapter :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: chapter :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { comic } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub id : String , pub name : String , pub url : String , pub comic_id : String , pub images : Vec < String > , pub created_date : String , pub updated_date : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , $ (pub $ field : crate :: prisma :: chapter :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (id) , stringify ! (name) , stringify ! (url) , stringify ! (comic_id) , stringify ! (images) , stringify ! (created_date) , stringify ! (updated_date)] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: chapter :: $ field :: NAME , & self . $ field) ? ;) * state . serialize_field (crate :: prisma :: chapter :: id :: NAME , & self . id) ? ; state . serialize_field (crate :: prisma :: chapter :: name :: NAME , & self . name) ? ; state . serialize_field (crate :: prisma :: chapter :: url :: NAME , & self . url) ? ; state . serialize_field (crate :: prisma :: chapter :: comic_id :: NAME , & self . comic_id) ? ; state . serialize_field (crate :: prisma :: chapter :: images :: NAME , & self . images) ? ; state . serialize_field (crate :: prisma :: chapter :: created_date :: NAME , & self . created_date) ? ; state . serialize_field (crate :: prisma :: chapter :: updated_date :: NAME , & self . updated_date) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , id , name , url , comic_id , images , created_date , updated_date } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: chapter :: $ field :: NAME) , + , crate :: prisma :: chapter :: id :: NAME , crate :: prisma :: chapter :: name :: NAME , crate :: prisma :: chapter :: url :: NAME , crate :: prisma :: chapter :: comic_id :: NAME , crate :: prisma :: chapter :: images :: NAME , crate :: prisma :: chapter :: created_date :: NAME , crate :: prisma :: chapter :: updated_date :: NAME] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: chapter :: $ field :: NAME => Ok (Field :: $ field)) , * , crate :: prisma :: chapter :: id :: NAME => Ok (Field :: id) , crate :: prisma :: chapter :: name :: NAME => Ok (Field :: name) , crate :: prisma :: chapter :: url :: NAME => Ok (Field :: url) , crate :: prisma :: chapter :: comic_id :: NAME => Ok (Field :: comic_id) , crate :: prisma :: chapter :: images :: NAME => Ok (Field :: images) , crate :: prisma :: chapter :: created_date :: NAME => Ok (Field :: created_date) , crate :: prisma :: chapter :: updated_date :: NAME => Ok (Field :: updated_date) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut id = None ; let mut name = None ; let mut url = None ; let mut comic_id = None ; let mut images = None ; let mut created_date = None ; let mut updated_date = None ; while let Some (key) = map . next_key () ? { match key { Field :: id => { if id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: id :: NAME)) ; } id = Some (map . next_value () ?) ; } Field :: name => { if name . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: name :: NAME)) ; } name = Some (map . next_value () ?) ; } Field :: url => { if url . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: url :: NAME)) ; } url = Some (map . next_value () ?) ; } Field :: comic_id => { if comic_id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: comic_id :: NAME)) ; } comic_id = Some (map . next_value () ?) ; } Field :: images => { if images . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: images :: NAME)) ; } images = Some (map . next_value () ?) ; } Field :: created_date => { if created_date . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: created_date :: NAME)) ; } created_date = Some (map . next_value () ?) ; } Field :: updated_date => { if updated_date . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: updated_date :: NAME)) ; } updated_date = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: $ field :: NAME)) ? ;) * let id = id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: id :: NAME)) ? ; let name = name . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: name :: NAME)) ? ; let url = url . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: url :: NAME)) ? ; let comic_id = comic_id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: comic_id :: NAME)) ? ; let images = images . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: images :: NAME)) ? ; let created_date = created_date . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: created_date :: NAME)) ? ; let updated_date = updated_date . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: updated_date :: NAME)) ? ; Ok (Data { id , name , url , comic_id , images , created_date , updated_date , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "name" , "url" , "comic" , "comicId" , "images" , "createdDate" , "updatedDate"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: chapter :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; comic : $ selection_mode : ident { $ ($ selections : tt) + }) => { comic :: Data } ; (@ field_type ; comic) => { crate :: prisma :: comic :: Data } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Chapter" , available relations are "comic")) } ; (@ field_module ; comic : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: comic :: include ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; comic $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: chapter :: IncludeParam > :: into (crate :: prisma :: chapter :: comic :: Include :: $ selection_mode (crate :: prisma :: comic :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; comic $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: chapter :: IncludeParam > :: into (crate :: prisma :: chapter :: comic :: Include :: Fetch) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: chapter :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; name) => { "name" } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; comic) => { "comic" } ; (@ field_serde_name ; comic_id) => { "comicId" } ; (@ field_serde_name ; images) => { "images" } ; (@ field_serde_name ; created_date) => { "createdDate" } ; (@ field_serde_name ; updated_date) => { "updatedDate" } ; }
+    macro_rules ! _include_chapter { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: chapter :: include ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: chapter :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: chapter :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: chapter :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: chapter :: include ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: chapter :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: chapter :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: chapter :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { comic } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub id : String , pub name : String , pub url : String , pub comic_id : String , pub images : Vec < String > , pub created_date : String , pub updated_date : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , $ (pub $ field : crate :: prisma :: chapter :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (id) , stringify ! (name) , stringify ! (url) , stringify ! (comic_id) , stringify ! (images) , stringify ! (created_date) , stringify ! (updated_date)] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: chapter :: $ field :: NAME , & self . $ field) ? ;) * state . serialize_field (crate :: prisma :: chapter :: id :: NAME , & self . id) ? ; state . serialize_field (crate :: prisma :: chapter :: name :: NAME , & self . name) ? ; state . serialize_field (crate :: prisma :: chapter :: url :: NAME , & self . url) ? ; state . serialize_field (crate :: prisma :: chapter :: comic_id :: NAME , & self . comic_id) ? ; state . serialize_field (crate :: prisma :: chapter :: images :: NAME , & self . images) ? ; state . serialize_field (crate :: prisma :: chapter :: created_date :: NAME , & self . created_date) ? ; state . serialize_field (crate :: prisma :: chapter :: updated_date :: NAME , & self . updated_date) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , id , name , url , comic_id , images , created_date , updated_date } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: chapter :: $ field :: NAME) , + , crate :: prisma :: chapter :: id :: NAME , crate :: prisma :: chapter :: name :: NAME , crate :: prisma :: chapter :: url :: NAME , crate :: prisma :: chapter :: comic_id :: NAME , crate :: prisma :: chapter :: images :: NAME , crate :: prisma :: chapter :: created_date :: NAME , crate :: prisma :: chapter :: updated_date :: NAME] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: chapter :: $ field :: NAME => Ok (Field :: $ field)) , * , crate :: prisma :: chapter :: id :: NAME => Ok (Field :: id) , crate :: prisma :: chapter :: name :: NAME => Ok (Field :: name) , crate :: prisma :: chapter :: url :: NAME => Ok (Field :: url) , crate :: prisma :: chapter :: comic_id :: NAME => Ok (Field :: comic_id) , crate :: prisma :: chapter :: images :: NAME => Ok (Field :: images) , crate :: prisma :: chapter :: created_date :: NAME => Ok (Field :: created_date) , crate :: prisma :: chapter :: updated_date :: NAME => Ok (Field :: updated_date) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut id = None ; let mut name = None ; let mut url = None ; let mut comic_id = None ; let mut images = None ; let mut created_date = None ; let mut updated_date = None ; while let Some (key) = map . next_key () ? { match key { Field :: id => { if id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: id :: NAME)) ; } id = Some (map . next_value () ?) ; } Field :: name => { if name . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: name :: NAME)) ; } name = Some (map . next_value () ?) ; } Field :: url => { if url . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: url :: NAME)) ; } url = Some (map . next_value () ?) ; } Field :: comic_id => { if comic_id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: comic_id :: NAME)) ; } comic_id = Some (map . next_value () ?) ; } Field :: images => { if images . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: images :: NAME)) ; } images = Some (map . next_value () ?) ; } Field :: created_date => { if created_date . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: created_date :: NAME)) ; } created_date = Some (map . next_value () ?) ; } Field :: updated_date => { if updated_date . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: updated_date :: NAME)) ; } updated_date = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: chapter :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: $ field :: NAME)) ? ;) * let id = id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: id :: NAME)) ? ; let name = name . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: name :: NAME)) ? ; let url = url . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: url :: NAME)) ? ; let comic_id = comic_id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: comic_id :: NAME)) ? ; let images = images . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: images :: NAME)) ? ; let created_date = created_date . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: created_date :: NAME)) ? ; let updated_date = updated_date . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: chapter :: updated_date :: NAME)) ? ; Ok (Data { id , name , url , comic_id , images , created_date , updated_date , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "name" , "url" , "comicId" , "images" , "createdDate" , "updatedDate" , "comic"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: chapter :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; comic : $ selection_mode : ident { $ ($ selections : tt) + }) => { comic :: Data } ; (@ field_type ; comic) => { crate :: prisma :: comic :: Data } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Chapter" , available relations are "comic")) } ; (@ field_module ; comic : $ selection_mode : ident { $ ($ selections : tt) + }) => { crate :: prisma :: comic :: include ! (@ definitions ; ; $ ($ selections) +) ; } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; comic $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? : $ selection_mode : ident { $ ($ selections : tt) + }) => { { Into :: < crate :: prisma :: chapter :: IncludeParam > :: into (crate :: prisma :: chapter :: comic :: Include :: $ selection_mode (crate :: prisma :: comic :: select ! (@ selections_to_params ; : $ selection_mode { $ ($ selections) + }) . into_iter () . collect ())) } } ; (@ selection_field_to_selection_param ; comic $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ?) => { { Into :: < crate :: prisma :: chapter :: IncludeParam > :: into (crate :: prisma :: chapter :: comic :: Include :: Fetch) } } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: chapter :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; name) => { "name" } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; comic_id) => { "comicId" } ; (@ field_serde_name ; images) => { "images" } ; (@ field_serde_name ; created_date) => { "createdDate" } ; (@ field_serde_name ; updated_date) => { "updatedDate" } ; (@ field_serde_name ; comic) => { "comic" } ; }
     pub use _include_chapter as include;
     pub enum IncludeParam {
         Id(id::Include),
         Name(name::Include),
         Url(url::Include),
-        Comic(comic::Include),
         ComicId(comic_id::Include),
         Images(images::Include),
         CreatedDate(created_date::Include),
         UpdatedDate(updated_date::Include),
+        Comic(comic::Include),
     }
     impl IncludeParam {
         pub fn to_selection(self) -> ::prisma_client_rust::Selection {
@@ -2568,11 +2646,11 @@ pub mod chapter {
                 Self::Id(data) => data.to_selection(),
                 Self::Name(data) => data.to_selection(),
                 Self::Url(data) => data.to_selection(),
-                Self::Comic(data) => data.to_selection(),
                 Self::ComicId(data) => data.to_selection(),
                 Self::Images(data) => data.to_selection(),
                 Self::CreatedDate(data) => data.to_selection(),
                 Self::UpdatedDate(data) => data.to_selection(),
+                Self::Comic(data) => data.to_selection(),
             }
         }
     }
@@ -2587,8 +2665,6 @@ pub mod chapter {
         pub name: String,
         #[serde(rename = "url")]
         pub url: String,
-        #[serde(rename = "comic")]
-        pub comic: Option<Box<super::comic::Data>>,
         #[serde(rename = "comicId")]
         pub comic_id: String,
         #[serde(rename = "images")]
@@ -2598,6 +2674,8 @@ pub mod chapter {
         #[serde(rename = "updatedDate")]
         pub updated_date:
             ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
+        #[serde(rename = "comic")]
+        pub comic: Option<Box<super::comic::Data>>,
     }
     impl Data {
         pub fn comic(
@@ -2635,7 +2713,6 @@ pub mod chapter {
         SetId(String),
         SetName(String),
         SetUrl(String),
-        ConnectComic(super::comic::UniqueWhereParam),
         SetComicId(String),
         SetImages(Vec<String>),
         PushImages(Vec<String>),
@@ -2643,6 +2720,7 @@ pub mod chapter {
         SetUpdatedDate(
             ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
         ),
+        ConnectComic(super::comic::UniqueWhereParam),
     }
     impl From<SetParam> for (String, ::prisma_client_rust::PrismaValue) {
         fn from(param: SetParam) -> Self {
@@ -2658,20 +2736,6 @@ pub mod chapter {
                 SetParam::SetUrl(value) => (
                     url::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::String(value),
-                ),
-                SetParam::ConnectComic(where_param) => (
-                    comic::NAME.to_string(),
-                    ::prisma_client_rust::PrismaValue::Object(vec![(
-                        "connect".to_string(),
-                        ::prisma_client_rust::PrismaValue::Object(
-                            [where_param]
-                                .into_iter()
-                                .map(Into::<super::comic::WhereParam>::into)
-                                .map(::prisma_client_rust::WhereInput::serialize)
-                                .map(::prisma_client_rust::SerializedWhereInput::transform_equals)
-                                .collect(),
-                        ),
-                    )]),
                 ),
                 SetParam::SetComicId(value) => (
                     comic_id::NAME.to_string(),
@@ -2705,6 +2769,20 @@ pub mod chapter {
                 SetParam::SetUpdatedDate(value) => (
                     updated_date::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::DateTime(value),
+                ),
+                SetParam::ConnectComic(where_param) => (
+                    comic::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::Object(vec![(
+                        "connect".to_string(),
+                        ::prisma_client_rust::PrismaValue::Object(
+                            [where_param]
+                                .into_iter()
+                                .map(Into::<super::comic::WhereParam>::into)
+                                .map(::prisma_client_rust::WhereInput::serialize)
+                                .map(::prisma_client_rust::SerializedWhereInput::transform_equals)
+                                .collect(),
+                        ),
+                    )]),
                 ),
             }
         }
@@ -2786,12 +2864,12 @@ pub mod chapter {
         Id(_prisma::read_filters::StringFilter),
         Name(_prisma::read_filters::StringFilter),
         Url(_prisma::read_filters::StringFilter),
-        ComicIs(Vec<super::comic::WhereParam>),
-        ComicIsNot(Vec<super::comic::WhereParam>),
         ComicId(_prisma::read_filters::StringFilter),
         Images(_prisma::read_filters::StringListFilter),
         CreatedDate(_prisma::read_filters::StringFilter),
         UpdatedDate(_prisma::read_filters::DateTimeFilter),
+        ComicIs(Vec<super::comic::WhereParam>),
+        ComicIsNot(Vec<super::comic::WhereParam>),
     }
     impl ::prisma_client_rust::WhereInput for WhereParam {
         fn serialize(self) -> ::prisma_client_rust::SerializedWhereInput {
@@ -2835,6 +2913,10 @@ pub mod chapter {
                 Self::Id(value) => (id::NAME, value.into()),
                 Self::Name(value) => (name::NAME, value.into()),
                 Self::Url(value) => (url::NAME, value.into()),
+                Self::ComicId(value) => (comic_id::NAME, value.into()),
+                Self::Images(value) => (images::NAME, value.into()),
+                Self::CreatedDate(value) => (created_date::NAME, value.into()),
+                Self::UpdatedDate(value) => (updated_date::NAME, value.into()),
                 Self::ComicIs(where_params) => (
                     comic::NAME,
                     ::prisma_client_rust::SerializedWhereValue::Object(vec![(
@@ -2861,10 +2943,6 @@ pub mod chapter {
                         ),
                     )]),
                 ),
-                Self::ComicId(value) => (comic_id::NAME, value.into()),
-                Self::Images(value) => (images::NAME, value.into()),
-                Self::CreatedDate(value) => (created_date::NAME, value.into()),
-                Self::UpdatedDate(value) => (updated_date::NAME, value.into()),
             };
             ::prisma_client_rust::SerializedWhereInput::new(name, value.into())
         }
@@ -2949,15 +3027,15 @@ pub mod chapter {
             self,
             name: String,
             url: String,
-            comic: super::comic::UniqueWhereParam,
             created_date: String,
+            comic: super::comic::UniqueWhereParam,
             mut _params: Vec<SetParam>,
         ) -> Create<'a> {
             _params.extend([
                 name::set(name),
                 url::set(url),
-                comic::connect(comic),
                 created_date::set(created_date),
+                comic::connect(comic),
             ]);
             Create::new(self.client, _params)
         }
@@ -3020,11 +3098,11 @@ pub mod chapter {
         pub fn upsert(
             self,
             _where: UniqueWhereParam,
-            (name, url, comic, created_date, mut _params): (
+            (name, url, created_date, comic, mut _params): (
+                String,
                 String,
                 String,
                 super::comic::UniqueWhereParam,
-                String,
                 Vec<SetParam>,
             ),
             _update: Vec<SetParam>,
@@ -3032,8 +3110,8 @@ pub mod chapter {
             _params.extend([
                 name::set(name),
                 url::set(url),
-                comic::connect(comic),
                 created_date::set(created_date),
+                comic::connect(comic),
             ]);
             Upsert::new(self.client, _where.into(), _params, _update)
         }
@@ -3302,63 +3380,6 @@ pub mod urls {
             }
         }
     }
-    pub mod is_error {
-        use super::super::*;
-        use super::_prisma::*;
-        use super::{
-            OrderByParam, SetParam, UncheckedSetParam, UniqueWhereParam, WhereParam, WithParam,
-        };
-        pub const NAME: &str = "isError";
-        pub struct Set(pub bool);
-        impl From<Set> for SetParam {
-            fn from(Set(v): Set) -> Self {
-                Self::SetIsError(v)
-            }
-        }
-        impl From<Set> for UncheckedSetParam {
-            fn from(Set(v): Set) -> Self {
-                Self::IsError(v)
-            }
-        }
-        pub fn set<T: From<Set>>(value: bool) -> T {
-            Set(value).into()
-        }
-        pub fn order(direction: ::prisma_client_rust::Direction) -> OrderByParam {
-            OrderByParam::IsError(direction)
-        }
-        pub fn equals(value: bool) -> WhereParam {
-            WhereParam::IsError(_prisma::read_filters::BoolFilter::Equals(value))
-        }
-        ::prisma_client_rust::scalar_where_param_fns!(
-            _prisma::read_filters::BoolFilter,
-            IsError,
-            {
-                fn not(_: bool) -> Not;
-            }
-        );
-        pub struct Include;
-        impl Into<super::IncludeParam> for Include {
-            fn into(self) -> super::IncludeParam {
-                super::IncludeParam::IsError(self)
-            }
-        }
-        impl Include {
-            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
-                ::prisma_client_rust::sel(NAME)
-            }
-        }
-        pub struct Select;
-        impl Into<super::SelectParam> for Select {
-            fn into(self) -> super::SelectParam {
-                super::SelectParam::IsError(self)
-            }
-        }
-        impl Select {
-            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
-                ::prisma_client_rust::sel(NAME)
-            }
-        }
-    }
     pub mod created_date {
         use super::super::*;
         use super::_prisma::*;
@@ -3464,6 +3485,63 @@ pub mod urls {
             }
         }
     }
+    pub mod is_error {
+        use super::super::*;
+        use super::_prisma::*;
+        use super::{
+            OrderByParam, SetParam, UncheckedSetParam, UniqueWhereParam, WhereParam, WithParam,
+        };
+        pub const NAME: &str = "isError";
+        pub struct Set(pub bool);
+        impl From<Set> for SetParam {
+            fn from(Set(v): Set) -> Self {
+                Self::SetIsError(v)
+            }
+        }
+        impl From<Set> for UncheckedSetParam {
+            fn from(Set(v): Set) -> Self {
+                Self::IsError(v)
+            }
+        }
+        pub fn set<T: From<Set>>(value: bool) -> T {
+            Set(value).into()
+        }
+        pub fn order(direction: ::prisma_client_rust::Direction) -> OrderByParam {
+            OrderByParam::IsError(direction)
+        }
+        pub fn equals(value: bool) -> WhereParam {
+            WhereParam::IsError(_prisma::read_filters::BoolFilter::Equals(value))
+        }
+        ::prisma_client_rust::scalar_where_param_fns!(
+            _prisma::read_filters::BoolFilter,
+            IsError,
+            {
+                fn not(_: bool) -> Not;
+            }
+        );
+        pub struct Include;
+        impl Into<super::IncludeParam> for Include {
+            fn into(self) -> super::IncludeParam {
+                super::IncludeParam::IsError(self)
+            }
+        }
+        impl Include {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                ::prisma_client_rust::sel(NAME)
+            }
+        }
+        pub struct Select;
+        impl Into<super::SelectParam> for Select {
+            fn into(self) -> super::SelectParam {
+                super::SelectParam::IsError(self)
+            }
+        }
+        impl Select {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                ::prisma_client_rust::sel(NAME)
+            }
+        }
+    }
     pub fn create(url: String, _params: Vec<SetParam>) -> (String, Vec<SetParam>) {
         (url, _params)
     }
@@ -3471,15 +3549,15 @@ pub mod urls {
         (url, _params)
     }
     #[macro_export]
-    macro_rules ! _select_urls { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: urls :: select ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: urls :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: urls :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: urls :: select ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: urls :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: urls :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { url , id , fetched , fetching , is_error , created_date } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : crate :: prisma :: urls :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: urls :: $ field :: NAME , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: urls :: $ field :: NAME) , + ,] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: urls :: $ field :: NAME => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: $ field :: NAME)) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["url" , "id" , "fetched" , "fetching" , "isError" , "createdDate"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: urls :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; url) => { String } ; (@ field_type ; id) => { String } ; (@ field_type ; fetched) => { bool } ; (@ field_type ; fetching) => { bool } ; (@ field_type ; is_error) => { bool } ; (@ field_type ; created_date) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Urls" , available relations are "url, id, fetched, fetching, is_error, created_date")) } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; url) => { Into :: < crate :: prisma :: urls :: SelectParam > :: into (crate :: prisma :: urls :: url :: Select) } ; (@ selection_field_to_selection_param ; id) => { Into :: < crate :: prisma :: urls :: SelectParam > :: into (crate :: prisma :: urls :: id :: Select) } ; (@ selection_field_to_selection_param ; fetched) => { Into :: < crate :: prisma :: urls :: SelectParam > :: into (crate :: prisma :: urls :: fetched :: Select) } ; (@ selection_field_to_selection_param ; fetching) => { Into :: < crate :: prisma :: urls :: SelectParam > :: into (crate :: prisma :: urls :: fetching :: Select) } ; (@ selection_field_to_selection_param ; is_error) => { Into :: < crate :: prisma :: urls :: SelectParam > :: into (crate :: prisma :: urls :: is_error :: Select) } ; (@ selection_field_to_selection_param ; created_date) => { Into :: < crate :: prisma :: urls :: SelectParam > :: into (crate :: prisma :: urls :: created_date :: Select) } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: urls :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; fetched) => { "fetched" } ; (@ field_serde_name ; fetching) => { "fetching" } ; (@ field_serde_name ; is_error) => { "isError" } ; (@ field_serde_name ; created_date) => { "createdDate" } ; }
+    macro_rules ! _select_urls { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: urls :: select ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: urls :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: urls :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: urls :: select ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: urls :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: urls :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { url , id , fetched , fetching , created_date , is_error } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : crate :: prisma :: urls :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: urls :: $ field :: NAME , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: urls :: $ field :: NAME) , + ,] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: urls :: $ field :: NAME => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: $ field :: NAME)) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["url" , "id" , "fetched" , "fetching" , "createdDate" , "isError"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: urls :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; url) => { String } ; (@ field_type ; id) => { String } ; (@ field_type ; fetched) => { bool } ; (@ field_type ; fetching) => { bool } ; (@ field_type ; created_date) => { :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } ; (@ field_type ; is_error) => { bool } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Urls" , available relations are "url, id, fetched, fetching, created_date, is_error")) } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; url) => { Into :: < crate :: prisma :: urls :: SelectParam > :: into (crate :: prisma :: urls :: url :: Select) } ; (@ selection_field_to_selection_param ; id) => { Into :: < crate :: prisma :: urls :: SelectParam > :: into (crate :: prisma :: urls :: id :: Select) } ; (@ selection_field_to_selection_param ; fetched) => { Into :: < crate :: prisma :: urls :: SelectParam > :: into (crate :: prisma :: urls :: fetched :: Select) } ; (@ selection_field_to_selection_param ; fetching) => { Into :: < crate :: prisma :: urls :: SelectParam > :: into (crate :: prisma :: urls :: fetching :: Select) } ; (@ selection_field_to_selection_param ; created_date) => { Into :: < crate :: prisma :: urls :: SelectParam > :: into (crate :: prisma :: urls :: created_date :: Select) } ; (@ selection_field_to_selection_param ; is_error) => { Into :: < crate :: prisma :: urls :: SelectParam > :: into (crate :: prisma :: urls :: is_error :: Select) } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: urls :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; fetched) => { "fetched" } ; (@ field_serde_name ; fetching) => { "fetching" } ; (@ field_serde_name ; created_date) => { "createdDate" } ; (@ field_serde_name ; is_error) => { "isError" } ; }
     pub use _select_urls as select;
     pub enum SelectParam {
         Url(url::Select),
         Id(id::Select),
         Fetched(fetched::Select),
         Fetching(fetching::Select),
-        IsError(is_error::Select),
         CreatedDate(created_date::Select),
+        IsError(is_error::Select),
     }
     impl SelectParam {
         pub fn to_selection(self) -> ::prisma_client_rust::Selection {
@@ -3488,21 +3566,21 @@ pub mod urls {
                 Self::Id(data) => data.to_selection(),
                 Self::Fetched(data) => data.to_selection(),
                 Self::Fetching(data) => data.to_selection(),
-                Self::IsError(data) => data.to_selection(),
                 Self::CreatedDate(data) => data.to_selection(),
+                Self::IsError(data) => data.to_selection(),
             }
         }
     }
     #[macro_export]
-    macro_rules ! _include_urls { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: urls :: include ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: urls :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: urls :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: urls :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: urls :: include ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: urls :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: urls :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: urls :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub url : String , pub id : String , pub fetched : bool , pub fetching : bool , pub is_error : bool , pub created_date : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , $ (pub $ field : crate :: prisma :: urls :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (url) , stringify ! (id) , stringify ! (fetched) , stringify ! (fetching) , stringify ! (is_error) , stringify ! (created_date)] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: urls :: $ field :: NAME , & self . $ field) ? ;) * state . serialize_field (crate :: prisma :: urls :: url :: NAME , & self . url) ? ; state . serialize_field (crate :: prisma :: urls :: id :: NAME , & self . id) ? ; state . serialize_field (crate :: prisma :: urls :: fetched :: NAME , & self . fetched) ? ; state . serialize_field (crate :: prisma :: urls :: fetching :: NAME , & self . fetching) ? ; state . serialize_field (crate :: prisma :: urls :: is_error :: NAME , & self . is_error) ? ; state . serialize_field (crate :: prisma :: urls :: created_date :: NAME , & self . created_date) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , url , id , fetched , fetching , is_error , created_date } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: urls :: $ field :: NAME) , + , crate :: prisma :: urls :: url :: NAME , crate :: prisma :: urls :: id :: NAME , crate :: prisma :: urls :: fetched :: NAME , crate :: prisma :: urls :: fetching :: NAME , crate :: prisma :: urls :: is_error :: NAME , crate :: prisma :: urls :: created_date :: NAME] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: urls :: $ field :: NAME => Ok (Field :: $ field)) , * , crate :: prisma :: urls :: url :: NAME => Ok (Field :: url) , crate :: prisma :: urls :: id :: NAME => Ok (Field :: id) , crate :: prisma :: urls :: fetched :: NAME => Ok (Field :: fetched) , crate :: prisma :: urls :: fetching :: NAME => Ok (Field :: fetching) , crate :: prisma :: urls :: is_error :: NAME => Ok (Field :: is_error) , crate :: prisma :: urls :: created_date :: NAME => Ok (Field :: created_date) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut url = None ; let mut id = None ; let mut fetched = None ; let mut fetching = None ; let mut is_error = None ; let mut created_date = None ; while let Some (key) = map . next_key () ? { match key { Field :: url => { if url . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: url :: NAME)) ; } url = Some (map . next_value () ?) ; } Field :: id => { if id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: id :: NAME)) ; } id = Some (map . next_value () ?) ; } Field :: fetched => { if fetched . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: fetched :: NAME)) ; } fetched = Some (map . next_value () ?) ; } Field :: fetching => { if fetching . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: fetching :: NAME)) ; } fetching = Some (map . next_value () ?) ; } Field :: is_error => { if is_error . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: is_error :: NAME)) ; } is_error = Some (map . next_value () ?) ; } Field :: created_date => { if created_date . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: created_date :: NAME)) ; } created_date = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: $ field :: NAME)) ? ;) * let url = url . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: url :: NAME)) ? ; let id = id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: id :: NAME)) ? ; let fetched = fetched . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: fetched :: NAME)) ? ; let fetching = fetching . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: fetching :: NAME)) ? ; let is_error = is_error . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: is_error :: NAME)) ? ; let created_date = created_date . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: created_date :: NAME)) ? ; Ok (Data { url , id , fetched , fetching , is_error , created_date , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["url" , "id" , "fetched" , "fetching" , "isError" , "createdDate"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: urls :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Urls" , available relations are "")) } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: urls :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; fetched) => { "fetched" } ; (@ field_serde_name ; fetching) => { "fetching" } ; (@ field_serde_name ; is_error) => { "isError" } ; (@ field_serde_name ; created_date) => { "createdDate" } ; }
+    macro_rules ! _include_urls { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: urls :: include ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: urls :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: urls :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: urls :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: urls :: include ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: urls :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: urls :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: urls :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub url : String , pub id : String , pub fetched : bool , pub fetching : bool , pub created_date : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , pub is_error : bool , $ (pub $ field : crate :: prisma :: urls :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (url) , stringify ! (id) , stringify ! (fetched) , stringify ! (fetching) , stringify ! (created_date) , stringify ! (is_error)] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: urls :: $ field :: NAME , & self . $ field) ? ;) * state . serialize_field (crate :: prisma :: urls :: url :: NAME , & self . url) ? ; state . serialize_field (crate :: prisma :: urls :: id :: NAME , & self . id) ? ; state . serialize_field (crate :: prisma :: urls :: fetched :: NAME , & self . fetched) ? ; state . serialize_field (crate :: prisma :: urls :: fetching :: NAME , & self . fetching) ? ; state . serialize_field (crate :: prisma :: urls :: created_date :: NAME , & self . created_date) ? ; state . serialize_field (crate :: prisma :: urls :: is_error :: NAME , & self . is_error) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , url , id , fetched , fetching , created_date , is_error } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: urls :: $ field :: NAME) , + , crate :: prisma :: urls :: url :: NAME , crate :: prisma :: urls :: id :: NAME , crate :: prisma :: urls :: fetched :: NAME , crate :: prisma :: urls :: fetching :: NAME , crate :: prisma :: urls :: created_date :: NAME , crate :: prisma :: urls :: is_error :: NAME] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: urls :: $ field :: NAME => Ok (Field :: $ field)) , * , crate :: prisma :: urls :: url :: NAME => Ok (Field :: url) , crate :: prisma :: urls :: id :: NAME => Ok (Field :: id) , crate :: prisma :: urls :: fetched :: NAME => Ok (Field :: fetched) , crate :: prisma :: urls :: fetching :: NAME => Ok (Field :: fetching) , crate :: prisma :: urls :: created_date :: NAME => Ok (Field :: created_date) , crate :: prisma :: urls :: is_error :: NAME => Ok (Field :: is_error) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut url = None ; let mut id = None ; let mut fetched = None ; let mut fetching = None ; let mut created_date = None ; let mut is_error = None ; while let Some (key) = map . next_key () ? { match key { Field :: url => { if url . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: url :: NAME)) ; } url = Some (map . next_value () ?) ; } Field :: id => { if id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: id :: NAME)) ; } id = Some (map . next_value () ?) ; } Field :: fetched => { if fetched . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: fetched :: NAME)) ; } fetched = Some (map . next_value () ?) ; } Field :: fetching => { if fetching . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: fetching :: NAME)) ; } fetching = Some (map . next_value () ?) ; } Field :: created_date => { if created_date . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: created_date :: NAME)) ; } created_date = Some (map . next_value () ?) ; } Field :: is_error => { if is_error . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: is_error :: NAME)) ; } is_error = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: urls :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: $ field :: NAME)) ? ;) * let url = url . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: url :: NAME)) ? ; let id = id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: id :: NAME)) ? ; let fetched = fetched . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: fetched :: NAME)) ? ; let fetching = fetching . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: fetching :: NAME)) ? ; let created_date = created_date . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: created_date :: NAME)) ? ; let is_error = is_error . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: urls :: is_error :: NAME)) ? ; Ok (Data { url , id , fetched , fetching , created_date , is_error , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["url" , "id" , "fetched" , "fetching" , "createdDate" , "isError"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: urls :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Urls" , available relations are "")) } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: urls :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; fetched) => { "fetched" } ; (@ field_serde_name ; fetching) => { "fetching" } ; (@ field_serde_name ; created_date) => { "createdDate" } ; (@ field_serde_name ; is_error) => { "isError" } ; }
     pub use _include_urls as include;
     pub enum IncludeParam {
         Url(url::Include),
         Id(id::Include),
         Fetched(fetched::Include),
         Fetching(fetching::Include),
-        IsError(is_error::Include),
         CreatedDate(created_date::Include),
+        IsError(is_error::Include),
     }
     impl IncludeParam {
         pub fn to_selection(self) -> ::prisma_client_rust::Selection {
@@ -3511,13 +3589,13 @@ pub mod urls {
                 Self::Id(data) => data.to_selection(),
                 Self::Fetched(data) => data.to_selection(),
                 Self::Fetching(data) => data.to_selection(),
-                Self::IsError(data) => data.to_selection(),
                 Self::CreatedDate(data) => data.to_selection(),
+                Self::IsError(data) => data.to_selection(),
             }
         }
     }
     #[macro_export]
-    macro_rules ! _partial_unchecked_urls { ($ struct_name : ident { $ ($ scalar_field : ident) + }) => { :: prisma_client_rust :: macros :: partial_unchecked ! { crate :: prisma :: urls struct $ struct_name { # [serde (rename = "url")] pub url : String , # [serde (rename = "id")] pub id : String , # [serde (rename = "fetched")] pub fetched : bool , # [serde (rename = "fetching")] pub fetching : bool , # [serde (rename = "isError")] pub is_error : bool , # [serde (rename = "createdDate")] pub created_date : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > } [$ ($ scalar_field) , +] } } ; }
+    macro_rules ! _partial_unchecked_urls { ($ struct_name : ident { $ ($ scalar_field : ident) + }) => { :: prisma_client_rust :: macros :: partial_unchecked ! { crate :: prisma :: urls struct $ struct_name { # [serde (rename = "url")] pub url : String , # [serde (rename = "id")] pub id : String , # [serde (rename = "fetched")] pub fetched : bool , # [serde (rename = "fetching")] pub fetching : bool , # [serde (rename = "createdDate")] pub created_date : :: prisma_client_rust :: chrono :: DateTime < :: prisma_client_rust :: chrono :: FixedOffset , > , # [serde (rename = "isError")] pub is_error : bool } [$ ($ scalar_field) , +] } } ; }
     pub use _partial_unchecked_urls as partial_unchecked;
     #[derive(Debug, Clone, :: serde :: Serialize, :: serde :: Deserialize)]
     pub struct Data {
@@ -3529,11 +3607,11 @@ pub mod urls {
         pub fetched: bool,
         #[serde(rename = "fetching")]
         pub fetching: bool,
-        #[serde(rename = "isError")]
-        pub is_error: bool,
         #[serde(rename = "createdDate")]
         pub created_date:
             ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
+        #[serde(rename = "isError")]
+        pub is_error: bool,
     }
     impl Data {}
     #[derive(Clone)]
@@ -3549,10 +3627,10 @@ pub mod urls {
         SetId(String),
         SetFetched(bool),
         SetFetching(bool),
-        SetIsError(bool),
         SetCreatedDate(
             ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
         ),
+        SetIsError(bool),
     }
     impl From<SetParam> for (String, ::prisma_client_rust::PrismaValue) {
         fn from(param: SetParam) -> Self {
@@ -3573,13 +3651,13 @@ pub mod urls {
                     fetching::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::Boolean(value),
                 ),
-                SetParam::SetIsError(value) => (
-                    is_error::NAME.to_string(),
-                    ::prisma_client_rust::PrismaValue::Boolean(value),
-                ),
                 SetParam::SetCreatedDate(value) => (
                     created_date::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::DateTime(value),
+                ),
+                SetParam::SetIsError(value) => (
+                    is_error::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::Boolean(value),
                 ),
             }
         }
@@ -3590,10 +3668,10 @@ pub mod urls {
         Id(String),
         Fetched(bool),
         Fetching(bool),
-        IsError(bool),
         CreatedDate(
             ::prisma_client_rust::chrono::DateTime<::prisma_client_rust::chrono::FixedOffset>,
         ),
+        IsError(bool),
     }
     impl From<UncheckedSetParam> for SetParam {
         fn from(param: UncheckedSetParam) -> Self {
@@ -3602,8 +3680,8 @@ pub mod urls {
                 UncheckedSetParam::Id(value) => Self::SetId(value),
                 UncheckedSetParam::Fetched(value) => Self::SetFetched(value),
                 UncheckedSetParam::Fetching(value) => Self::SetFetching(value),
-                UncheckedSetParam::IsError(value) => Self::SetIsError(value),
                 UncheckedSetParam::CreatedDate(value) => Self::SetCreatedDate(value),
+                UncheckedSetParam::IsError(value) => Self::SetIsError(value),
             }
         }
     }
@@ -3613,8 +3691,8 @@ pub mod urls {
         Id(::prisma_client_rust::Direction),
         Fetched(::prisma_client_rust::Direction),
         Fetching(::prisma_client_rust::Direction),
-        IsError(::prisma_client_rust::Direction),
         CreatedDate(::prisma_client_rust::Direction),
+        IsError(::prisma_client_rust::Direction),
     }
     impl Into<(String, ::prisma_client_rust::PrismaValue)> for OrderByParam {
         fn into(self) -> (String, ::prisma_client_rust::PrismaValue) {
@@ -3635,12 +3713,12 @@ pub mod urls {
                     fetching::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::String(direction.to_string()),
                 ),
-                Self::IsError(direction) => (
-                    is_error::NAME.to_string(),
-                    ::prisma_client_rust::PrismaValue::String(direction.to_string()),
-                ),
                 Self::CreatedDate(direction) => (
                     created_date::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::String(direction.to_string()),
+                ),
+                Self::IsError(direction) => (
+                    is_error::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::String(direction.to_string()),
                 ),
             }
@@ -3655,8 +3733,8 @@ pub mod urls {
         Id(_prisma::read_filters::StringFilter),
         Fetched(_prisma::read_filters::BoolFilter),
         Fetching(_prisma::read_filters::BoolFilter),
-        IsError(_prisma::read_filters::BoolFilter),
         CreatedDate(_prisma::read_filters::DateTimeFilter),
+        IsError(_prisma::read_filters::BoolFilter),
     }
     impl ::prisma_client_rust::WhereInput for WhereParam {
         fn serialize(self) -> ::prisma_client_rust::SerializedWhereInput {
@@ -3701,8 +3779,8 @@ pub mod urls {
                 Self::Id(value) => (id::NAME, value.into()),
                 Self::Fetched(value) => (fetched::NAME, value.into()),
                 Self::Fetching(value) => (fetching::NAME, value.into()),
-                Self::IsError(value) => (is_error::NAME, value.into()),
                 Self::CreatedDate(value) => (created_date::NAME, value.into()),
+                Self::IsError(value) => (is_error::NAME, value.into()),
             };
             ::prisma_client_rust::SerializedWhereInput::new(name, value.into())
         }
@@ -3750,8 +3828,8 @@ pub mod urls {
                 ::prisma_client_rust::sel(id::NAME),
                 ::prisma_client_rust::sel(fetched::NAME),
                 ::prisma_client_rust::sel(fetching::NAME),
-                ::prisma_client_rust::sel(is_error::NAME),
                 ::prisma_client_rust::sel(created_date::NAME),
+                ::prisma_client_rust::sel(is_error::NAME),
             ]
         }
     }
@@ -3860,6 +3938,69 @@ pub mod proxy {
     use super::_prisma::*;
     use super::*;
     pub const NAME: &str = "Proxy";
+    pub mod id {
+        use super::super::*;
+        use super::_prisma::*;
+        use super::{
+            OrderByParam, SetParam, UncheckedSetParam, UniqueWhereParam, WhereParam, WithParam,
+        };
+        pub const NAME: &str = "id";
+        pub struct Set(pub String);
+        impl From<Set> for SetParam {
+            fn from(Set(v): Set) -> Self {
+                Self::SetId(v)
+            }
+        }
+        impl From<Set> for UncheckedSetParam {
+            fn from(Set(v): Set) -> Self {
+                Self::Id(v)
+            }
+        }
+        pub fn set<T: From<Set>>(value: String) -> T {
+            Set(value).into()
+        }
+        pub fn order(direction: ::prisma_client_rust::Direction) -> OrderByParam {
+            OrderByParam::Id(direction)
+        }
+        pub fn equals<T: From<UniqueWhereParam>>(value: String) -> T {
+            UniqueWhereParam::IdEquals(value).into()
+        }
+        ::prisma_client_rust::scalar_where_param_fns!(_prisma::read_filters::StringFilter, Id, {
+            fn in_vec(_: Vec<String>) -> InVec;
+            fn not_in_vec(_: Vec<String>) -> NotInVec;
+            fn lt(_: String) -> Lt;
+            fn lte(_: String) -> Lte;
+            fn gt(_: String) -> Gt;
+            fn gte(_: String) -> Gte;
+            fn contains(_: String) -> Contains;
+            fn starts_with(_: String) -> StartsWith;
+            fn ends_with(_: String) -> EndsWith;
+            fn mode(_: super::super::QueryMode) -> Mode;
+            fn not(_: String) -> Not;
+        });
+        pub struct Include;
+        impl Into<super::IncludeParam> for Include {
+            fn into(self) -> super::IncludeParam {
+                super::IncludeParam::Id(self)
+            }
+        }
+        impl Include {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                ::prisma_client_rust::sel(NAME)
+            }
+        }
+        pub struct Select;
+        impl Into<super::SelectParam> for Select {
+            fn into(self) -> super::SelectParam {
+                super::SelectParam::Id(self)
+            }
+        }
+        impl Select {
+            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
+                ::prisma_client_rust::sel(NAME)
+            }
+        }
+    }
     pub mod url {
         use super::super::*;
         use super::_prisma::*;
@@ -3915,73 +4056,6 @@ pub mod proxy {
         impl Into<super::SelectParam> for Select {
             fn into(self) -> super::SelectParam {
                 super::SelectParam::Url(self)
-            }
-        }
-        impl Select {
-            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
-                ::prisma_client_rust::sel(NAME)
-            }
-        }
-    }
-    pub mod username {
-        use super::super::*;
-        use super::_prisma::*;
-        use super::{
-            OrderByParam, SetParam, UncheckedSetParam, UniqueWhereParam, WhereParam, WithParam,
-        };
-        pub const NAME: &str = "username";
-        pub struct Set(pub Option<String>);
-        impl From<Set> for SetParam {
-            fn from(Set(v): Set) -> Self {
-                Self::SetUsername(v)
-            }
-        }
-        impl From<Set> for UncheckedSetParam {
-            fn from(Set(v): Set) -> Self {
-                Self::Username(v)
-            }
-        }
-        pub fn set<T: From<Set>>(value: Option<String>) -> T {
-            Set(value).into()
-        }
-        pub fn order(direction: ::prisma_client_rust::Direction) -> OrderByParam {
-            OrderByParam::Username(direction)
-        }
-        pub fn equals(value: Option<String>) -> WhereParam {
-            WhereParam::Username(_prisma::read_filters::StringNullableFilter::Equals(value))
-        }
-        ::prisma_client_rust::scalar_where_param_fns!(
-            _prisma::read_filters::StringNullableFilter,
-            Username,
-            {
-                fn in_vec(_: Vec<String>) -> InVec;
-                fn not_in_vec(_: Vec<String>) -> NotInVec;
-                fn lt(_: String) -> Lt;
-                fn lte(_: String) -> Lte;
-                fn gt(_: String) -> Gt;
-                fn gte(_: String) -> Gte;
-                fn contains(_: String) -> Contains;
-                fn starts_with(_: String) -> StartsWith;
-                fn ends_with(_: String) -> EndsWith;
-                fn mode(_: super::super::QueryMode) -> Mode;
-                fn not(_: Option<String>) -> Not;
-            }
-        );
-        pub struct Include;
-        impl Into<super::IncludeParam> for Include {
-            fn into(self) -> super::IncludeParam {
-                super::IncludeParam::Username(self)
-            }
-        }
-        impl Include {
-            pub fn to_selection(self) -> ::prisma_client_rust::Selection {
-                ::prisma_client_rust::sel(NAME)
-            }
-        }
-        pub struct Select;
-        impl Into<super::SelectParam> for Select {
-            fn into(self) -> super::SelectParam {
-                super::SelectParam::Username(self)
             }
         }
         impl Select {
@@ -4057,50 +4131,54 @@ pub mod proxy {
             }
         }
     }
-    pub mod id {
+    pub mod username {
         use super::super::*;
         use super::_prisma::*;
         use super::{
             OrderByParam, SetParam, UncheckedSetParam, UniqueWhereParam, WhereParam, WithParam,
         };
-        pub const NAME: &str = "id";
-        pub struct Set(pub String);
+        pub const NAME: &str = "username";
+        pub struct Set(pub Option<String>);
         impl From<Set> for SetParam {
             fn from(Set(v): Set) -> Self {
-                Self::SetId(v)
+                Self::SetUsername(v)
             }
         }
         impl From<Set> for UncheckedSetParam {
             fn from(Set(v): Set) -> Self {
-                Self::Id(v)
+                Self::Username(v)
             }
         }
-        pub fn set<T: From<Set>>(value: String) -> T {
+        pub fn set<T: From<Set>>(value: Option<String>) -> T {
             Set(value).into()
         }
         pub fn order(direction: ::prisma_client_rust::Direction) -> OrderByParam {
-            OrderByParam::Id(direction)
+            OrderByParam::Username(direction)
         }
-        pub fn equals<T: From<UniqueWhereParam>>(value: String) -> T {
-            UniqueWhereParam::IdEquals(value).into()
+        pub fn equals(value: Option<String>) -> WhereParam {
+            WhereParam::Username(_prisma::read_filters::StringNullableFilter::Equals(value))
         }
-        ::prisma_client_rust::scalar_where_param_fns!(_prisma::read_filters::StringFilter, Id, {
-            fn in_vec(_: Vec<String>) -> InVec;
-            fn not_in_vec(_: Vec<String>) -> NotInVec;
-            fn lt(_: String) -> Lt;
-            fn lte(_: String) -> Lte;
-            fn gt(_: String) -> Gt;
-            fn gte(_: String) -> Gte;
-            fn contains(_: String) -> Contains;
-            fn starts_with(_: String) -> StartsWith;
-            fn ends_with(_: String) -> EndsWith;
-            fn mode(_: super::super::QueryMode) -> Mode;
-            fn not(_: String) -> Not;
-        });
+        ::prisma_client_rust::scalar_where_param_fns!(
+            _prisma::read_filters::StringNullableFilter,
+            Username,
+            {
+                fn in_vec(_: Vec<String>) -> InVec;
+                fn not_in_vec(_: Vec<String>) -> NotInVec;
+                fn lt(_: String) -> Lt;
+                fn lte(_: String) -> Lte;
+                fn gt(_: String) -> Gt;
+                fn gte(_: String) -> Gte;
+                fn contains(_: String) -> Contains;
+                fn starts_with(_: String) -> StartsWith;
+                fn ends_with(_: String) -> EndsWith;
+                fn mode(_: super::super::QueryMode) -> Mode;
+                fn not(_: Option<String>) -> Not;
+            }
+        );
         pub struct Include;
         impl Into<super::IncludeParam> for Include {
             fn into(self) -> super::IncludeParam {
-                super::IncludeParam::Id(self)
+                super::IncludeParam::Username(self)
             }
         }
         impl Include {
@@ -4111,7 +4189,7 @@ pub mod proxy {
         pub struct Select;
         impl Into<super::SelectParam> for Select {
             fn into(self) -> super::SelectParam {
-                super::SelectParam::Id(self)
+                super::SelectParam::Username(self)
             }
         }
         impl Select {
@@ -4127,56 +4205,56 @@ pub mod proxy {
         (url, _params)
     }
     #[macro_export]
-    macro_rules ! _select_proxy { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: proxy :: select ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: proxy :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: proxy :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: proxy :: select ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: proxy :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: proxy :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { url , username , password , id } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : crate :: prisma :: proxy :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: proxy :: $ field :: NAME , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: proxy :: $ field :: NAME) , + ,] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: proxy :: $ field :: NAME => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: proxy :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: proxy :: $ field :: NAME)) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["url" , "username" , "password" , "id"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: proxy :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; url) => { String } ; (@ field_type ; username) => { Option < String > } ; (@ field_type ; password) => { Option < String > } ; (@ field_type ; id) => { String } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Proxy" , available relations are "url, username, password, id")) } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; url) => { Into :: < crate :: prisma :: proxy :: SelectParam > :: into (crate :: prisma :: proxy :: url :: Select) } ; (@ selection_field_to_selection_param ; username) => { Into :: < crate :: prisma :: proxy :: SelectParam > :: into (crate :: prisma :: proxy :: username :: Select) } ; (@ selection_field_to_selection_param ; password) => { Into :: < crate :: prisma :: proxy :: SelectParam > :: into (crate :: prisma :: proxy :: password :: Select) } ; (@ selection_field_to_selection_param ; id) => { Into :: < crate :: prisma :: proxy :: SelectParam > :: into (crate :: prisma :: proxy :: id :: Select) } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: proxy :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; username) => { "username" } ; (@ field_serde_name ; password) => { "password" } ; (@ field_serde_name ; id) => { "id" } ; }
+    macro_rules ! _select_proxy { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: proxy :: select ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: proxy :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn select ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: proxy :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: proxy :: select ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: SelectType for Selection { type Data = Data ; type ModelData = crate :: prisma :: proxy :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: proxy :: select ! (@ selections_to_params ; : select { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () ,] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { id , url , password , username } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { $ (pub $ field : crate :: prisma :: proxy :: select ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) +] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: proxy :: $ field :: NAME , & self . $ field) ? ;) * state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: proxy :: $ field :: NAME) , + ,] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: proxy :: $ field :: NAME => Ok (Field :: $ field)) , * , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * while let Some (key) = map . next_key () ? { match key { $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: proxy :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: proxy :: $ field :: NAME)) ? ;) * Ok (Data { $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "url" , "password" , "username"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: proxy :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; id) => { String } ; (@ field_type ; url) => { String } ; (@ field_type ; password) => { Option < String > } ; (@ field_type ; username) => { Option < String > } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Proxy" , available relations are "id, url, password, username")) } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; id) => { Into :: < crate :: prisma :: proxy :: SelectParam > :: into (crate :: prisma :: proxy :: id :: Select) } ; (@ selection_field_to_selection_param ; url) => { Into :: < crate :: prisma :: proxy :: SelectParam > :: into (crate :: prisma :: proxy :: url :: Select) } ; (@ selection_field_to_selection_param ; password) => { Into :: < crate :: prisma :: proxy :: SelectParam > :: into (crate :: prisma :: proxy :: password :: Select) } ; (@ selection_field_to_selection_param ; username) => { Into :: < crate :: prisma :: proxy :: SelectParam > :: into (crate :: prisma :: proxy :: username :: Select) } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: proxy :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; password) => { "password" } ; (@ field_serde_name ; username) => { "username" } ; }
     pub use _select_proxy as select;
     pub enum SelectParam {
-        Url(url::Select),
-        Username(username::Select),
-        Password(password::Select),
         Id(id::Select),
+        Url(url::Select),
+        Password(password::Select),
+        Username(username::Select),
     }
     impl SelectParam {
         pub fn to_selection(self) -> ::prisma_client_rust::Selection {
             match self {
-                Self::Url(data) => data.to_selection(),
-                Self::Username(data) => data.to_selection(),
-                Self::Password(data) => data.to_selection(),
                 Self::Id(data) => data.to_selection(),
+                Self::Url(data) => data.to_selection(),
+                Self::Password(data) => data.to_selection(),
+                Self::Username(data) => data.to_selection(),
             }
         }
     }
     #[macro_export]
-    macro_rules ! _include_proxy { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: proxy :: include ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: proxy :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: proxy :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: proxy :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: proxy :: include ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: proxy :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: proxy :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: proxy :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub url : String , pub username : Option < String > , pub password : Option < String > , pub id : String , $ (pub $ field : crate :: prisma :: proxy :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (url) , stringify ! (username) , stringify ! (password) , stringify ! (id)] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: proxy :: $ field :: NAME , & self . $ field) ? ;) * state . serialize_field (crate :: prisma :: proxy :: url :: NAME , & self . url) ? ; state . serialize_field (crate :: prisma :: proxy :: username :: NAME , & self . username) ? ; state . serialize_field (crate :: prisma :: proxy :: password :: NAME , & self . password) ? ; state . serialize_field (crate :: prisma :: proxy :: id :: NAME , & self . id) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , url , username , password , id } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: proxy :: $ field :: NAME) , + , crate :: prisma :: proxy :: url :: NAME , crate :: prisma :: proxy :: username :: NAME , crate :: prisma :: proxy :: password :: NAME , crate :: prisma :: proxy :: id :: NAME] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: proxy :: $ field :: NAME => Ok (Field :: $ field)) , * , crate :: prisma :: proxy :: url :: NAME => Ok (Field :: url) , crate :: prisma :: proxy :: username :: NAME => Ok (Field :: username) , crate :: prisma :: proxy :: password :: NAME => Ok (Field :: password) , crate :: prisma :: proxy :: id :: NAME => Ok (Field :: id) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut url = None ; let mut username = None ; let mut password = None ; let mut id = None ; while let Some (key) = map . next_key () ? { match key { Field :: url => { if url . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: proxy :: url :: NAME)) ; } url = Some (map . next_value () ?) ; } Field :: username => { if username . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: proxy :: username :: NAME)) ; } username = Some (map . next_value () ?) ; } Field :: password => { if password . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: proxy :: password :: NAME)) ; } password = Some (map . next_value () ?) ; } Field :: id => { if id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: proxy :: id :: NAME)) ; } id = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: proxy :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: proxy :: $ field :: NAME)) ? ;) * let url = url . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: proxy :: url :: NAME)) ? ; let username = username . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: proxy :: username :: NAME)) ? ; let password = password . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: proxy :: password :: NAME)) ? ; let id = id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: proxy :: id :: NAME)) ? ; Ok (Data { url , username , password , id , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["url" , "username" , "password" , "id"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: proxy :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Proxy" , available relations are "")) } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: proxy :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; username) => { "username" } ; (@ field_serde_name ; password) => { "password" } ; (@ field_serde_name ; id) => { "id" } ; }
+    macro_rules ! _include_proxy { ($ (($ ($ func_arg : ident : $ func_arg_ty : ty) , +) =>) ? $ module_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { # [allow (warnings)] pub mod $ module_name { crate :: prisma :: proxy :: include ! (@ definitions ; $ module_name ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; use super :: * ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: proxy :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } pub fn include ($ ($ ($ func_arg : $ func_arg_ty) , +) ?) -> Selection { Selection ([crate :: prisma :: proxy :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: proxy :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } } ; ({ $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { { crate :: prisma :: proxy :: include ! (@ definitions ; ; $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) +) ; pub struct Selection (Vec < :: prisma_client_rust :: Selection >) ; impl :: prisma_client_rust :: IncludeType for Selection { type Data = Data ; type ModelData = crate :: prisma :: proxy :: Data ; fn to_selections (self) -> Vec < :: prisma_client_rust :: Selection > { self . 0 } } Selection ([crate :: prisma :: proxy :: include ! (@ selections_to_params ; : include { $ ($ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) + }) . into_iter () . map (| p | p . to_selection ()) . collect :: < Vec < _ >> () , < crate :: prisma :: proxy :: Types as :: prisma_client_rust :: ModelTypes > :: scalar_selections ()] . into_iter () . flatten () . collect :: < Vec < _ >> ()) } } ; (@ definitions ; $ ($ module_name : ident) ? ; $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) +) => { # [allow (warnings)] enum Fields { } # [allow (warnings)] impl Fields { fn selections () { $ (let _ = Fields :: $ field ;) + } } # [allow (warnings)] # [derive (std :: fmt :: Debug , Clone)] pub struct Data { pub id : String , pub url : String , pub password : Option < String > , pub username : Option < String > , $ (pub $ field : crate :: prisma :: proxy :: include ! (@ field_type ; $ field $ (: $ selection_mode { $ ($ selections) + }) ?) ,) + } impl :: serde :: Serialize for Data { fn serialize < S > (& self , serializer : S) -> Result < S :: Ok , S :: Error > where S : :: serde :: Serializer , { use :: serde :: ser :: SerializeStruct ; let mut state = serializer . serialize_struct ("Data" , [$ (stringify ! ($ field) ,) + stringify ! (id) , stringify ! (url) , stringify ! (password) , stringify ! (username)] . len ()) ? ; $ (state . serialize_field (crate :: prisma :: proxy :: $ field :: NAME , & self . $ field) ? ;) * state . serialize_field (crate :: prisma :: proxy :: id :: NAME , & self . id) ? ; state . serialize_field (crate :: prisma :: proxy :: url :: NAME , & self . url) ? ; state . serialize_field (crate :: prisma :: proxy :: password :: NAME , & self . password) ? ; state . serialize_field (crate :: prisma :: proxy :: username :: NAME , & self . username) ? ; state . end () } } impl < 'de > :: serde :: Deserialize < 'de > for Data { fn deserialize < D > (deserializer : D) -> Result < Self , D :: Error > where D : :: serde :: Deserializer < 'de > , { # [allow (warnings)] enum Field { $ ($ field) , + , id , url , password , username } impl < 'de > :: serde :: Deserialize < 'de > for Field { fn deserialize < D > (deserializer : D) -> Result < Field , D :: Error > where D : :: serde :: Deserializer < 'de > , { struct FieldVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for FieldVisitor { type Value = Field ; fn expecting (& self , formatter : & mut :: std :: fmt :: Formatter) -> :: std :: fmt :: Result { formatter . write_str (& [$ (crate :: prisma :: proxy :: $ field :: NAME) , + , crate :: prisma :: proxy :: id :: NAME , crate :: prisma :: proxy :: url :: NAME , crate :: prisma :: proxy :: password :: NAME , crate :: prisma :: proxy :: username :: NAME] . into_iter () . collect :: < Vec < _ >> () . join (", ")) } fn visit_str < E > (self , value : & str) -> Result < Field , E > where E : :: serde :: de :: Error , { match value { $ (crate :: prisma :: proxy :: $ field :: NAME => Ok (Field :: $ field)) , * , crate :: prisma :: proxy :: id :: NAME => Ok (Field :: id) , crate :: prisma :: proxy :: url :: NAME => Ok (Field :: url) , crate :: prisma :: proxy :: password :: NAME => Ok (Field :: password) , crate :: prisma :: proxy :: username :: NAME => Ok (Field :: username) , _ => Err (:: serde :: de :: Error :: unknown_field (value , FIELDS)) , } } } deserializer . deserialize_identifier (FieldVisitor) } } struct DataVisitor ; impl < 'de > :: serde :: de :: Visitor < 'de > for DataVisitor { type Value = Data ; fn expecting (& self , formatter : & mut std :: fmt :: Formatter) -> std :: fmt :: Result { formatter . write_str ("struct Data") } fn visit_map < V > (self , mut map : V) -> Result < Data , V :: Error > where V : :: serde :: de :: MapAccess < 'de > , { $ (let mut $ field = None ;) * let mut id = None ; let mut url = None ; let mut password = None ; let mut username = None ; while let Some (key) = map . next_key () ? { match key { Field :: id => { if id . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: proxy :: id :: NAME)) ; } id = Some (map . next_value () ?) ; } Field :: url => { if url . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: proxy :: url :: NAME)) ; } url = Some (map . next_value () ?) ; } Field :: password => { if password . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: proxy :: password :: NAME)) ; } password = Some (map . next_value () ?) ; } Field :: username => { if username . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: proxy :: username :: NAME)) ; } username = Some (map . next_value () ?) ; } $ (Field :: $ field => { if $ field . is_some () { return Err (:: serde :: de :: Error :: duplicate_field (crate :: prisma :: proxy :: $ field :: NAME)) ; } $ field = Some (map . next_value () ?) ; }) * } } $ (let $ field = $ field . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: proxy :: $ field :: NAME)) ? ;) * let id = id . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: proxy :: id :: NAME)) ? ; let url = url . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: proxy :: url :: NAME)) ? ; let password = password . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: proxy :: password :: NAME)) ? ; let username = username . ok_or_else (|| serde :: de :: Error :: missing_field (crate :: prisma :: proxy :: username :: NAME)) ? ; Ok (Data { id , url , password , username , $ ($ field) , * }) } } const FIELDS : & 'static [& 'static str] = & ["id" , "url" , "password" , "username"] ; deserializer . deserialize_struct ("Data" , FIELDS , DataVisitor) } } $ ($ (pub mod $ field { crate :: prisma :: proxy :: $ selection_mode ! (@ field_module ; $ field : $ selection_mode { $ ($ selections) + }) ; }) ?) + } ; (@ field_type ; $ field : ident $ ($ tokens : tt) *) => { compile_error ! (stringify ! (Cannot include nonexistent relation $ field on model "Proxy" , available relations are "")) } ; (@ field_module ; $ ($ tokens : tt) *) => { } ; (@ selection_field_to_selection_param ; $ ($ tokens : tt) *) => { compile_error ! (stringify ! ($ ($ tokens) *)) } ; (@ selections_to_params ; : $ macro_name : ident { $ ($ field : ident $ (($ ($ filters : tt) +) $ (. $ arg : ident ($ ($ arg_params : tt) *)) *) ? $ (: $ selection_mode : ident { $ ($ selections : tt) + }) ?) + }) => { [$ (crate :: prisma :: proxy :: $ macro_name ! (@ selection_field_to_selection_param ; $ field $ (($ ($ filters) +) $ (. $ arg ($ ($ arg_params) *)) *) ? $ (: $ selection_mode { $ ($ selections) + }) ?) ,) +] } ; (@ filters_to_args ;) => { vec ! [] } ; (@ filters_to_args ; $ ($ t : tt) *) => { $ ($ t) * } ; (@ field_serde_name ; id) => { "id" } ; (@ field_serde_name ; url) => { "url" } ; (@ field_serde_name ; password) => { "password" } ; (@ field_serde_name ; username) => { "username" } ; }
     pub use _include_proxy as include;
     pub enum IncludeParam {
-        Url(url::Include),
-        Username(username::Include),
-        Password(password::Include),
         Id(id::Include),
+        Url(url::Include),
+        Password(password::Include),
+        Username(username::Include),
     }
     impl IncludeParam {
         pub fn to_selection(self) -> ::prisma_client_rust::Selection {
             match self {
-                Self::Url(data) => data.to_selection(),
-                Self::Username(data) => data.to_selection(),
-                Self::Password(data) => data.to_selection(),
                 Self::Id(data) => data.to_selection(),
+                Self::Url(data) => data.to_selection(),
+                Self::Password(data) => data.to_selection(),
+                Self::Username(data) => data.to_selection(),
             }
         }
     }
     #[macro_export]
-    macro_rules ! _partial_unchecked_proxy { ($ struct_name : ident { $ ($ scalar_field : ident) + }) => { :: prisma_client_rust :: macros :: partial_unchecked ! { crate :: prisma :: proxy struct $ struct_name { # [serde (rename = "url")] pub url : String , # [serde (rename = "username")] # [serde (default , with = "::prisma_client_rust::serde::double_option")] pub username : Option < String > , # [serde (rename = "password")] # [serde (default , with = "::prisma_client_rust::serde::double_option")] pub password : Option < String > , # [serde (rename = "id")] pub id : String } [$ ($ scalar_field) , +] } } ; }
+    macro_rules ! _partial_unchecked_proxy { ($ struct_name : ident { $ ($ scalar_field : ident) + }) => { :: prisma_client_rust :: macros :: partial_unchecked ! { crate :: prisma :: proxy struct $ struct_name { # [serde (rename = "id")] pub id : String , # [serde (rename = "url")] pub url : String , # [serde (rename = "password")] # [serde (default , with = "::prisma_client_rust::serde::double_option")] pub password : Option < String > , # [serde (rename = "username")] # [serde (default , with = "::prisma_client_rust::serde::double_option")] pub username : Option < String > } [$ ($ scalar_field) , +] } } ; }
     pub use _partial_unchecked_proxy as partial_unchecked;
     #[derive(Debug, Clone, :: serde :: Serialize, :: serde :: Deserialize)]
     pub struct Data {
-        #[serde(rename = "url")]
-        pub url: String,
-        #[serde(rename = "username")]
-        pub username: Option<String>,
-        #[serde(rename = "password")]
-        pub password: Option<String>,
         #[serde(rename = "id")]
         pub id: String,
+        #[serde(rename = "url")]
+        pub url: String,
+        #[serde(rename = "password")]
+        pub password: Option<String>,
+        #[serde(rename = "username")]
+        pub username: Option<String>,
     }
     impl Data {}
     #[derive(Clone)]
@@ -4188,23 +4266,21 @@ pub mod proxy {
     }
     #[derive(Clone)]
     pub enum SetParam {
-        SetUrl(String),
-        SetUsername(Option<String>),
-        SetPassword(Option<String>),
         SetId(String),
+        SetUrl(String),
+        SetPassword(Option<String>),
+        SetUsername(Option<String>),
     }
     impl From<SetParam> for (String, ::prisma_client_rust::PrismaValue) {
         fn from(param: SetParam) -> Self {
             match param {
+                SetParam::SetId(value) => (
+                    id::NAME.to_string(),
+                    ::prisma_client_rust::PrismaValue::String(value),
+                ),
                 SetParam::SetUrl(value) => (
                     url::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::String(value),
-                ),
-                SetParam::SetUsername(value) => (
-                    username::NAME.to_string(),
-                    value
-                        .map(|value| ::prisma_client_rust::PrismaValue::String(value))
-                        .unwrap_or_else(|| ::prisma_client_rust::PrismaValue::Null),
                 ),
                 SetParam::SetPassword(value) => (
                     password::NAME.to_string(),
@@ -4212,54 +4288,56 @@ pub mod proxy {
                         .map(|value| ::prisma_client_rust::PrismaValue::String(value))
                         .unwrap_or_else(|| ::prisma_client_rust::PrismaValue::Null),
                 ),
-                SetParam::SetId(value) => (
-                    id::NAME.to_string(),
-                    ::prisma_client_rust::PrismaValue::String(value),
+                SetParam::SetUsername(value) => (
+                    username::NAME.to_string(),
+                    value
+                        .map(|value| ::prisma_client_rust::PrismaValue::String(value))
+                        .unwrap_or_else(|| ::prisma_client_rust::PrismaValue::Null),
                 ),
             }
         }
     }
     #[derive(Clone)]
     pub enum UncheckedSetParam {
-        Url(String),
-        Username(Option<String>),
-        Password(Option<String>),
         Id(String),
+        Url(String),
+        Password(Option<String>),
+        Username(Option<String>),
     }
     impl From<UncheckedSetParam> for SetParam {
         fn from(param: UncheckedSetParam) -> Self {
             match param {
-                UncheckedSetParam::Url(value) => Self::SetUrl(value),
-                UncheckedSetParam::Username(value) => Self::SetUsername(value),
-                UncheckedSetParam::Password(value) => Self::SetPassword(value),
                 UncheckedSetParam::Id(value) => Self::SetId(value),
+                UncheckedSetParam::Url(value) => Self::SetUrl(value),
+                UncheckedSetParam::Password(value) => Self::SetPassword(value),
+                UncheckedSetParam::Username(value) => Self::SetUsername(value),
             }
         }
     }
     #[derive(Clone)]
     pub enum OrderByParam {
-        Url(::prisma_client_rust::Direction),
-        Username(::prisma_client_rust::Direction),
-        Password(::prisma_client_rust::Direction),
         Id(::prisma_client_rust::Direction),
+        Url(::prisma_client_rust::Direction),
+        Password(::prisma_client_rust::Direction),
+        Username(::prisma_client_rust::Direction),
     }
     impl Into<(String, ::prisma_client_rust::PrismaValue)> for OrderByParam {
         fn into(self) -> (String, ::prisma_client_rust::PrismaValue) {
             match self {
-                Self::Url(direction) => (
-                    url::NAME.to_string(),
+                Self::Id(direction) => (
+                    id::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::String(direction.to_string()),
                 ),
-                Self::Username(direction) => (
-                    username::NAME.to_string(),
+                Self::Url(direction) => (
+                    url::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::String(direction.to_string()),
                 ),
                 Self::Password(direction) => (
                     password::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::String(direction.to_string()),
                 ),
-                Self::Id(direction) => (
-                    id::NAME.to_string(),
+                Self::Username(direction) => (
+                    username::NAME.to_string(),
                     ::prisma_client_rust::PrismaValue::String(direction.to_string()),
                 ),
             }
@@ -4270,10 +4348,10 @@ pub mod proxy {
         Not(Vec<WhereParam>),
         Or(Vec<WhereParam>),
         And(Vec<WhereParam>),
-        Url(_prisma::read_filters::StringFilter),
-        Username(_prisma::read_filters::StringNullableFilter),
-        Password(_prisma::read_filters::StringNullableFilter),
         Id(_prisma::read_filters::StringFilter),
+        Url(_prisma::read_filters::StringFilter),
+        Password(_prisma::read_filters::StringNullableFilter),
+        Username(_prisma::read_filters::StringNullableFilter),
     }
     impl ::prisma_client_rust::WhereInput for WhereParam {
         fn serialize(self) -> ::prisma_client_rust::SerializedWhereInput {
@@ -4314,10 +4392,10 @@ pub mod proxy {
                         ),
                     ),
                 ),
-                Self::Url(value) => (url::NAME, value.into()),
-                Self::Username(value) => (username::NAME, value.into()),
-                Self::Password(value) => (password::NAME, value.into()),
                 Self::Id(value) => (id::NAME, value.into()),
+                Self::Url(value) => (url::NAME, value.into()),
+                Self::Password(value) => (password::NAME, value.into()),
+                Self::Username(value) => (username::NAME, value.into()),
             };
             ::prisma_client_rust::SerializedWhereInput::new(name, value.into())
         }
@@ -4357,10 +4435,10 @@ pub mod proxy {
         const MODEL: &'static str = NAME;
         fn scalar_selections() -> Vec<::prisma_client_rust::Selection> {
             vec![
-                ::prisma_client_rust::sel(url::NAME),
-                ::prisma_client_rust::sel(username::NAME),
-                ::prisma_client_rust::sel(password::NAME),
                 ::prisma_client_rust::sel(id::NAME),
+                ::prisma_client_rust::sel(url::NAME),
+                ::prisma_client_rust::sel(password::NAME),
+                ::prisma_client_rust::sel(username::NAME),
             ]
         }
     }
@@ -4612,6 +4690,8 @@ pub mod _prisma {
         CreatedDate,
         #[serde(rename = "updatedDate")]
         UpdatedDate,
+        #[serde(rename = "pythonFetchInfo")]
+        PythonFetchInfo,
     }
     impl ToString for ComicScalarFieldEnum {
         fn to_string(&self) -> String {
@@ -4630,6 +4710,7 @@ pub mod _prisma {
                 Self::Thumbnail => "thumbnail".to_string(),
                 Self::CreatedDate => "createdDate".to_string(),
                 Self::UpdatedDate => "updatedDate".to_string(),
+                Self::PythonFetchInfo => "pythonFetchInfo".to_string(),
             }
         }
     }
@@ -4665,22 +4746,22 @@ pub mod _prisma {
     }
     #[derive(Debug, Clone, Copy, :: serde :: Serialize, :: serde :: Deserialize, PartialEq, Eq)]
     pub enum ProxyScalarFieldEnum {
-        #[serde(rename = "url")]
-        Url,
-        #[serde(rename = "username")]
-        Username,
-        #[serde(rename = "password")]
-        Password,
         #[serde(rename = "id")]
         Id,
+        #[serde(rename = "url")]
+        Url,
+        #[serde(rename = "password")]
+        Password,
+        #[serde(rename = "username")]
+        Username,
     }
     impl ToString for ProxyScalarFieldEnum {
         fn to_string(&self) -> String {
             match self {
-                Self::Url => "url".to_string(),
-                Self::Username => "username".to_string(),
-                Self::Password => "password".to_string(),
                 Self::Id => "id".to_string(),
+                Self::Url => "url".to_string(),
+                Self::Password => "password".to_string(),
+                Self::Username => "username".to_string(),
             }
         }
     }
@@ -4746,10 +4827,10 @@ pub mod _prisma {
         Fetched,
         #[serde(rename = "fetching")]
         Fetching,
-        #[serde(rename = "isError")]
-        IsError,
         #[serde(rename = "createdDate")]
         CreatedDate,
+        #[serde(rename = "isError")]
+        IsError,
     }
     impl ToString for UrlsScalarFieldEnum {
         fn to_string(&self) -> String {
@@ -4758,8 +4839,8 @@ pub mod _prisma {
                 Self::Id => "id".to_string(),
                 Self::Fetched => "fetched".to_string(),
                 Self::Fetching => "fetching".to_string(),
-                Self::IsError => "isError".to_string(),
                 Self::CreatedDate => "createdDate".to_string(),
+                Self::IsError => "isError".to_string(),
             }
         }
     }
