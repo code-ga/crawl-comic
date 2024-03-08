@@ -142,3 +142,42 @@ export const apiRouter =
                 id: t.String()
             })
         })
+        .get("/refetch/comic/chaps/:id", async ({ params }) => {
+            console.log(params)
+            const comic = await prisma.comic.findUnique({
+                where: {
+                    id: params.id
+                }
+            })
+            if (!comic) return comic
+            const url = await prisma.urls.findFirst({
+                where: {
+                    url: {
+                        contains: comic.url
+                    }
+                }
+            })
+            if (!url) return url
+            if (url.fetching) return {
+                fetching: true,
+                message: "Already fetching"
+            }
+            await prisma.urls.updateMany({
+                where: {
+                    url: {
+                        contains: comic.url
+                    }
+                },
+                data: {
+                    fetched: false
+                }
+            })
+            return {
+                fetching: true,
+                message: "Start fetching ( added to queue )"
+            }
+        }, {
+            params: t.Object({
+                id: t.String()
+            })
+        })
