@@ -1,77 +1,45 @@
 import asyncio
-import time
-import socket
-from aiohttp import ClientSession
+import aiohttp
 from dotenv import load_dotenv
-from modules.blogtruyenmoi import (
-    crawlAllLinksInHTML,
-    fullFetchComic,
-    isComicPage,
-)
 from prisma import Prisma
-from prisma.models import PendingUrl as PendingUrlModel
-from prisma.models import HistoryUrl as HistoryUrlModel
-from util.clientSession import random_proxy
+
+from modules.blogtruyenmoi import parseComicHtmlPage
 
 
 load_dotenv(dotenv_path=".env")
 
-COMIC_URL = "https://blogtruyenmoi.com/31115/oneshot-nhung-lai-la-series"  # https://blogtruyenmoi.com/31115/oneshot-nhung-lai-la-series
-
-PendingUrl: list[str] = []
-
 
 async def main():
-    socket.setdefaulttimeout(120)
     db = Prisma(auto_register=True)
     await db.connect()
-    await crawlAllComics(COMIC_URL)
-    # print(comic.toJson())
-    await db.disconnect()
 
-
-async def crawlAllComics(start_url: str = "https://blogtruyenmoi.com/"):
-    current_url = start_url
     while True:
-        if (
-            await HistoryUrlModel.prisma().find_first(
-                where={"url": {"equals": current_url}}
-            )
-            is not None
-        ):
-            await PendingUrlModel.prisma().delete_many(
-                where={"url": {"equals": current_url}}
-            )
-            current_url = await PendingUrlModel.prisma().find_first()
-            if current_url is None:
-                break
-            current_url = current_url.url
-            continue
-        print(f"in time crawl: {current_url}")
-        async with ClientSession() as session, session.get(
-            current_url, proxy=random_proxy()
-        ) as response:
-            html = await response.text()
-            if isComicPage(html):
-                # asyncio.create_task
-                await fullFetchComic(
-                    current_url,
-                    html,
-                )
+        comic_in_db = await db.comic.find_first(
+            where={"pythonFetchInfo": False}, order={"createdDate": "asc"}
+        )
+        if not comic_in_db:
+            break
+        async with aiohttp.ClientSession() as session:
+            async with session.get(comic_in_db.url) as response:
+                if response.status == 200:
+                    print(f"parsing url {comic_in_db.url} - {comic_in_db.id}")
+                    html = await response.text()
+                    if "Truyện đã bị xóa hoặc không tồn tại!" in html:
+                        print("comic not found")
+                        await db.comic.update(
+                            where={"id": comic_in_db.id},
+                            data={"pythonFetchInfo": True},
+                        )
+                        continue
+                    comic = parseComicHtmlPage(html, comic_in_db)
+                    await db.comic.update(
+                        where={"id": comic_in_db.id},
+                        data=comic,
+                    )
+                    print("updated comic", comic_in_db.id)
+                    # await asyncio.sleep(1)
 
-            await PendingUrlModel.prisma().create_many(
-                data=[{"url": u} for u in await crawlAllLinksInHTML(html)],
-                skip_duplicates=True,
-            )
-            await PendingUrlModel.prisma().delete_many(
-                where={"url": {"equals": current_url}}
-            )
-            await HistoryUrlModel.prisma().create({"url": current_url})
-            current_url = await PendingUrlModel.prisma().find_first()
-            if current_url is None:
-                break
-            current_url = current_url.url
-            # await asyncio.sleep(1)
+    await db.disconnect()
 
 
 if __name__ == "__main__":

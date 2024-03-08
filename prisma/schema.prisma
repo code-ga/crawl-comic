@@ -1,9 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider             = "prisma-client-py"
-  recursive_type_depth = -1 // 5
+  recursive_type_depth = "-1"
   interface            = "asyncio"
 }
 
@@ -13,45 +10,47 @@ datasource db {
 }
 
 model Comic {
-  id             String    @id
-  name           String
-  url            String
-  genre          Json
-  content        String?
-  translatorTeam Json
-  anotherName    String[]
-  source         Json
-  author         Json
-  postedBy       Json
-  status         String
-  chapters       Chapter[]
-  createdDate    DateTime  @default(now())
-  updatedDate    DateTime  @default(now())
+  id              String    @id
+  name            String    @default("")
+  url             String    @unique
+  genre           Json      @default("{}")
+  content         String?
+  translatorTeam  Json      @default("{}")
+  anotherName     String[]
+  source          Json      @default("{}")
+  author          Json      @default("{}")
+  postedBy        Json      @default("{}")
+  status          String    @default("")
+  thumbnail       String?
+  createdDate     DateTime  @default(now())
+  updatedDate     DateTime  @updatedAt
+  pythonFetchInfo Boolean   @default(false)
+  chapters        Chapter[]
 }
 
 model Chapter {
   id          String   @id
   name        String
-  url         String
-  comic       Comic    @relation(fields: [comicId], references: [id])
+  url         String   @unique
   comicId     String
   images      String[]
   createdDate String
   updatedDate DateTime @default(now())
+  comic       Comic    @relation(fields: [comicId], references: [id])
 }
 
-model HistoryUrl {
-  url         String
-  id          String   @id @default(uuid())
-  createdDate DateTime @default(now())
-
-  @@unique([url])
+model Proxy {
+  id       String  @id
+  url      String
+  password String?
+  username String?
 }
 
-model PendingUrl {
-  url         String
-  id          String   @id @default(uuid())
+model Urls {
+  url         String   @unique
+  id          String   @id
+  fetched     Boolean  @default(false)
+  fetching    Boolean  @default(false)
   createdDate DateTime @default(now())
-
-  @@unique([url])
+  isError     Boolean  @default(false)
 }
