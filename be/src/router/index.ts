@@ -1,5 +1,6 @@
 import { Elysia, t } from "elysia";
 import { prisma } from "../db";
+import { parseComicHtmlPage } from "../utils/fetchComicInfo";
 
 
 
@@ -41,6 +42,7 @@ export const apiRouter =
                     }
                 }
             })
+
         }, {
             params: t.Object({
                 id: t.String()
@@ -114,5 +116,29 @@ export const apiRouter =
                 take: t.Numeric({
                     default: 10
                 }),
+            })
+        })
+        .get("/refetch/comic/info/:id", async ({ params }) => {
+            console.log(params)
+            const comic = await prisma.comic.findUnique({
+                where: {
+                    id: params.id
+                }
+            })
+            if (!comic) return comic
+            const resp = await (await fetch(comic.url)).text()
+            const parsed = (parseComicHtmlPage(resp))
+            console.log({ parsed })
+            return await prisma.comic.update({
+                where: {
+                    id: params.id
+                },
+                data: {
+                    ...parsed
+                }
+            })
+        }, {
+            params: t.Object({
+                id: t.String()
             })
         })
