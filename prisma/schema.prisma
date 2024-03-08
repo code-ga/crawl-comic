@@ -1,0 +1,80 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Comic {
+  id               String         @id
+  name             String
+  aliases          String[]
+  thumbnail        String
+  banner           String
+  description      String
+  category         Category[]
+  translatorTeam   TranslatorTeam @relation(fields: [translatorTeamId], references: [id])
+  translatorTeamId String
+  author           Author         @relation(fields: [authorId], references: [id])
+  authorId         String
+  createAt         DateTime       @default(now())
+  updateAt         DateTime       @updatedAt()
+  chapters         Chapter[]
+}
+
+model Category {
+  id     String  @id
+  name   String
+  comics Comic[]
+}
+
+model Author {
+  id             String           @id
+  username       String
+  createAt       DateTime         @default(now())
+  // premium        Boolean          @default(true) vì tác giả ko phải là đối tượng use
+  translatorTeam TranslatorTeam[]
+  history        History[]
+  comic          Comic[]
+  updateAt       DateTime         @updatedAt()
+
+  @@map("User")
+}
+
+model History {
+  id       String    @id
+  comicId  String    @unique
+  chapters Chapter[]
+  Author   Author?   @relation(fields: [authorId], references: [id])
+  authorId String?
+}
+
+model TranslatorTeam {
+  id       String   @id
+  members  Author[]
+  comics   Comic[]
+  createAt DateTime @default(now())
+  updateAt DateTime @updatedAt()
+}
+
+model Chapter {
+  comicId     String   @id
+  comic       Comic    @relation(fields: [comicId], references: [id])
+  id          String
+  number      Float
+  title       String
+  description String?
+  images      String[]
+  createAt    DateTime @default(now())
+  updateAt    DateTime @updatedAt()
+  History     History? @relation(fields: [historyId], references: [id])
+  historyId   String?
+}
