@@ -120,7 +120,7 @@ export const apiRouter =
         })
         .get("/refetch/comic/info/:id", async ({ params }) => {
             console.log(params)
-            const comic = await prisma.comic.findUnique({
+            const comic = await prisma.comic.findFirst({
                 where: {
                     id: params.id
                 }
@@ -144,7 +144,7 @@ export const apiRouter =
         })
         .get("/refetch/comic/chaps/:id", async ({ params }) => {
             console.log(params)
-            const comic = await prisma.comic.findUnique({
+            const comic = await prisma.comic.findFirst({
                 where: {
                     id: params.id
                 }
@@ -158,6 +158,11 @@ export const apiRouter =
                 }
             })
             if (!url) return url
+            // if url.updatedDate < 2 days then return already fetched
+            if (url.updatedDate < new Date(Date.now() - 1000 * 60 * 60 * 24 * 2)) return {
+                fetched: true,
+                message: "Already fetched"
+            }
             if (url.fetching) return {
                 fetching: true,
                 message: "Already fetching"

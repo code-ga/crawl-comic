@@ -52,4 +52,5 @@ model Urls {
   fetching    Boolean  @default(false)
   createdDate DateTime @default(now())
   isError     Boolean  @default(false)
+  updatedDate DateTime @default(now()) @updatedAt
 }
