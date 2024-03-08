@@ -20,21 +20,22 @@ model Chapter {
 }
 
 model Comic {
-  id             String    @id
-  name           String    @default("")
-  url            String    @unique
-  genre          Json      @default("{}")
-  content        String?
-  translatorTeam Json      @default("{}")
-  anotherName    String[]
-  source         Json      @default("{}")
-  author         Json      @default("{}")
-  postedBy       Json      @default("{}")
-  status         String    @default("")
-  thumbnail      String?
-  createdDate    DateTime  @default(now())
-  updatedDate    DateTime  @default(now())
-  Chapter        Chapter[]
+  id              String    @id
+  name            String    @default("")
+  url             String    @unique
+  genre           Json      @default("{}")
+  content         String?
+  translatorTeam  Json      @default("{}")
+  anotherName     String[]
+  source          Json      @default("{}")
+  author          Json      @default("{}")
+  postedBy        Json      @default("{}")
+  status          String    @default("")
+  thumbnail       String?
+  createdDate     DateTime  @default(now())
+  updatedDate     DateTime
+  pythonFetchInfo Boolean   @default(false)
+  Chapter         Chapter[]
 }
 
 model Proxy {
