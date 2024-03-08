@@ -99,3 +99,20 @@ export const apiRouter =
                 })
             }
         })
+        .get("/news", async ({ query }) => {
+            console.log(query)
+            return await prisma.comic.findMany({
+                skip: query.skip,
+                take: query.take,
+                orderBy: { createdDate: 'desc' },
+            })
+        }, {
+            query: t.Object({
+                skip: t.Numeric({
+                    default: 0
+                }),
+                take: t.Numeric({
+                    default: 10
+                }),
+            })
+        })
