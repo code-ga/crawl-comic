@@ -8,6 +8,7 @@ from prisma.models import PendingUrl as PendingUrlModel
 from prisma.models import HistoryUrl as HistoryUrlModel
 
 from util.parse import CustomBeautifulSoup
+from util.clientSession import random_proxy
 
 BASE_URL = "https://blogtruyenmoi.com"
 
@@ -90,9 +91,13 @@ async def fetchComic(
 ) -> Tuple[Comic, list[str]]:
     print(f"fetching comic: {comic_url}")
     if html:
+        await PendingUrlModel.prisma().delete_many(where={"url": {"equals": comic_url}})
+        await HistoryUrlModel.prisma().create({"url": comic_url})
         return (parseComicHtmlPage(html, comic_url), [])
     else:
-        async with ClientSession() as session, session.get(comic_url) as response:
+        async with ClientSession() as session, session.get(
+            comic_url, proxy=random_proxy()
+        ) as response:
             html = await response.text()
             await PendingUrlModel.prisma().delete_many(
                 where={"url": {"equals": comic_url}}
@@ -118,31 +123,46 @@ async def crawlAllLinksInHTML(html: str) -> list[str]:
     return pendingUrl
 
 
-async def fetchChapters(url: str) -> Tuple[Comic, list[str]]:
+async def fetchChaptersImages(url: str) -> Tuple[Comic, list[str]]:
     print(f"fetching chapters: {url}")
-    async with ClientSession() as session, session.get(url) as response:
-        html = await response.text()
-        soup = CustomBeautifulSoup(html, "html.parser")
-        images_tags = soup.select("#content")[0].select("img")
-        # result: list[str] = []
-        images_url = [img["src"] for img in images_tags]
-        # upload image to guilded
-        # for url in images_url:
-        #     file_name, file = await upload.get_file(url)
-        #     while file is None:
-        #         await asyncio.sleep(1)
-        #         file_name, file = await upload.get_file(url)
-        #     resp = await upload.send_to_guilded(file_name=file_name, file=file)
-        #     while resp["success"] is not True:
-        #         await asyncio.sleep(1)
-        #         print(f"retrying upload: {url}")
-        #         resp = await upload.send_to_guilded(file_name=file_name, file=file)
-        #     print(f"upload success: {resp['url']}")
-        #     result.append(resp["url"])
-        #     await asyncio.sleep(1)
-        await PendingUrlModel.prisma().delete_many(where={"url": {"equals": url}})
-        await HistoryUrlModel.prisma().create({"url": url})
-        return images_url, await crawlAllLinksInHTML(html)
+    async with ClientSession() as session:
+        while True:
+            try:
+                async with session.get(url, proxy=random_proxy()) as response:
+                    html = await response.text()
+                    soup = CustomBeautifulSoup(html, "html.parser")
+                    images_tags = soup.select("#content")[0].select("img")
+                    # result: list[str] = []
+                    images_url = [img["src"] for img in images_tags]
+                    # upload image to guilded
+                    # for url in images_url:
+                    #     file_name, file = await upload.get_file(url)
+                    #     while file is None:
+                    #         await asyncio.sleep(1)
+                    #         file_name, file = await upload.get_file(url)
+                    #     resp = await upload.send_to_guilded(file_name=file_name, file=file)
+                    #     while resp["success"] is not True:
+                    #         await asyncio.sleep(1)
+                    #         print(f"retrying upload: {url}")
+                    #         resp = await upload.send_to_guilded(file_name=file_name, file=file)
+                    #     print(f"upload success: {resp['url']}")
+                    #     result.append(resp["url"])
+                    #     await asyncio.sleep(1)
+                    await PendingUrlModel.prisma().delete_many(where={"url": {"equals": url}})
+                    await HistoryUrlModel.prisma().create({"url": url})
+                    return images_url, await crawlAllLinksInHTML(html)
+            except Exception:
+                print(f"retrying: {url}")
+                await asyncio.sleep(1)
+
+
+async def fetchChapter(chapter: Chapter) -> list[str]:
+    image_url, chapPendingUrl = await fetchChaptersImages(chapter.url)
+    chapter.setImages(image_url)
+    print(f"{chapter.name} - {chapter.url}")
+    await chapter.commitToDB()
+    await asyncio.sleep(1)
+    return chapPendingUrl
 
 
 async def fullFetchComic(
@@ -153,36 +173,37 @@ async def fullFetchComic(
     Fetches the comic and all its chapters with images.
 
     Args:
-    - session: aiohttp.ClientSession object
-    - comic_url: URL of the comic to fetch
-    - commitToDB: function to commit data to the database parameter is comic: ComicInfo and int number of step had passed
+    - comic_url (str): The URL of the comic.
+    - html (str, optional): The HTML content of the comic.
 
     Returns:
     - Comic object with chapters and their images
     """
-    pendingUrl: list[str] = []
+    pendingUrls: list[str] = []
     # because we fetch all link of page at outer function
     comic, _ = await fetchComic(comic_url, html)
     await comic.commitToDB()
     await asyncio.sleep(1)
-    for chapter in comic.chapters:
-        image_url, chapPendingUrl = await fetchChapters(chapter.url)
-        chapter.setImages(image_url)
-        print(f"{chapter.name} - {chapter.url}")
-        await chapter.commitToDB()
-        await asyncio.sleep(1)
-        pendingUrl.extend(chapPendingUrl)
-        # pendingUrl = [...pendingUrl, ...chapPendingUrl]
+    # for chapter in comic.chapters:
+    #     image_url, chapPendingUrl = await fetchChaptersImages(chapter.url)
+    #     chapter.setImages(image_url)
+    #     print(f"{chapter.name} - {chapter.url}")
+    #     await chapter.commitToDB()
+    #     await asyncio.sleep(1)
+    #     pendingUrl.extend(chapPendingUrl)
+    #     # pendingUrl = [...pendingUrl, ...chapPendingUrl]
+    for pendingUrl in await asyncio.gather(*[fetchChapter(c) for c in comic.chapters]):
+        pendingUrls.extend(pendingUrl)
     await comic.commitToDB()
     # remove chapter url out of pending url
-    pendingUrl = [u for u in pendingUrl if u not in comic.chapters_urls]
+    pendingUrls = [u for u in pendingUrls if u not in comic.chapters_urls]
     await PendingUrlModel.prisma().create_many(
-        data=[{"url": u} for u in pendingUrl],
+        data=[{"url": u} for u in pendingUrls],
         skip_duplicates=True,
     )
     print(f"fetch completed: {comic.name} - {comic_url}")
 
-    return comic, pendingUrl
+    return comic, pendingUrls
 
 
 def isComicPage(html: str):

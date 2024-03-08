@@ -1,7 +1,7 @@
 import asyncio
 import time
-
-import aiohttp
+import socket
+from aiohttp import ClientSession
 from dotenv import load_dotenv
 from modules.blogtruyenmoi import (
     crawlAllLinksInHTML,
@@ -11,6 +11,7 @@ from modules.blogtruyenmoi import (
 from prisma import Prisma
 from prisma.models import PendingUrl as PendingUrlModel
 from prisma.models import HistoryUrl as HistoryUrlModel
+from util.clientSession import random_proxy
 
 
 load_dotenv(dotenv_path=".env")
@@ -21,6 +22,7 @@ PendingUrl: list[str] = []
 
 
 async def main():
+    socket.setdefaulttimeout(120)
     db = Prisma(auto_register=True)
     await db.connect()
     await crawlAllComics(COMIC_URL)
@@ -46,8 +48,8 @@ async def crawlAllComics(start_url: str = "https://blogtruyenmoi.com/"):
             current_url = current_url.url
             continue
         print(f"in time crawl: {current_url}")
-        async with aiohttp.ClientSession() as session, session.get(
-            current_url
+        async with ClientSession() as session, session.get(
+            current_url, proxy=random_proxy()
         ) as response:
             html = await response.text()
             if isComicPage(html):

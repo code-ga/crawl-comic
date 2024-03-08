@@ -41,11 +41,17 @@ model Chapter {
 }
 
 model HistoryUrl {
-  url String
-  id  String @id @default(uuid())
+  url         String
+  id          String   @id @default(uuid())
+  createdDate DateTime @default(now())
+
+  @@unique([url])
 }
 
 model PendingUrl {
-  url String
-  id  String @id @default(uuid())
+  url         String
+  id          String   @id @default(uuid())
+  createdDate DateTime @default(now())
+
+  @@unique([url])
 }
