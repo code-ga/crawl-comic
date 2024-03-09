@@ -1,29 +1,45 @@
-import Image from "next/image";
+"use client";
 import { ElysiaServerApi } from "@/typings";
 import { edenTreaty } from "@elysiajs/eden";
 import { use } from "react";
+import { ComicCard } from "../components/ComicCard";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
+const comicPerPage = 10;
 export default function Home() {
-  const app = edenTreaty<ElysiaServerApi>("http://localhost:8080");
-  const { data } = use(app.comics.get({ $query: { skip: 0, take: 10 } }));
+  const searchParams = useSearchParams();
+  const page = Number(searchParams.get("page") || 0);
+  const app = edenTreaty<ElysiaServerApi>("https://ai-datalake.nz.io.vn/");
+  const { data } = use(
+    app.api.comics.get({
+      $query: { skip: page * comicPerPage, take: comicPerPage },
+    })
+  );
 
-  console.log(data);
+  // console.log(data);
 
   return (
-    <main>
-      <div className="w-full flex justify-center content-center my-4">
-        {/* navbar */}
-        <h1 className="text-3xl">this is the navbar {"=>>"}</h1>
-      </div>
-      <div className="grid grid-cols-4 gap-4 text-center">
-        {/* content */}
-        <div>Side Bar</div>
-        <div className="col-span-3">
-          {data?.map((comic) => (
-            <div key={comic.id}>{comic.name}</div>
-          ))}
+    <div className="grid grid-cols-4 gap-4 text-center">
+      {/* content */}
+      <div>Side Bar</div>
+      <div className="col-span-3">
+        {data?.map((comic) => (
+          <ComicCard key={comic.id} comic={comic}></ComicCard>
+        ))}
+        {/* next page */}
+        <div className="flex justify-center content-center mb-3">
+          {page > 0 && (
+            <Link className="text-center mx-3" href={`/?page=${page - 1}`}>
+              Previous Page
+            </Link>
+          )}
+          <span className="text-center mx-3">{page}</span>
+          <Link className="text-center mx-3" href={`/?page=${page + 1}`}>
+            Next Page
+          </Link>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
