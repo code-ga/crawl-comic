@@ -7,7 +7,8 @@
     "start:bun": "bun src/index.ts",
     "dev:bun": "bun run --watch src/index.ts",
     "start:node": "tsx src/index.ts",
-    "dev:node": "tsx --watch src/index.ts"
+    "dev:node": "tsx --watch src/index.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@elysiajs/swagger": "^0.8.5",
