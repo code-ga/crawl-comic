@@ -27,6 +27,9 @@ model Comic {
   authorId         String
   createAt         DateTime       @default(now())
   updateAt         DateTime       @updatedAt()
+  follows          Int            @default(0)
+  likes            Int            @default(0)
+  dislikes         Int            @default(0)
   chapters         Chapter[]
 }
 

@@ -9,7 +9,7 @@ export const apiRouter = new Elysia({
   .get(
     "/comics/id",
     async ({ query }) => {
-      console.log(query);
+      console.log(`comics/id: ${query}`);
       return await prisma.comic.findUnique({
         where: {
           id: query.id,
@@ -50,12 +50,44 @@ export const apiRouter = new Elysia({
           acc.push(val);
         }
         return acc;
-      }, alias)
+      }, alias);
     },
     {
       query: t.Object({
         name: t.String({
           minLength: 1,
+        }),
+      }),
+    }
+  )
+  // recommend
+  .get(
+    "/recommend",
+    async ({ query }) => {
+      console.log(`recommend: ${query}`);
+
+      return await prisma.comic.findMany({
+        where: {
+          likes: {
+            gt: query.min ?? 1,
+          },
+        },
+        orderBy: {
+          likes: "desc",
+        },
+        take: query.quantity,
+      });
+    },
+    {
+      query: t.Object({
+        min: t.Nullable(
+          t.Numeric({
+            minimum: 1,
+          })
+        ),
+        quantity: t.Numeric({
+          default: 10,
+          minimum: 2,
         }),
       }),
     }
