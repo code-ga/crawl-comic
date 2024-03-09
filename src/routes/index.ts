@@ -1,9 +1,9 @@
 import { Elysia, t } from "elysia";
 import prisma from "../db";
+import { Genre } from "@prisma/client";
 
 export const apiRouter = new Elysia({
   prefix: "/api",
-  name: "Api routing",
 })
   // comics
   .get(
@@ -24,6 +24,7 @@ export const apiRouter = new Elysia({
       }),
     }
   )
+  // tạm thời thay thế search system
   .get(
     "/comics/name",
     async ({ query }) => {
@@ -80,7 +81,7 @@ export const apiRouter = new Elysia({
     },
     {
       query: t.Object({
-        min: t.Nullable(
+        min: t.Optional(
           t.Numeric({
             minimum: 1,
           })
@@ -89,6 +90,34 @@ export const apiRouter = new Elysia({
           default: 10,
           minimum: 2,
         }),
+      }),
+    }
+  )
+  // add comic
+  .post(
+    "/dashboard",
+    async ({ query }) => {
+      await prisma.comic.create({
+        data: {
+          name: query.name,
+          aliases: query.name.split("$"),
+          thumbnail: query.thumbnail,
+          banner: query.banner,
+          description: query.description,
+          genre: query.genre,
+          color: query.color,
+        },
+      });
+    },
+    {
+      query: t.Object({
+        name: t.String(),
+        aliases: t.String(),
+        thumbnail: t.String(),
+        banner: t.String(),
+        description: t.String(),
+        genre: t.Array(t.Enum(Genre)),
+        color: t.BooleanString(),
       }),
     }
   );

@@ -14,36 +14,57 @@ datasource db {
 }
 
 model Comic {
-  id               String         @id
+  id               String          @id @default(uuid())
   name             String
   aliases          String[]
   thumbnail        String
   banner           String
   description      String
-  category         Category[]
-  translatorTeam   TranslatorTeam @relation(fields: [translatorTeamId], references: [id])
-  translatorTeamId String
-  author           Author         @relation(fields: [authorId], references: [id])
-  authorId         String
-  createAt         DateTime       @default(now())
-  updateAt         DateTime       @updatedAt()
-  follows          Int            @default(0)
-  likes            Int            @default(0)
-  dislikes         Int            @default(0)
+  genre            Genre[]
+  translatorTeam   TranslatorTeam? @relation(fields: [translatorTeamId], references: [id])
+  translatorTeamId String?
+  author           Author?         @relation(fields: [id], references: [id])
+  color            Boolean
+  createAt         DateTime        @default(now())
+  updateAt         DateTime        @updatedAt()
+  views            Int             @default(0)
+  follows          Int             @default(0)
+  likes            Int             @default(0)
+  dislikes         Int             @default(0)
   chapters         Chapter[]
 }
 
-model Category {
-  id     String  @id
-  name   String
-  comics Comic[]
+enum Genre {
+  DRAMA
+  ECCHI
+  ACTION
+  COMEDY
+  FANTASY
+  SHOUNEN
+  ADVENTURE
+  MANHWA
+  MANHUA
+  WEBTOON
+  ISEKAI
+  HAREM
+  SCI_FI
+  SEINEN
+  HORROR
+  MYSTERY
+  ROMANCE
+  SCHOOL_LIFE
+  SUPERNATURAL
+  DETECTIVE
+  MARTIAL
+  SWORDSMANSHIP
 }
 
 model Author {
-  id             String           @id
+  id             String           @id @default(uuid())
   username       String
+  displayName    String
   createAt       DateTime         @default(now())
-  // premium        Boolean          @default(true) vì tác giả ko phải là đối tượng use
+  premium        Boolean          @default(true)
   translatorTeam TranslatorTeam[]
   history        History[]
   comic          Comic[]
@@ -53,7 +74,7 @@ model Author {
 }
 
 model History {
-  id       String    @id
+  id       String    @id @default(uuid())
   comicId  String    @unique
   chapters Chapter[]
   Author   Author?   @relation(fields: [authorId], references: [id])
@@ -69,9 +90,9 @@ model TranslatorTeam {
 }
 
 model Chapter {
-  comicId     String   @id
+  id          String   @id @default(uuid())
+  comicId     String
   comic       Comic    @relation(fields: [comicId], references: [id])
-  id          String
   number      Float
   title       String
   description String?
