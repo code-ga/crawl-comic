@@ -44,3 +44,5 @@ package-lock.json
 
 # your custom deploy file
 update.sh
+
+bun.lockb
