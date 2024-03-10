@@ -12,7 +12,7 @@ export default function Home() {
     <div className="grid grid-cols-4 gap-4 text-center">
       {/* content */}
       <div>Side Bar</div>
-      <Suspense fallback={<>Loading...</>}>
+      <Suspense fallback={<span>Loading...</span>}>
         <ListComic app={app} />
       </Suspense>
     </div>

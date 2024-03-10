@@ -1,36 +1,52 @@
 "use client";
 import { edenTreaty } from "@elysiajs/eden";
 import { ElysiaServerApi } from "../../../typings";
-import { use, useState } from "react";
+import { use, useMemo, useState } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { beUrl, cdnUrl } from "../../../constant";
 import { useRouter } from "next/navigation";
+import { Toast } from "../../../components/toast";
 
 export default function Page({ params }: { params: { id: string } }) {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
   const router = useRouter();
+  const [toast, setToast] = useState<string | null>(null);
+  const { data, error } = useMemo(
+    () => use(app.api.comic[params.id].get()),
+    [app.api.comic, params.id]
+  );
 
-  const { data, error } = use(app.api.comic[params.id].get());
-  if (!data || error || !data.data) {
+  if ((!data || !data.data) && error) {
     notFound();
-    return;
   }
-  const comic = data.data;
+  const comic = data!.data!;
   const refetchComicInfo = async () => {
     await app.api.refetch.comic.info[comic.id].get();
     router.refresh();
   };
+
+  const refetchChapterList = async () => {
+    const { data, error } = await app.api.refetch.comic.chaps[comic.id].get();
+    console.log(data, error);
+    if (error) {
+      setToast(error.message);
+    }
+    if (data) {
+      setToast(data.message);
+    }
+  };
   return (
-    <div className="p-3 bg-slate-900 m-3">
-      <div className="flex flex-col gap-2  m-3 justify-center content-center text-center">
+    <div className="p-3  m-3">
+      {toast && <Toast message={toast}></Toast>}
+      <div className="flex flex-col gap-2 bg-slate-900 m-3 justify-center content-center text-center">
         <h1 className="text-2xl mb-2">{comic.name}</h1>
         <div className="text-sm mb-2">
           Cập nhập cuối lúc : {comic.updatedDate.toLocaleString()}
         </div>
         <div className="grid grid-cols-4">
-          <div className="col-span-1">
+          <div className="col-span-1 ml-2">
             <Image
               src={cdnUrl + "/image?url=" + comic.thumbnail}
               alt={comic.name}
@@ -142,6 +158,42 @@ export default function Page({ params }: { params: { id: string } }) {
         <div className="text-md mb-2">
           <div className="text-lg">Nội dung</div>
           <div>{comic.content ? comic.content : "No content available"}</div>
+        </div>
+      </div>
+      <div className="text-md m-3 bg-slate-900 p-3">
+        <div className="text-lg">
+          <span>Chapters</span>
+          <button
+            className="bg-red-700 p-1 px-3 border border-slate-700 rounded-md mx-3"
+            onClick={() => refetchChapterList()}
+          >
+            Refetch Chapter
+          </button>
+        </div>
+        <div>
+          <table className="table-auto">
+            <thead>
+              <tr>
+                <th>Chapter</th>
+                <th>Tạo ngày</th>
+              </tr>
+            </thead>
+            <tbody>
+              {comic.Chapter.map((chapter) => (
+                <tr key={chapter.id}>
+                  <td>
+                    <Link
+                      href={`/chapter/${chapter.id}`}
+                      className="text-blue-500"
+                    >
+                      {chapter.name}
+                    </Link>
+                  </td>
+                  <td>{chapter.createdDate}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
