@@ -1,3 +1,4 @@
+"use client";
 import { use } from "react";
 import { ComicCard } from "../components/ComicCard";
 import { useSearchParams } from "next/navigation";
