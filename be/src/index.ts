@@ -10,6 +10,7 @@ const app = new Elysia()
   .listen(PORT);
 
 export type App = typeof app
+export * as types from "./typings"
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
 );

@@ -1,20 +1,24 @@
-import { TSchema, t } from "elysia";
+import { Static, TSchema, t } from "elysia";
 
 export const Comic = t.Object({
     id: t.String(),
     name: t.String(),
+    url: t.String(),
+    genre: t.Record(t.String(), t.String()),
+    content: t.Optional(t.String()),
+    translatorTeam: t.Record(t.String(), t.String()),
     anotherName: t.Array(t.String()),
     source: t.Record(t.String(), t.String()),
-    translatorTeam: t.Record(t.String(), t.String()),
+    author: t.Record(t.String(), t.String()),
     postedBy: t.Record(t.String(), t.String()),
-    genre: t.Record(t.String(), t.String()),
-    content: t.String(),
+    status: t.String(),
     thumbnail: t.String(),
     createdDate: t.Date(),
     updatedDate: t.Date(),
-    status: t.String(),
     pythonFetchInfo: t.Boolean()
 })
+
+export type ComicStatic = Static<typeof Comic>
 
 export const ComicIncludeChapter = t.Composite([
     Comic,
@@ -26,6 +30,9 @@ export const ComicIncludeChapter = t.Composite([
         }))
     })
 ])
+
+export type ComicIncludeChapterStatic = Static<typeof ComicIncludeChapter>
+
 export const Chapter = t.Object({
     id: t.String(),
     name: t.String(),
@@ -35,6 +42,8 @@ export const Chapter = t.Object({
     updatedDate: t.Date(),
     comicId: t.String()
 })
+
+export type ChapterStatic = Static<typeof Chapter>
 
 export const BaseResponse = <T extends TSchema>(st: T) => t.Object({
     status: t.Number(),

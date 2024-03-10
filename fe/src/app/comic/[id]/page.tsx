@@ -8,15 +8,15 @@ import Link from "next/link";
 export default function Page({ params }: { params: { id: string } }) {
   const app = edenTreaty<ElysiaServerApi>("https://ai-datalake.nz.io.vn/");
 
-  const { data: comic, error } = use(app.api.comic[params.id].get());
-  if (!comic || error) {
+  const { data, error } = use(app.api.comic[params.id].get());
+  if (!data || error || !data.data) {
     notFound();
     return;
   }
+  const comic = data.data;
   const refetchComicInfo = async () => {
     await app.api.refetch.comic.info[comic.id].get();
   }
-  console.log(comic);
   return (
     <div className="flex flex-col gap-2 bg-slate-900 m-3 justify-center content-center text-center">
       <h1 className="text-2xl mb-2">{comic.name}</h1>
@@ -71,11 +71,7 @@ export default function Page({ params }: { params: { id: string } }) {
                     </span>
                   ))
                 : "Unknown"}
-            </div>No overload matches this call.
-              Overload 1 of 2, '(o: {}): string[]', gave the following error.
-                Argument of type 'JsonValue' is not assignable to parameter of type '{}'.
-              Overload 2 of 2, '(o: object): string[]', gave the following error.
-                Argument of type 'JsonValue' is not assignable to parameter of type 'object'.
+            </div>
           )}
           {comic.anotherName.length > 0 && (
             <div className="text-md mb-2">

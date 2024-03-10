@@ -16,6 +16,10 @@ export default function Home() {
       $query: { skip: page * comicPerPage, take: comicPerPage },
     })
   );
+  if (!data || data.status !== 200 || !data.data) {
+    return <>Server have some error</>;
+  }
+  const comics= data.data;
 
   // console.log(data);
 
@@ -24,7 +28,7 @@ export default function Home() {
       {/* content */}
       <div>Side Bar</div>
       <div className="col-span-3">
-        {data?.map((comic) => (
+        {comics?.map((comic) => (
           <ComicCard key={comic.id} comic={comic}></ComicCard>
         ))}
         {/* next page */}

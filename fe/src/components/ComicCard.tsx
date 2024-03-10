@@ -1,12 +1,8 @@
-import { ArrayChildren, ComicsApiReturn } from "../typings";
+import { ComicsApiReturn } from "../typings";
 import Image from "next/image";
 import Link from "next/link";
 
-export const ComicCard = ({
-  comic,
-}: {
-  comic: ArrayChildren<ComicsApiReturn>;
-}) => {
+export const ComicCard = ({ comic }: { comic: ComicsApiReturn }) => {
   if (!comic) {
     return null;
   }

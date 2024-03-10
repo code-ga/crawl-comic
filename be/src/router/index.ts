@@ -15,11 +15,11 @@ export const apiRouter =
             return {
                 status: 200,
                 message: "Fetched successfully",
-                data: await prisma.comic.findMany({
+                data: (await prisma.comic.findMany({
                     skip: query.skip,
                     take: query.take,
                     orderBy: { createdDate: 'asc' },
-                })
+                })) as any
             }
         }, {
             query: t.Object({
@@ -39,7 +39,7 @@ export const apiRouter =
             return {
                 status: 200,
                 message: "Fetched successfully",
-                data: await prisma.comic.findUnique({
+                data: (await prisma.comic.findUnique({
                     where: {
                         id: params.id
                     },
@@ -52,7 +52,7 @@ export const apiRouter =
                             }
                         }
                     }
-                })
+                })) as any
             }
         }, {
             params: t.Object({
@@ -67,13 +67,13 @@ export const apiRouter =
             return {
                 status: 200,
                 message: "Fetched successfully",
-                data: await prisma.comic.findMany({
+                data: (await prisma.comic.findMany({
                     where: {
                         name: {
                             contains: params.name
                         }
                     }
-                })
+                })) as any
             }
         }, {
             params: t.Object({
@@ -88,13 +88,13 @@ export const apiRouter =
             return {
                 status: 200,
                 message: "Fetched successfully",
-                data: await prisma.comic.findMany({
+                data: (await prisma.comic.findMany({
                     where: {
                         url: {
                             contains: query.url
                         }
                     }
-                })
+                })) as any
             }
         },
             {
@@ -120,14 +120,14 @@ export const apiRouter =
                     filteredImages.push(url)
                 }
             }
-            return await prisma.chapter.update({
+            return (await prisma.chapter.update({
                 where: {
                     id: params.id
                 },
                 data: {
                     images: filteredImages
                 }
-            })
+            })) as any
         }, {
             params: t.Object({
                 id: t.String()
@@ -150,11 +150,11 @@ export const apiRouter =
         })
         .get("/news", async ({ query }) => {
             console.log(query)
-            return await prisma.comic.findMany({
+            return (await prisma.comic.findMany({
                 skip: query.skip,
                 take: query.take,
                 orderBy: { createdDate: 'desc' },
-            })
+            })) as any
         }, {
             query: t.Object({
                 skip: t.Numeric({
@@ -179,14 +179,14 @@ export const apiRouter =
             const resp = await (await fetch(comic.url)).text()
             const parsed = (parseComicHtmlPage(resp))
             console.log({ parsed })
-            return await prisma.comic.update({
+            return (await prisma.comic.update({
                 where: {
                     id: params.id
                 },
                 data: {
                     ...parsed
                 }
-            })
+            })) as any
         }, {
             params: t.Object({
                 id: t.String()
@@ -202,7 +202,14 @@ export const apiRouter =
                     id: params.id
                 }
             })
-            if (!comic) return comic
+            if (!comic) return {
+                status: 404,
+                message: "Not found",
+                data: {
+                    fetching: false,
+                    message: "Not found"
+                }
+            }
             const url = await prisma.urls.findFirst({
                 where: {
                     url: {
@@ -210,15 +217,30 @@ export const apiRouter =
                     }
                 }
             })
-            if (!url) return url
+            if (!url) return {
+                status: 404,
+                message: "Not found",
+                data: {
+                    fetching: false,
+                    message: "Not found"
+                }
+            }
             // if url.updatedDate < 2 days then return already fetched
             if (url.updatedDate < new Date(Date.now() - 1000 * 60 * 60 * 24 * 2)) return {
-                fetched: true,
-                message: "Already fetched"
+                status: 200,
+                message: "Already fetched",
+                data: {
+                    fetching: false,
+                    message: "Already fetched"
+                }
             }
             if (url.fetching) return {
-                fetching: true,
-                message: "Already fetching"
+                status: 200,
+                message: "Already fetching",
+                data: {
+                    fetching: true,
+                    message: "Already fetching"
+                }
             }
             await prisma.urls.updateMany({
                 where: {
@@ -231,17 +253,21 @@ export const apiRouter =
                 }
             })
             return {
-                fetching: true,
-                message: "Start fetching ( added to queue )"
+                status: 200,
+                message: "Fetched successfully",
+                data: {
+                    fetching: true,
+                    message: "Start fetching ( added to queue )"
+                }
             }
         }, {
             params: t.Object({
                 id: t.String()
             }),
             response: {
-                200: BaseResponse(t.Object({
-                    fetched: t.Boolean(),
+                200: (BaseResponse(t.Object({
+                    fetching: t.Boolean(),
                     message: t.String()
-                }))
+                })))
             }
         })
