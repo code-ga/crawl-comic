@@ -4,9 +4,10 @@ import { use } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { beUrl, cdnUrl } from "../../../constant";
 
 export default function Page({ params }: { params: { id: string } }) {
-  const app = edenTreaty<ElysiaServerApi>("https://ai-datalake.nz.io.vn/");
+  const app = edenTreaty<ElysiaServerApi>(beUrl);
 
   const { data, error } = use(app.api.comic[params.id].get());
   if (!data || error || !data.data) {
@@ -16,7 +17,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const comic = data.data;
   const refetchComicInfo = async () => {
     await app.api.refetch.comic.info[comic.id].get();
-  }
+  };
   return (
     <div className="flex flex-col gap-2 bg-slate-900 m-3 justify-center content-center text-center">
       <h1 className="text-2xl mb-2">{comic.name}</h1>
@@ -26,7 +27,7 @@ export default function Page({ params }: { params: { id: string } }) {
       <div className="grid grid-cols-4">
         <div className="col-span-1">
           <Image
-            src={"/api/images?url=" + comic.thumbnail}
+            src={cdnUrl + "/image?url=" + comic.thumbnail}
             alt={comic.name}
             width={300}
             height={300}
@@ -125,12 +126,11 @@ export default function Page({ params }: { params: { id: string } }) {
             >
               Đọc mới nhất
             </Link>
-            <Link
-              href={`/chapter/${comic.Chapter[0].id}`}
+            <button
               className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3"
             >
-              Thêm vô nhìn cho đủ chứ vẫn là đọc mới nhất
-            </Link>
+              Refetch Comic
+            </button>
           </div>
         </div>
       </div>

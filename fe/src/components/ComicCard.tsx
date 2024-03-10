@@ -1,6 +1,7 @@
 import { ComicsApiReturn } from "../typings";
 import Image from "next/image";
 import Link from "next/link";
+import { cdnUrl } from "../constant";
 
 export const ComicCard = ({ comic }: { comic: ComicsApiReturn }) => {
   if (!comic) {
@@ -10,7 +11,7 @@ export const ComicCard = ({ comic }: { comic: ComicsApiReturn }) => {
     <div className="flex flex-col gap-2 bg-slate-900 m-3 border border-slate-700 justify-center content-center">
       <div className="flex justify-center content-center">
         <Image
-          src={"/api/images?url=" + comic.thumbnail || ""}
+          src={cdnUrl+"/image?url=" + comic.thumbnail || ""}
           alt={comic.name}
           width={300}
           height={300}
