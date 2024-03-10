@@ -1,6 +1,7 @@
 import { Elysia, t } from "elysia";
 import { prisma } from "../db";
 import { parseComicHtmlPage } from "../utils/fetchComicInfo";
+import { BaseResponse, Chapter, Comic, ComicIncludeChapter } from "../typings";
 
 
 
@@ -11,11 +12,15 @@ export const apiRouter =
     })
         .get("/comics", async ({ query }) => {
             console.log(query)
-            return await prisma.comic.findMany({
-                skip: query.skip,
-                take: query.take,
-                orderBy: { createdDate: 'asc' },
-            })
+            return {
+                status: 200,
+                message: "Fetched successfully",
+                data: await prisma.comic.findMany({
+                    skip: query.skip,
+                    take: query.take,
+                    orderBy: { createdDate: 'asc' },
+                })
+            }
         }, {
             query: t.Object({
                 skip: t.Numeric({
@@ -24,43 +29,80 @@ export const apiRouter =
                 take: t.Numeric({
                     default: 10
                 }),
-            })
+            }),
+            response: {
+                200: BaseResponse(t.Array(Comic))
+            }
         })
         .get("/comic/:id", async ({ params }) => {
             console.log(params)
-            return await prisma.comic.findUnique({
-                where: {
-                    id: params.id
-                },
-                include: {
-                    Chapter: {
-                        select: {
-                            id: true,
-                            name: true,
-                            createdDate: true
+            return {
+                status: 200,
+                message: "Fetched successfully",
+                data: await prisma.comic.findUnique({
+                    where: {
+                        id: params.id
+                    },
+                    include: {
+                        Chapter: {
+                            select: {
+                                id: true,
+                                name: true,
+                                createdDate: true
+                            }
                         }
                     }
-                }
-            })
-
+                })
+            }
         }, {
             params: t.Object({
                 id: t.String()
-            })
+            }),
+            response: {
+                200: BaseResponse(ComicIncludeChapter)
+            }
         })
-        .get("/search/:name", async ({ params }) => {
+        .get("/search/name/:name", async ({ params }) => {
             console.log(params)
-            return await prisma.comic.findMany({
-                where: {
-                    name: {
-                        contains: params.name
+            return {
+                status: 200,
+                message: "Fetched successfully",
+                data: await prisma.comic.findMany({
+                    where: {
+                        name: {
+                            contains: params.name
+                        }
                     }
-                }
-            })
+                })
+            }
         }, {
             params: t.Object({
                 name: t.String()
-            })
+            }),
+            response: {
+                200: BaseResponse(t.Array(Comic))
+            }
+        })
+        .get("/search/url/:url", async ({ params }) => {
+            console.log(params)
+            return {
+                status: 200,
+                message: "Fetched successfully",
+                data: await prisma.comic.findMany({
+                    where: {
+                        url: {
+                            contains: params.url
+                        }
+                    }
+                })
+            }
+        }, {
+            params: t.Object({
+                url: t.String()
+            }),
+            response: {
+                200: BaseResponse(t.Array(Comic))
+            }
         })
         .get("/chapter/:id", async ({ params }) => {
             console.log(params)
@@ -87,7 +129,10 @@ export const apiRouter =
         }, {
             params: t.Object({
                 id: t.String()
-            })
+            }),
+            response: {
+                200: BaseResponse(Chapter)
+            }
         })
         .get("/stats", async () => {
             return {
@@ -116,7 +161,10 @@ export const apiRouter =
                 take: t.Numeric({
                     default: 10
                 }),
-            })
+            }),
+            response: {
+                200: BaseResponse(t.Array(Comic))
+            }
         })
         .get("/refetch/comic/info/:id", async ({ params }) => {
             console.log(params)
@@ -140,7 +188,10 @@ export const apiRouter =
         }, {
             params: t.Object({
                 id: t.String()
-            })
+            }),
+            response: {
+                200: BaseResponse(Comic)
+            }
         })
         .get("/refetch/comic/chaps/:id", async ({ params }) => {
             console.log(params)
@@ -184,5 +235,11 @@ export const apiRouter =
         }, {
             params: t.Object({
                 id: t.String()
-            })
+            }),
+            response: {
+                200: BaseResponse(t.Object({
+                    fetched: t.Boolean(),
+                    message: t.String()
+                }))
+            }
         })

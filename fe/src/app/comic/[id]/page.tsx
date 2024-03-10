@@ -13,6 +13,9 @@ export default function Page({ params }: { params: { id: string } }) {
     notFound();
     return;
   }
+  const refetchComicInfo = async () => {
+    await app.api.refetch.comic.info[comic.id].get();
+  }
   console.log(comic);
   return (
     <div className="flex flex-col gap-2 bg-slate-900 m-3 justify-center content-center text-center">
@@ -68,7 +71,11 @@ export default function Page({ params }: { params: { id: string } }) {
                     </span>
                   ))
                 : "Unknown"}
-            </div>
+            </div>No overload matches this call.
+              Overload 1 of 2, '(o: {}): string[]', gave the following error.
+                Argument of type 'JsonValue' is not assignable to parameter of type '{}'.
+              Overload 2 of 2, '(o: object): string[]', gave the following error.
+                Argument of type 'JsonValue' is not assignable to parameter of type 'object'.
           )}
           {comic.anotherName.length > 0 && (
             <div className="text-md mb-2">
