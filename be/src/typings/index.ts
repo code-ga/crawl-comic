@@ -12,7 +12,7 @@ export const Comic = t.Object({
     author: t.Record(t.String(), t.String()),
     postedBy: t.Record(t.String(), t.String()),
     status: t.String(),
-    thumbnail: t.String(),
+    thumbnail: t.Optional(t.String()),
     createdDate: t.Date(),
     updatedDate: t.Date(),
     pythonFetchInfo: t.Boolean()
