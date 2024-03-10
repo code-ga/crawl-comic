@@ -39,7 +39,7 @@ export default function Page({ params }: { params: { id: string } }) {
             />
           </div>
           <div className="col-span-3 text-start ml-4">
-            <div className="text-md mb-2 flex text-wrap max-w-20">
+            <div className="text-md mb-2 flex text-wrap">
               <span className="text-lg">Thể loại: </span>
               {Object.keys(comic.genre).map((genre, index) => (
                 <p key={genre}>
