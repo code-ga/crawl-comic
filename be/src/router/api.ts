@@ -113,21 +113,29 @@ export const apiRoute =
                     id: params.id
                 }
             })
-            if (!chap) return chap
+            if (!chap) return {
+                status: 404,
+                message: "Chapter not found",
+                data: null
+            }
             const filteredImages = []
             for (const url of chap.images) {
                 if (url.startsWith("https://i")) {
                     filteredImages.push(url)
                 }
             }
-            return (await prisma.chapter.update({
-                where: {
-                    id: params.id
-                },
-                data: {
-                    images: filteredImages
-                }
-            })) as any
+            return {
+                status: 200,
+                message: "Fetched successfully",
+                data: (await prisma.chapter.update({
+                    where: {
+                        id: params.id
+                    },
+                    data: {
+                        images: filteredImages
+                    }
+                })) as any
+            }
         }, {
             params: t.Object({
                 id: t.String()
@@ -150,11 +158,15 @@ export const apiRoute =
         })
         .get("/news", async ({ query }) => {
             console.log(query)
-            return (await prisma.comic.findMany({
-                skip: query.skip,
-                take: query.take,
-                orderBy: { createdDate: 'desc' },
-            })) as any
+            return {
+                status: 200,
+                message: "Fetched successfully",
+                data: (await prisma.comic.findMany({
+                    skip: query.skip,
+                    take: query.take,
+                    orderBy: { createdDate: 'desc' },
+                })) as any
+            }
         }, {
             query: t.Object({
                 skip: t.Numeric({
@@ -175,18 +187,26 @@ export const apiRoute =
                     id: params.id
                 }
             })
-            if (!comic) return comic
+            if (!comic) return {
+                status: 404,
+                message: "Not found",
+                data: null
+            }
             const resp = await (await fetch(comic.url)).text()
             const parsed = (parseComicHtmlPage(resp))
             console.log({ parsed })
-            return (await prisma.comic.update({
-                where: {
-                    id: params.id
-                },
-                data: {
-                    ...parsed
-                }
-            })) as any
+            return {
+                status: 200,
+                message: "Fetched successfully",
+                data: (await prisma.comic.update({
+                    where: {
+                        id: params.id
+                    },
+                    data: {
+                        ...parsed
+                    }
+                })) as any
+            }
         }, {
             params: t.Object({
                 id: t.String()

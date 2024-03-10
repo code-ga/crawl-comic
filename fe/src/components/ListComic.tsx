@@ -15,7 +15,7 @@ export function ListComic({ app }: { app: AppApi }) {
     })
   );
   if (!data || data.status !== 200 || !data.data) {
-    return <>Server have some error</>;
+    return <div>Server have some error</div>;
   }
   const comics = data.data;
   return (
