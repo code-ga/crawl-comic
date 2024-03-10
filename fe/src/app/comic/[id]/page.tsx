@@ -1,26 +1,26 @@
 "use client";
 import { edenTreaty } from "@elysiajs/eden";
 import { ElysiaServerApi } from "../../../typings";
-import { use } from "react";
+import { use, useState } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { beUrl, cdnUrl } from "../../../constant";
-import { useRouter } from "next/navigation";
 
 export default function Page({ params }: { params: { id: string } }) {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
-  const router = useRouter();
 
-  const { data, error } = use(app.api.comic[params.id].get());
+  const [{ data, error }, setComicData] = useState(
+    use(app.api.comic[params.id].get())
+  );
   if (!data || error || !data.data) {
     notFound();
     return;
   }
   const comic = data.data;
   const refetchComicInfo = async () => {
-    await app.api.refetch.comic.info[comic.id].get();
-    router.refresh();
+    const newComic = await app.api.refetch.comic.info[comic.id].get();
+    setComicData(newComic);
   };
   return (
     <div className="p-3 bg-slate-900 m-3">

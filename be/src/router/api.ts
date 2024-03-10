@@ -204,6 +204,15 @@ export const apiRoute =
                     },
                     data: {
                         ...parsed
+                    },
+                    include: {
+                        Chapter: {
+                            select: {
+                                id: true,
+                                name: true,
+                                createdDate: true
+                            }
+                        }
                     }
                 })) as any
             }
@@ -212,7 +221,7 @@ export const apiRoute =
                 id: t.String()
             }),
             response: {
-                200: BaseResponse(Comic)
+                200: BaseResponse(ComicIncludeChapter)
             }
         })
         .get("/refetch/comic/chaps/:id", async ({ params }) => {
