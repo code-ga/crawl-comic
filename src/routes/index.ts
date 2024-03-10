@@ -29,6 +29,7 @@ export const apiRouter = new Elysia({
     "/comics/name",
     async ({ query }) => {
       console.log(`comics/name: ${query}`);
+      query.name.split(" ").join(" & ");
 
       const name = await prisma.comic.findMany({
         where: {
@@ -68,11 +69,11 @@ export const apiRouter = new Elysia({
       console.log(`recommend: ${query}`);
 
       return await prisma.comic.findMany({
-        where: {
-          likes: {
-            gt: query.min ?? 1,
-          },
-        },
+        // where: {
+        //   likes: {
+        //     gt: query.min ?? 1,
+        //   },
+        // },
         orderBy: {
           likes: "desc",
         },
@@ -96,25 +97,28 @@ export const apiRouter = new Elysia({
   // add comic
   .post(
     "/dashboard",
-    async ({ query }) => {
-      await prisma.comic.create({
-        data: {
-          name: query.name,
-          aliases: query.name.split("$"),
-          thumbnail: query.thumbnail,
-          banner: query.banner,
-          description: query.description,
-          genre: query.genre,
-          color: query.color,
-        },
-      });
+    async ({ body }) => {
+      console.log(body.name);
+      const c = await prisma.comic
+        .create({
+          data: {
+            name: body.name,
+            aliases: body.aliases,
+            thumbnail: body.thumbnail,
+            description: body.description,
+            genre: body.genre,
+            color: body.color,
+          },
+        })
+        .catch(console.error);
+      console.log(c);
+      return c;
     },
     {
-      query: t.Object({
+      body: t.Object({
         name: t.String(),
-        aliases: t.String(),
+        aliases: t.Array(t.String()),
         thumbnail: t.String(),
-        banner: t.String(),
         description: t.String(),
         genre: t.Array(t.Enum(Genre)),
         color: t.BooleanString(),

@@ -1,12 +1,13 @@
 import { Elysia } from "elysia";
 import { swagger } from "@elysiajs/swagger";
+import { cors } from "@elysiajs/cors";
 import { apiRouter } from "./routes";
 
 const app = new Elysia()
   .use(swagger())
-  .use(apiRouter)
+  .use(cors())
   .get("/", () => "Hello Elysia")
-  .listen(3000)
+  .use(apiRouter)
   .onError(({ code, error }) => {
     if (code === "VALIDATION") return error.validator.Errors(error.value).First().message;
     if (code === "NOT_FOUND")
@@ -19,6 +20,6 @@ const app = new Elysia()
     }
     if (code === "PARSE") {
     }
-  });
-
+  })
+  .listen(process.env.PORT || 8000);
 console.log(`🦊 Elysia is running at http://${app.server?.hostname}:${app.server?.port}`);

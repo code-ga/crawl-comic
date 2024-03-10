@@ -14,24 +14,32 @@ datasource db {
 }
 
 model Comic {
-  id               String          @id @default(uuid())
-  name             String
+  id               String          @id @default(cuid())
+  name             String          @unique
   aliases          String[]
   thumbnail        String
-  banner           String
+  banner           String?
   description      String
   genre            Genre[]
   translatorTeam   TranslatorTeam? @relation(fields: [translatorTeamId], references: [id])
   translatorTeamId String?
-  author           Author?         @relation(fields: [id], references: [id])
+  author           Author?         @relation(fields: [authorId], references: [id])
+  authorId         String?
   color            Boolean
   createAt         DateTime        @default(now())
   updateAt         DateTime        @updatedAt()
+  status           Status          @default(COMING_SOON)
   views            Int             @default(0)
   follows          Int             @default(0)
   likes            Int             @default(0)
   dislikes         Int             @default(0)
   chapters         Chapter[]
+}
+
+enum Status {
+  IN_PROCESS
+  COMPLETE
+  COMING_SOON
 }
 
 enum Genre {
@@ -74,7 +82,7 @@ model Author {
 }
 
 model History {
-  id       String    @id @default(uuid())
+  id       String    @id @default(cuid())
   comicId  String    @unique
   chapters Chapter[]
   Author   Author?   @relation(fields: [authorId], references: [id])
@@ -82,7 +90,7 @@ model History {
 }
 
 model TranslatorTeam {
-  id       String   @id
+  id       String   @id @default(cuid())
   members  Author[]
   comics   Comic[]
   createAt DateTime @default(now())
@@ -90,7 +98,7 @@ model TranslatorTeam {
 }
 
 model Chapter {
-  id          String   @id @default(uuid())
+  id          String   @id @default(cuid())
   comicId     String
   comic       Comic    @relation(fields: [comicId], references: [id])
   number      Float
