@@ -49,7 +49,8 @@ export const apiRoute =
                                 id: true,
                                 name: true,
                                 createdDate: true
-                            }
+                            },
+                            orderBy: { updatedDate: 'desc' }
                         }
                     }
                 })) as any
@@ -211,7 +212,8 @@ export const apiRoute =
                                 id: true,
                                 name: true,
                                 createdDate: true
-                            }
+                            },
+                            orderBy: { updatedDate: 'desc' }
                         }
                     }
                 })) as any
