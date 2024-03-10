@@ -11,6 +11,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@elysiajs/cors": "^0.8.0",
     "@elysiajs/swagger": "^0.8.5",
     "@prisma/client": "5.10.2",
     "cheerio": "^1.0.0-rc.12",
