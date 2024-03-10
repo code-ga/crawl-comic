@@ -83,27 +83,29 @@ export const apiRouter =
                 200: BaseResponse(t.Array(Comic))
             }
         })
-        .get("/search/url/:url", async ({ params }) => {
-            console.log(params)
+        .get("/search/url", async ({ query }) => {
+            console.log(query)
             return {
                 status: 200,
                 message: "Fetched successfully",
                 data: await prisma.comic.findMany({
                     where: {
                         url: {
-                            contains: params.url
+                            contains: query.url
                         }
                     }
                 })
             }
-        }, {
-            params: t.Object({
-                url: t.String()
-            }),
-            response: {
-                200: BaseResponse(t.Array(Comic))
+        },
+            {
+                query: t.Object({
+                    url: t.String()
+                }),
+                response: {
+                    200: BaseResponse(t.Array(Comic))
+                }
             }
-        })
+        )
         .get("/chapter/:id", async ({ params }) => {
             console.log(params)
             const chap = await prisma.chapter.findFirst({
