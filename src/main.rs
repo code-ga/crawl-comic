@@ -25,7 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         let tx = main_tx.clone();
         let rx = worker_rx.clone();
         let worker = tokio::spawn(async move {
-            modules::blogtruyenmoi::thread_worker(tx, rx, i).await;
+            modules::thread_worker(tx, rx, i).await;
         });
 
         workers.push(types::Worker {
@@ -81,7 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let tx = main_tx.clone();
                 let rx = worker_rx.clone();
                 let worker = tokio::spawn(async move {
-                    modules::blogtruyenmoi::thread_worker(tx, rx, id).await;
+                    modules::thread_worker(tx, rx, id).await;
                 });
                 workers[id].join_handle = worker;
             }

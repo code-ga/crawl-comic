@@ -1,1 +1,284 @@
+use std::sync::Arc;
+
+use regex::Regex;
+use tokio::sync::Mutex;
+
+use crate::{
+    modules::blogtruyenmoi::{is_comic_page, parse_chapter_page, parse_comic_page},
+    prisma::{self, PrismaClient},
+    types::thread_message::ThreadMessage,
+};
+use rand::Rng;
+
 pub mod blogtruyenmoi;
+
+pub fn process_url(url: &str, now_url: &str) -> Option<String> {
+    let url = url.trim().to_string();
+    if url.starts_with("//id.blogtruyenmoi.com") {
+        // return Some(format!("https:{}", url).trim().to_string());
+        return None;
+    }
+    if url.starts_with("/c") {
+        return Some(format!("https://blogtruyenmoi.com{}", url));
+    }
+    if url.starts_with("javascript:LoadListMangaPage(") {
+        // javascript:LoadListMangaPage(2) -> https://blogtruyenmoi.com/ajax/Search/AjaxLoadListManga?key=tatca&orderBy=3&p=2
+        let re = Regex::new(r#"LoadListMangaPage\((\d+)\)"#).unwrap();
+        let cap = re.captures(&url).unwrap();
+        let page = cap[1].to_string();
+        return Some(format!(
+            "https://blogtruyenmoi.com/ajax/Search/AjaxLoadListManga?key=tatca&orderBy=3&p={}",
+            page
+        ));
+    }
+    if url.starts_with("/") {
+        let comic_regex = Regex::new(r#"/\d+/.+"#).unwrap();
+        if comic_regex.is_match(&url) {
+            return Some(
+                format!("https://blogtruyenmoi.com{}", url)
+                    .trim()
+                    .to_string(),
+            );
+        }
+        return None;
+    }
+    // if url.starts_with("https://vlogtruyen11.net") {
+    //     return Some(url.to_string());
+    // }
+    // if url.starts_with("/") {
+    //     return Some(format!("https://vlogtruyen11.net{}", url));
+    // }
+    None
+}
+
+pub async fn thread_worker(
+    tx: async_channel::Sender<ThreadMessage>,
+    rx: async_channel::Receiver<ThreadMessage>,
+    worker_id: usize,
+) {
+    let client: PrismaClient = {
+        let tmp = PrismaClient::_builder().build().await;
+        if tmp.is_err() {
+            tx.send(ThreadMessage::Stop(worker_id)).await.unwrap();
+        }
+        tmp.unwrap()
+    };
+
+    let client = Arc::new(Mutex::new(client));
+
+    loop {
+        let job = rx.recv().await.unwrap();
+        match job {
+            ThreadMessage::Start(url, i_tries) => {
+                let wait_time = rand::thread_rng().gen_range(1..10);
+                tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
+                {
+                    let tmp = client
+                        .lock()
+                        .await
+                        .urls()
+                        .find_first(vec![
+                            prisma::urls::url::equals(url.clone()),
+                            prisma_client_rust::operator::or(vec![
+                                prisma::urls::fetched::equals(true),
+                                prisma::urls::fetching::equals(false),
+                            ]),
+                        ])
+                        .exec()
+                        .await;
+                    if tmp.is_err() {
+                        {
+                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                .await
+                                .unwrap();
+                        }
+                        continue;
+                    }
+                    if tmp.unwrap().is_some() {
+                        // already fetched emit done
+                        tx.send(ThreadMessage::Done(vec![], url.clone(), true))
+                            .await
+                            .unwrap();
+                        println!("worker {} already fetched {}", worker_id, url);
+                        continue;
+                    }
+                };
+
+                let (http_client, _) = {
+                    let client = client.lock().await;
+                    let proxy = crate::util::get_proxy(&client).await;
+                    let mut http_client = reqwest::ClientBuilder::new();
+                    if proxy.is_some() {
+                        let proxy = proxy.clone().unwrap();
+                        println!("using proxy {} - {}", proxy.id, proxy.url);
+                        http_client = http_client.proxy({
+                            let client_proxy =
+                                reqwest::Proxy::all(proxy.url.to_string().trim().to_string());
+                            if client_proxy.is_err() {
+                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                    .await
+                                    .unwrap();
+                                continue;
+                            }
+                            let mut client_proxy = client_proxy.unwrap();
+                            if proxy.username.is_some() && proxy.password.is_some() {
+                                client_proxy = client_proxy
+                                    .basic_auth(&proxy.username.unwrap(), &proxy.password.unwrap())
+                            }
+                            client_proxy
+                        });
+                    }
+                    (http_client.build().unwrap(), proxy)
+                };
+
+                println!("worker {} fetching {}", worker_id, url);
+
+                let rep = http_client
+                    .get(url.clone())
+                    .header("User-Agent", "Mozilla/5.0")
+                    .header("Referrer", "https://blogtruyenmoi.com/");
+                let resp = rep.send().await;
+                if resp.is_err() {
+                    {
+                        tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                            .await
+                            .unwrap();
+                    }
+                    continue;
+                }
+                if resp.as_ref().unwrap().status().is_success() == false
+                    && resp.as_ref().unwrap().status().as_u16().eq(&404) == false
+                {
+                    if resp.as_ref().unwrap().status().as_u16().eq(&429) {
+                        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+                    }
+                    {
+                        tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                            .await
+                            .unwrap();
+                    }
+                    println!(
+                        "worker {} failed {} status : {}",
+                        worker_id,
+                        url,
+                        resp.unwrap().status()
+                    );
+                    continue;
+                }
+                let html = {
+                    let tmp = resp.unwrap().text().await;
+                    if tmp.is_err() {
+                        {
+                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                .await
+                                .unwrap();
+                        }
+                        continue;
+                    }
+                    tmp.unwrap()
+                };
+
+                // dbg!(&html);
+                // println!("worker {} fetched {}", worker_id, url);
+                let mut result = Vec::new();
+                let re = Regex::new(r#"href=["|']([^"']+)"#).unwrap();
+                for cap in re.captures_iter(&html) {
+                    // dbg!(&cap[1]);
+                    let url = process_url(&cap[1], &url);
+                    if url.is_some() {
+                        result.push(url.unwrap());
+                    }
+                }
+
+                // chapter page
+                if url.starts_with("https://blogtruyenmoi.com/c") {
+                    // fetch chap
+                    let client = client.lock().await;
+                    let tmp = parse_chapter_page(&url, &html, &client).await;
+                    if tmp.is_none() {
+                        {
+                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                .await
+                                .unwrap();
+                        }
+                        continue;
+                    }
+                    if tmp.is_some() {
+                        // tx.send(ThreadMessage::Done(tmp.unwrap(), url.clone(), false))
+                        //     .await
+                        //     .unwrap();
+                        result.extend(tmp.unwrap());
+                    }
+                    {
+                        let tmp = client
+                            .urls()
+                            .update_many(
+                                vec![prisma::urls::url::equals(url.clone())],
+                                vec![
+                                    prisma::urls::fetched::set(true),
+                                    prisma::urls::fetching::set(false),
+                                ],
+                            )
+                            .exec()
+                            .await;
+                        if tmp.is_err() {
+                            {
+                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                    .await
+                                    .unwrap();
+                            }
+                            continue;
+                        }
+                    }
+                } else if is_comic_page(&html) {
+                    // only chapter pending url because we had fetch comic page pending url before
+                    let pending_url_comic = {
+                        let tmp = parse_comic_page(&html, &url, client.clone()).await;
+                        if tmp.is_none() {
+                            {
+                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                    .await
+                                    .unwrap();
+                            }
+                            continue;
+                        }
+                        tmp.unwrap()
+                    };
+                    result.extend(pending_url_comic.clone());
+                }
+                result = result
+                    .into_iter()
+                    .collect::<std::collections::HashSet<_>>()
+                    .into_iter()
+                    .collect();
+                {
+                    let tmp = client
+                        .lock()
+                        .await
+                        .urls()
+                        .update_many(
+                            vec![prisma::urls::url::equals(url.clone())],
+                            vec![
+                                prisma::urls::fetched::set(true),
+                                prisma::urls::fetching::set(false),
+                            ],
+                        )
+                        .exec()
+                        .await;
+                    if tmp.is_err() {
+                        {
+                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                .await
+                                .unwrap();
+                        }
+                        continue;
+                    }
+                }
+                tx.send(ThreadMessage::Done(result, url, false))
+                    .await
+                    .unwrap();
+            }
+            _ => {}
+        }
+    }
+}

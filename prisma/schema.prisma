@@ -27,7 +27,7 @@ model Comic {
   status          String    @default("")
   thumbnail       String?
   createdDate     DateTime  @default(now())
-  updatedDate     DateTime  @default(now())
+  updatedDate     DateTime  @updatedAt
   pythonFetchInfo Boolean   @default(false)
   chapters        Chapter[]
 }
@@ -50,6 +50,7 @@ model Urls {
   fetching    Boolean  @default(false)
   createdDate DateTime @default(now())
   isError     Boolean  @default(false)
+  updatedDate DateTime @default(now())
 }
 
 model Proxy {
