@@ -9,6 +9,7 @@ import { beUrl, cdnUrl } from "../../../constant";
 import { useRouter } from "next/navigation";
 import { Bounce, toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function Page({ params }: { params: { id: string } }) {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
