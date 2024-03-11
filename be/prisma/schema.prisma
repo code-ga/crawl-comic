@@ -17,6 +17,8 @@ model Chapter {
   createdDate String
   updatedDate DateTime @default(now())
   Comic       Comic    @relation(fields: [comicId], references: [id])
+  previousId  String?
+  nextId      String?
 }
 
 model Comic {

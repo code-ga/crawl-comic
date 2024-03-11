@@ -36,10 +36,77 @@ export const apiRoute =
         })
         .get("/comic/:id", async ({ params }) => {
             console.log(params)
+            const comic = await prisma.comic.findUnique({
+                where: {
+                    id: params.id
+                },
+                include: {
+                    Chapter: {
+                        select: {
+                            id: true,
+                            name: true,
+                            createdDate: true,
+                            previousId: true,
+                            nextId: true,
+                            url: true
+                        },
+                        orderBy: { name: 'desc' }
+                    }
+                }
+            })
+            if (!comic) {
+                return {
+                    status: 404,
+                    message: "Not found",
+                }
+            }
+            console.log(comic)
+            if (comic.Chapter.length <= 1) {
+                return {
+                    status: 200,
+                    message: "Fetched successfully",
+                    data: comic as any
+                }
+            }
+            const chapterUpdateInfo = []
+            // [>2 element] => [{here} , {}]
+            for (let i = 0; i < comic.Chapter.length; i++) {
+                const current = comic.Chapter[i]
+                if (i != 0) {
+                    const previous = comic.Chapter[i - 1]
+                    if (!previous) break
+                    if (!current.previousId || previous.id != current.previousId) {
+                        chapterUpdateInfo.push(prisma.chapter.update({
+                            where: {
+                                id: current.id
+                            },
+                            data: {
+                                previousId: previous.id
+                            }
+                        }))
+                    }
+                }
+                // update next
+
+                const next = comic.Chapter[i + 1]
+                if (!next) break
+                if (!current.nextId || next.id != current.nextId) {
+                    chapterUpdateInfo.push(prisma.chapter.update({
+                        where: {
+                            id: current.id
+                        },
+                        data: {
+                            nextId: next.id
+                        }
+                    }))
+                }
+
+            }
+            await prisma.$transaction(chapterUpdateInfo)
             return {
                 status: 200,
                 message: "Fetched successfully",
-                data: (await prisma.comic.findUnique({
+                data: await prisma.comic.findUnique({
                     where: {
                         id: params.id
                     },
@@ -48,12 +115,15 @@ export const apiRoute =
                             select: {
                                 id: true,
                                 name: true,
-                                createdDate: true
+                                createdDate: true,
+                                previousId: true,
+                                nextId: true,
+                                url: true
                             },
-                            orderBy: { updatedDate: 'desc' }
+                            orderBy: { name: 'desc' }
                         }
                     }
-                })) as any
+                }) as any
             }
         }, {
             params: t.Object({

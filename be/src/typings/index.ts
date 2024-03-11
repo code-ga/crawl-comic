@@ -20,13 +20,18 @@ export const Comic = t.Object({
 
 export type ComicStatic = Static<typeof Comic>
 
+export const OptionalOrNull = <T extends TSchema>(st: T) => (t.Union([t.Null(), st, t.Undefined()]))
+
 export const ComicIncludeChapter = t.Composite([
     Comic,
     t.Object({
         Chapter: t.Array(t.Object({
             id: t.String(),
             name: t.String(),
-            createdDate: t.String()
+            createdDate: t.String(),
+            previousId: OptionalOrNull(t.String()),
+            nextId: OptionalOrNull(t.String()),
+            url: t.String()
         }))
     })
 ])
