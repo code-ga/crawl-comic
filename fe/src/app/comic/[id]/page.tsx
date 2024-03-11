@@ -46,12 +46,12 @@ export default function Page({ params }: { params: { id: string } }) {
   }
   const comic = data!;
   console.log({ comic });
-  const refetchComicInfo = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const refetchComicInfo = async (e: React.MouseEvent<HTMLButtonElement,MouseEvent>) => {
     e.preventDefault();
-    e.target.disabled = true;
+    (e.target as HTMLButtonElement).disabled = true;
     await app.api.refetch.comic.info[comic.id].get();
     router.refresh();
-    e.target.disabled = false;
+    (e.target as HTMLButtonElement).disabled = false;
   };
 
   const refetchChapterList = async (e: React.MouseEvent<HTMLButtonElement>) => {
