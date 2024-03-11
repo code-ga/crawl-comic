@@ -1,5 +1,6 @@
 use crate::prisma::{self, PrismaClient};
 use rand::Rng;
+use regex::Regex;
 
 pub async fn get_pending_urls(
     client: &PrismaClient,
@@ -88,4 +89,13 @@ pub async fn get_proxy(client: &PrismaClient) -> Option<prisma::proxy::Data> {
         .unwrap();
     // dbg!(&proxies);
     return proxies;
+}
+
+pub fn get_host(url:&str) -> Option<String> {
+    let re = Regex::new(r#"https?://([^/]+)"#).unwrap();
+    let cap = re.captures(url);
+    if cap.is_none() {
+        return None;
+    }
+    return Some(cap.unwrap()[1].to_string());
 }

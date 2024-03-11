@@ -4,50 +4,60 @@ use regex::Regex;
 use tokio::sync::Mutex;
 
 use crate::{
-    modules::blogtruyenmoi::{is_comic_page, parse_chapter_page, parse_comic_page},
+    modules::blogtruyenmoi::{
+        is_comic_page as is_blogtruyenmoi_comic_page,
+        parse_chapter_page as parse_blogtruyenmoi_chapter_page,
+        parse_comic_page as parse_blogtruyenmoi_comic_page,
+    },
     prisma::{self, PrismaClient},
     types::thread_message::ThreadMessage,
+    util::get_host,
 };
 use rand::Rng;
 
 pub mod blogtruyenmoi;
 
 pub fn process_url(url: &str, now_url: &str) -> Option<String> {
-    let url = url.trim().to_string();
-    if url.starts_with("//id.blogtruyenmoi.com") {
-        // return Some(format!("https:{}", url).trim().to_string());
+    if !url.starts_with("https://") && !url.starts_with("http://") {
         return None;
     }
-    if url.starts_with("/c") {
-        return Some(format!("https://blogtruyenmoi.com{}", url));
+    let host = get_host(now_url);
+    if host.is_none() {
+        return None;
     }
-    if url.starts_with("javascript:LoadListMangaPage(") {
-        // javascript:LoadListMangaPage(2) -> https://blogtruyenmoi.com/ajax/Search/AjaxLoadListManga?key=tatca&orderBy=3&p=2
-        let re = Regex::new(r#"LoadListMangaPage\((\d+)\)"#).unwrap();
-        let cap = re.captures(&url).unwrap();
-        let page = cap[1].to_string();
-        return Some(format!(
-            "https://blogtruyenmoi.com/ajax/Search/AjaxLoadListManga?key=tatca&orderBy=3&p={}",
-            page
-        ));
-    }
-    if url.starts_with("/") {
-        let comic_regex = Regex::new(r#"/\d+/.+"#).unwrap();
-        if comic_regex.is_match(&url) {
-            return Some(
-                format!("https://blogtruyenmoi.com{}", url)
-                    .trim()
-                    .to_string(),
-            );
+    let host = host.unwrap();
+    if host.contains("blogtruyenmoi.com") {
+        let url = url.trim().to_string();
+        if url.starts_with("//id.blogtruyenmoi.com") {
+            // return Some(format!("https:{}", url).trim().to_string());
+            return None;
         }
-        return None;
+        if url.starts_with("/c") {
+            return Some(format!("https://blogtruyenmoi.com{}", url));
+        }
+        if url.starts_with("javascript:LoadListMangaPage(") {
+            // javascript:LoadListMangaPage(2) -> https://blogtruyenmoi.com/ajax/Search/AjaxLoadListManga?key=tatca&orderBy=3&p=2
+            let re = Regex::new(r#"LoadListMangaPage\((\d+)\)"#).unwrap();
+            let cap = re.captures(&url).unwrap();
+            let page = cap[1].to_string();
+            return Some(format!(
+                "https://blogtruyenmoi.com/ajax/Search/AjaxLoadListManga?key=tatca&orderBy=3&p={}",
+                page
+            ));
+        }
+        if url.starts_with("/") {
+            let comic_regex = Regex::new(r#"/\d+/.+"#).unwrap();
+            if comic_regex.is_match(&url) {
+                return Some(
+                    format!("https://blogtruyenmoi.com{}", url)
+                        .trim()
+                        .to_string(),
+                );
+            }
+            return None;
+        }
     }
-    // if url.starts_with("https://vlogtruyen11.net") {
-    //     return Some(url.to_string());
-    // }
-    // if url.starts_with("/") {
-    //     return Some(format!("https://vlogtruyen11.net{}", url));
-    // }
+
     None
 }
 
@@ -190,50 +200,12 @@ pub async fn thread_worker(
                     }
                 }
 
-                // chapter page
-                if url.starts_with("https://blogtruyenmoi.com/c") {
-                    // fetch chap
-                    let client = client.lock().await;
-                    let tmp = parse_chapter_page(&url, &html, &client).await;
-                    if tmp.is_none() {
-                        {
-                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
-                                .await
-                                .unwrap();
-                        }
-                        continue;
-                    }
-                    if tmp.is_some() {
-                        // tx.send(ThreadMessage::Done(tmp.unwrap(), url.clone(), false))
-                        //     .await
-                        //     .unwrap();
-                        result.extend(tmp.unwrap());
-                    }
-                    {
-                        let tmp = client
-                            .urls()
-                            .update_many(
-                                vec![prisma::urls::url::equals(url.clone())],
-                                vec![
-                                    prisma::urls::fetched::set(true),
-                                    prisma::urls::fetching::set(false),
-                                ],
-                            )
-                            .exec()
-                            .await;
-                        if tmp.is_err() {
-                            {
-                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
-                                    .await
-                                    .unwrap();
-                            }
-                            continue;
-                        }
-                    }
-                } else if is_comic_page(&html) {
-                    // only chapter pending url because we had fetch comic page pending url before
-                    let pending_url_comic = {
-                        let tmp = parse_comic_page(&html, &url, client.clone()).await;
+                if url.contains("blogtruyenmoi.com") {
+                    // chapter page
+                    if url.starts_with("https://blogtruyenmoi.com/c") {
+                        // fetch chap
+                        let client = client.lock().await;
+                        let tmp = parse_blogtruyenmoi_chapter_page(&url, &html, &client).await;
                         if tmp.is_none() {
                             {
                                 tx.send(ThreadMessage::Retry(url.clone(), i_tries))
@@ -242,9 +214,50 @@ pub async fn thread_worker(
                             }
                             continue;
                         }
-                        tmp.unwrap()
-                    };
-                    result.extend(pending_url_comic.clone());
+                        if tmp.is_some() {
+                            // tx.send(ThreadMessage::Done(tmp.unwrap(), url.clone(), false))
+                            //     .await
+                            //     .unwrap();
+                            result.extend(tmp.unwrap());
+                        }
+                        {
+                            let tmp = client
+                                .urls()
+                                .update_many(
+                                    vec![prisma::urls::url::equals(url.clone())],
+                                    vec![
+                                        prisma::urls::fetched::set(true),
+                                        prisma::urls::fetching::set(false),
+                                    ],
+                                )
+                                .exec()
+                                .await;
+                            if tmp.is_err() {
+                                {
+                                    tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                        .await
+                                        .unwrap();
+                                }
+                                continue;
+                            }
+                        }
+                    } else if is_blogtruyenmoi_comic_page(&html) {
+                        // only chapter pending url because we had fetch comic page pending url before
+                        let pending_url_comic = {
+                            let tmp =
+                                parse_blogtruyenmoi_comic_page(&html, &url, client.clone()).await;
+                            if tmp.is_none() {
+                                {
+                                    tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                        .await
+                                        .unwrap();
+                                }
+                                continue;
+                            }
+                            tmp.unwrap()
+                        };
+                        result.extend(pending_url_comic.clone());
+                    }
                 }
                 result = result
                     .into_iter()

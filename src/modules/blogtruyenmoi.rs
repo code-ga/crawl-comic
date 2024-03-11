@@ -16,20 +16,6 @@ pub async fn parse_comic_page(
     client: Arc<Mutex<PrismaClient>>,
 ) -> Option<Vec<String>> {
     let client = client.lock().await;
-    // {
-    //     let tmp = client
-    //         .comic()
-    //         .find_first(vec![prisma::comic::url::equals(url.to_string())])
-    //         .exec()
-    //         .await;
-    //     if tmp.is_err() {
-    //         return None;
-    //     }
-    //     if tmp.unwrap().is_some() {
-    //         return Some(Vec::new());
-    //     }
-    // }
-    // println!("fetching comic page {}", url);
     let mut result = Vec::new();
     // fetch all urls from page
     let db_comic = {
@@ -85,9 +71,6 @@ pub async fn parse_comic_page(
     // regex for a chapter
     let  chapter_regex = Regex::new(r#"<p\s+id="chapter-(\d+)">\s+<span\s+class="title">\s+<a\s+id="\w+_\d+"\s+href="(.+)"\s+title=".+>(.+)<\/a>\s+<\/span>\s+<span\s+class="publishedDate">(.+)<\/span>"#).unwrap();
     for cap in chapter_regex.captures_iter(page) {
-        // println!("{} {}", cap[1].to_string(), cap[2].to_string());
-        // let wait = rand::thread_rng().gen_range(3..5);
-        // tokio::time::sleep(std::time::Duration::from_secs(wait)).await;
         // let id = cap[1].to_string();
         let mut url = format!("https://blogtruyenmoi.com{}", cap[2].to_string())
             .trim()
@@ -97,22 +80,6 @@ pub async fn parse_comic_page(
         }
         let title = cap[3].to_string().trim().to_string();
         let date = cap[4].to_string();
-        // let mut pending_url =
-        //     fetch_chapter_page(&url, &title, &date, &comic_id, &client, proxy.clone()).await;
-        // let mut tries = 0;
-        // while pending_url.is_none() {
-        //     let wait_time = rand::thread_rng().gen_range(1..5);
-        //     tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
-        //     pending_url =
-        //         fetch_chapter_page(&url, &title, &date, &comic_id, &client, proxy.clone()).await;
-        //     // println!("retry {}", url);
-        //     if tries > 10 {
-        //         break;
-        //     }
-        //     tries += 1;
-        // }
-        // // combine pending url with result
-        // result.extend(pending_url.unwrap().clone());
         println!("found chapter url {}", url);
         {
             let tmp = client
@@ -129,20 +96,6 @@ pub async fn parse_comic_page(
                 continue;
             }
         }
-        // let chapter = client
-        //     .chapter()
-        //     .create(
-        //         title.to_string(),
-        //         url.to_string(),
-        //         prisma::comic::UniqueWhereParam::IdEquals(comic_id.to_string()),
-        //         date.to_string(),
-        //         vec![],
-        //     )
-        //     .exec()
-        //     .await;
-        // if chapter.is_err() {
-        //     continue;
-        // }
         chapters.push(prisma::chapter::create_unchecked(
             title.to_string(),
             url.to_string(),
@@ -198,9 +151,6 @@ pub async fn parse_chapter_page(
                 .unwrap();
         }
     }
-    // TODO: enable this sleep code if rate limit is fixed
-    // let wait_time = rand::thread_rng().gen_range(1..3);
-    // tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
     println!("fetching chapter {}", url);
     let result = Vec::new();
 
@@ -234,13 +184,5 @@ pub async fn parse_chapter_page(
         .exec()
         .await
         .unwrap();
-    // let re = Regex::new(r#"href="([^"]+)"#).unwrap();
-    // for cap in re.captures_iter(&html) {
-    //     // dbg!(&cap[1]);
-    //     let url = process_url(&cap[1]);
-    //     if url.is_some() {
-    //         result.push(url.unwrap());
-    //     }
-    // }
     Some(result)
 }
