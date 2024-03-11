@@ -7,6 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { beUrl, cdnUrl } from "../../../constant";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function Page({ params }: { params: { id: string } }) {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
@@ -46,7 +47,9 @@ export default function Page({ params }: { params: { id: string } }) {
   }
   const comic = data!;
   console.log({ comic });
-  const refetchComicInfo = async (e: React.MouseEvent<HTMLButtonElement,MouseEvent>) => {
+  const refetchComicInfo = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     e.preventDefault();
     (e.target as HTMLButtonElement).disabled = true;
     await app.api.refetch.comic.info[comic.id].get();
@@ -58,6 +61,30 @@ export default function Page({ params }: { params: { id: string } }) {
     e.preventDefault();
     console.log("refetch");
     const { data, error } = await app.api.refetch.comic.chaps[comic.id].get();
+    if (error) {
+      toast.error("Update thất bại", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    }
+    if (data) {
+      toast.success(data?.data?.message || "Update thành công", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    }
     console.log({ data, error });
   };
   return (
