@@ -12,7 +12,7 @@ export default function Template({
         <Link href="/">Back to home here</Link>
       </div>
       {children}
-      <div className="w-full flex justify-center content-center py-4 bg-slate-900">
+      <div className="w-full flex justify-center content-center py-4 bg-slate-900 ">
         {/* footer */}
         <h1 className="text-3xl">this is the footer {"=>>"}</h1>
       </div>

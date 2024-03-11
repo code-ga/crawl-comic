@@ -45,7 +45,9 @@ export const Chapter = t.Object({
     url: t.String(),
     images: t.Array(t.String()),
     updatedDate: t.Date(),
-    comicId: t.String()
+    comicId: t.String(),
+    previousId: OptionalOrNull(t.String()),
+    nextId: OptionalOrNull(t.String()),
 })
 
 export type ChapterStatic = Static<typeof Chapter>
