@@ -256,8 +256,8 @@ export const apiRoute =
                     message: "Not found"
                 }
             }
-            // if url.updatedDate < 2 days then return already fetched
-            if (url.updatedDate < new Date(Date.now() - 1000 * 60 * 60 * 24 * 2)) return {
+            // if url.updatedDate > 2 days then return already fetched
+            if (url.updatedDate > new Date(Date.now() - 1000 * 60 * 60 * 24 * 2)) return {
                 status: 200,
                 message: "Already fetched",
                 data: {

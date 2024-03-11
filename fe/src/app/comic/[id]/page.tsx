@@ -7,17 +7,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { beUrl, cdnUrl } from "../../../constant";
 import { useRouter } from "next/navigation";
-import { Toast } from "../../../components/toast";
 
 export default function Page({ params }: { params: { id: string } }) {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
   const router = useRouter();
-  const [toast, setToast] = useState<string | null>(null);
-  const { data, error } = useMemo(
-    () => use(app.api.comic[params.id].get()),
-    [app.api.comic, params.id]
-  );
-
+  const { data, error } = use(app.api.comic[params.id].get());
   if ((!data || !data.data) && error) {
     notFound();
   }
@@ -29,17 +23,9 @@ export default function Page({ params }: { params: { id: string } }) {
 
   const refetchChapterList = async () => {
     const { data, error } = await app.api.refetch.comic.chaps[comic.id].get();
-    console.log(data, error);
-    if (error) {
-      setToast(error.message);
-    }
-    if (data) {
-      setToast(data.message);
-    }
   };
   return (
     <div className="p-3  m-3">
-      {toast && <Toast message={toast}></Toast>}
       <div className="flex flex-col gap-2 bg-slate-900 m-3 justify-center content-center text-center">
         <h1 className="text-2xl mb-2">{comic.name}</h1>
         <div className="text-sm mb-2">
