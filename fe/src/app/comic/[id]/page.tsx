@@ -7,7 +7,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { beUrl, cdnUrl } from "../../../constant";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { Bounce, toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 
 export default function Page({ params }: { params: { id: string } }) {
@@ -101,6 +101,7 @@ export default function Page({ params }: { params: { id: string } }) {
         draggable
         pauseOnHover={false}
         theme="dark"
+        transition={Bounce}
       />
       <div className="flex flex-col gap-2 bg-slate-900 m-3 justify-center content-center text-center">
         <h1 className="text-2xl mb-2">{comic.name}</h1>
