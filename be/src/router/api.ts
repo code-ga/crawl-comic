@@ -194,18 +194,91 @@ export const apiRoute =
                 if (url.startsWith("https://i")) {
                     filteredImages.push(url)
                 }
+            };
+            const chapter = await prisma.chapter.update({
+                where: {
+                    id: params.id
+                },
+                data: {
+                    images: filteredImages
+                }
+            })
+            if (!chapter) {
+                return {
+                    status: 404,
+                    message: "Chapter not found",
+                    data: null
+                }
+            }
+            if (!chapter.nextId && !chapter.previousId) {
+                const comic = await prisma.comic.findUnique({
+                    where: {
+                        id: chap.comicId
+                    },
+                    include: {
+                        Chapter: {
+                            select: {
+                                id: true,
+                            }
+                        }
+                    }
+                })
+                if (!comic) {
+                    return {
+                        status: 404,
+                        message: "Comic not found",
+                    }
+                }
+                // 2 element
+                if (comic.Chapter.length <= 1) {
+                    return {
+                        status: 200,
+                        message: "Fetched successfully",
+                        data: chapter as any
+                    }
+                }
+                const currentChapterIndex = comic.Chapter.findIndex(c => c.id == chapter.id)
+                if (currentChapterIndex == -1) {
+                    return {
+                        status: 200,
+                        message: "Fetched successfully",
+                        data: chapter as any
+                    }
+                }
+                if (currentChapterIndex == 0) {
+                    return {
+                        status: 200,
+                        message: "Fetched successfully",
+                        data: await prisma.chapter.update({
+                            where: {
+                                id: chapter.id
+                            },
+                            data: {
+                                previousId: null,
+                                nextId: comic.Chapter[1].id
+                            }
+                        }) as any
+                    }
+                } else {
+                    return {
+                        status: 200,
+                        message: "Fetched successfully",
+                        data: await prisma.chapter.update({
+                            where: {
+                                id: chapter.id
+                            },
+                            data: {
+                                previousId: comic.Chapter[currentChapterIndex - 1].id,
+                                nextId: comic.Chapter[currentChapterIndex + 1].id
+                            }
+                        })
+                    }
+                }
             }
             return {
                 status: 200,
                 message: "Fetched successfully",
-                data: (await prisma.chapter.update({
-                    where: {
-                        id: params.id
-                    },
-                    data: {
-                        images: filteredImages
-                    }
-                })) as any
+                data: chapter as any
             }
         }, {
             params: t.Object({
