@@ -1,7 +1,7 @@
 "use client";
 import { edenTreaty } from "@elysiajs/eden";
-import { ElysiaServerApi } from "../../../typings";
-import { use, useMemo, useState } from "react";
+import { ComicIncludeChapter, ElysiaServerApi } from "../../../typings";
+import { use, useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -11,18 +11,54 @@ import { useRouter } from "next/navigation";
 export default function Page({ params }: { params: { id: string } }) {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
   const router = useRouter();
-  const { data, error } = use(app.api.comic[params.id].get());
-  if ((!data || !data.data) && error) {
+  const [{ data, error, loading }, setComic] = useState<{
+    data?: ComicIncludeChapter | null;
+    error: any;
+    loading: boolean;
+  }>({
+    data: null,
+    error: null,
+    loading: true,
+  });
+  useEffect(() => {
+    app.api.comic[params.id]
+      .get()
+      .then((data) => {
+        if (data.error) {
+          setComic({ data: null, error: data.error, loading: false });
+          return;
+        }
+        console.log({ data });
+        setComic({ data: data.data.data, error: data.error, loading: false });
+      })
+      .catch((err) => {
+        setComic({ data: null, error: err, loading: false });
+      })
+      .finally(() => {
+        setComic((pre) => ({ ...pre, loading: false }));
+      });
+  }, []);
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+  if (!data && error) {
     notFound();
   }
-  const comic = data!.data!;
-  const refetchComicInfo = async () => {
+  const comic = data!;
+  console.log({ comic });
+  const refetchComicInfo = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.target.disabled = true;
     await app.api.refetch.comic.info[comic.id].get();
     router.refresh();
+    e.target.disabled = false;
   };
 
-  const refetchChapterList = async () => {
+  const refetchChapterList = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    console.log("refetch");
     const { data, error } = await app.api.refetch.comic.chaps[comic.id].get();
+    console.log({ data, error });
   };
   return (
     <div className="p-3  m-3">
@@ -134,7 +170,7 @@ export default function Page({ params }: { params: { id: string } }) {
               </Link>
               <button
                 className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3"
-                onClick={() => refetchComicInfo()}
+                onClick={(e) => refetchComicInfo(e)}
               >
                 Refetch Comic
               </button>
@@ -151,7 +187,7 @@ export default function Page({ params }: { params: { id: string } }) {
           <span>Chapters</span>
           <button
             className="bg-red-700 p-1 px-3 border border-slate-700 rounded-md mx-3"
-            onClick={() => refetchChapterList()}
+            onClick={(e) => refetchChapterList(e)}
           >
             Refetch Chapter
           </button>
