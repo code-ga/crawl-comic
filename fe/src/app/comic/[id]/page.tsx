@@ -1,13 +1,14 @@
 "use client";
 import { edenTreaty } from "@elysiajs/eden";
 import { ComicIncludeChapter, ElysiaServerApi } from "../../../typings";
-import { use, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { beUrl, cdnUrl } from "../../../constant";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 
 export default function Page({ params }: { params: { id: string } }) {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
@@ -89,6 +90,18 @@ export default function Page({ params }: { params: { id: string } }) {
   };
   return (
     <div className="p-3  m-3">
+      <ToastContainer
+        position="bottom-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover={false}
+        theme="dark"
+      />
       <div className="flex flex-col gap-2 bg-slate-900 m-3 justify-center content-center text-center">
         <h1 className="text-2xl mb-2">{comic.name}</h1>
         <div className="text-sm mb-2">
