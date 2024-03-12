@@ -6,6 +6,7 @@ import { ChapterApiReturn, ElysiaServerApi } from "../../../typings";
 import { beUrl, cdnUrl } from "../../../constant";
 import Link from "next/link";
 import Image from "next/image";
+import { Loading } from "../../../components/loading";
 
 export default function Page({ params }: { params: { id: string } }) {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
@@ -39,9 +40,9 @@ export default function Page({ params }: { params: { id: string } }) {
       .finally(() => {
         setChapter((pre) => ({ ...pre, loading: false }));
       });
-  }, []);
+  }, [app.api.chapter, params.id]);
   if (chapterLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
   if (!chapterData && chapterError) {
     notFound();

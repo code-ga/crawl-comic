@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { Bounce, toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Loading } from "../../../components/loading";
 
 export default function Page({ params }: { params: { id: string } }) {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
@@ -40,9 +41,9 @@ export default function Page({ params }: { params: { id: string } }) {
       .finally(() => {
         setComic((pre) => ({ ...pre, loading: false }));
       });
-  }, []);
+  }, [app.api.comic, params.id]);
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
   if (!data && error) {
     notFound();
@@ -90,7 +91,7 @@ export default function Page({ params }: { params: { id: string } }) {
     console.log({ data, error });
   };
   return (
-    <div className="p-3  m-3">
+    <div className="m-3">
       <ToastContainer
         position="bottom-center"
         autoClose={5000}
@@ -104,7 +105,7 @@ export default function Page({ params }: { params: { id: string } }) {
         theme="dark"
         transition={Bounce}
       />
-      <div className="flex flex-col gap-2 bg-slate-900 m-3 justify-center content-center text-center">
+      <div className="flex flex-col gap-2 p-3 bg-slate-900 m-3 justify-center content-center text-center rounded-lg shadow-2xl shadow-slate-500 border border-slate-700 hover:border-slate-500">
         <h1 className="text-2xl mb-2">{comic.name}</h1>
         <div className="text-sm mb-2">
           Cập nhập cuối lúc : {comic.updatedDate.toLocaleString()}
@@ -224,7 +225,7 @@ export default function Page({ params }: { params: { id: string } }) {
           <div>{comic.content ? comic.content : "No content available"}</div>
         </div>
       </div>
-      <div className="text-md m-3 bg-slate-900 p-3">
+      <div className="text-md m-3 mt-5 bg-slate-900 p-3 rounded-md border border-slate-700">
         <div className="text-lg">
           <span>Chapters</span>
           <button
