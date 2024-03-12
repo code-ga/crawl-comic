@@ -368,7 +368,8 @@ export const apiRoute =
                                 createdDate: true,
                                 updatedDate: true,
                                 previousId: true,
-                                nextId: true
+                                nextId: true,
+                                url: true
                             },
                             orderBy: { updatedDate: 'desc' }
                         }
