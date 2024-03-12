@@ -36,7 +36,7 @@ export const apiRoute =
         })
         .get("/comic/:id", async ({ params, set }) => {
             console.log(params)
-            const comic = await prisma.comic.findUnique({
+            let comic = await prisma.comic.findUnique({
                 where: {
                     id: params.id
                 },
@@ -60,6 +60,30 @@ export const apiRoute =
                     status: 404,
                     message: "Not found",
                 }
+            }
+            if (!comic.thumbnail) {
+                // refetch comic 
+                const resp = await (await fetch(comic.url)).text()
+                const parsed = (parseComicHtmlPage(resp))
+                comic = await prisma.comic.update({
+                    where: {
+                        id: params.id
+                    },
+                    data: parsed,
+                    include: {
+                        Chapter: {
+                            select: {
+                                id: true,
+                                name: true,
+                                createdDate: true,
+                                previousId: true,
+                                nextId: true,
+                                url: true
+                            },
+                            orderBy: { createdDate: 'desc' }
+                        }
+                    }
+                })
             }
             console.log(comic)
             if (comic.Chapter.length <= 1) {
