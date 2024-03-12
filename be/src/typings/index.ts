@@ -1,18 +1,20 @@
 import { Static, TSchema, t } from "elysia";
 
+export const OptionalOrNull = <T extends TSchema>(st: T) => (t.Union([t.Null(), st, t.Undefined()]))
+
 export const Comic = t.Object({
     id: t.String(),
     name: t.String(),
     url: t.String(),
     genre: t.Record(t.String(), t.String()),
-    content: t.Optional(t.String()),
+    content: OptionalOrNull(t.String()),
     translatorTeam: t.Record(t.String(), t.String()),
     anotherName: t.Array(t.String()),
     source: t.Record(t.String(), t.String()),
     author: t.Record(t.String(), t.String()),
     postedBy: t.Record(t.String(), t.String()),
     status: t.String(),
-    thumbnail: t.Optional(t.String()),
+    thumbnail: OptionalOrNull(t.String()),
     createdDate: t.Date(),
     updatedDate: t.Date(),
     pythonFetchInfo: t.Boolean()
@@ -20,7 +22,6 @@ export const Comic = t.Object({
 
 export type ComicStatic = Static<typeof Comic>
 
-export const OptionalOrNull = <T extends TSchema>(st: T) => (t.Union([t.Null(), st, t.Undefined()]))
 
 export const ComicIncludeChapter = t.Composite([
     Comic,
