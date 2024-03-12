@@ -41,7 +41,8 @@ export default function Page({ params }: { params: { id: string } }) {
       .finally(() => {
         setComic((pre) => ({ ...pre, loading: false }));
       });
-  }, [app.api.comic, params.id]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   if (loading) {
     return <Loading />;
   }

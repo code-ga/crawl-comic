@@ -38,7 +38,8 @@ export function ListComic({ app }: { app: AppApi }) {
       .finally(() => {
         setComic((pre) => ({ ...pre, loading: false }));
       });
-  }, [app.api.comics, page]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   if (loading) {
     return <Loading/>;
   }
