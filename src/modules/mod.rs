@@ -17,7 +17,7 @@ use rand::Rng;
 
 pub mod blogtruyenmoi;
 
-pub static ACCEPTED_HOSTS: [&str; 1] = ["blogtruyenmoi.com"];
+pub static ACCEPTED_HOSTS: [&str; 2] = ["blogtruyenmoi.com", "nettruyenee.com"];
 
 pub fn process_url(url: &str, now_url: &str) -> Option<String> {
     if !url.starts_with("https://") && !url.starts_with("http://") {
@@ -86,7 +86,7 @@ pub async fn thread_worker(
         match job {
             ThreadMessage::Start(url, i_tries) => {
                 let hostname = get_host(&url).unwrap();
-                if ACCEPTED_HOSTS.contains(&hostname.as_str()) {
+                if !ACCEPTED_HOSTS.contains(&hostname.as_str()) {
                     {
                         let tmp = client
                             .lock()
@@ -236,7 +236,7 @@ pub async fn thread_worker(
                     }
                 }
 
-                if url.contains("blogtruyenmoi.com") {
+                if hostname.contains("blogtruyenmoi.com") {
                     // chapter page
                     if url.starts_with("https://blogtruyenmoi.com/c") {
                         // fetch chap
@@ -294,6 +294,8 @@ pub async fn thread_worker(
                         };
                         result.extend(pending_url_comic.clone());
                     }
+                } else if hostname.contains("nettruyenee.com") {
+                    todo!();
                 }
                 result = result
                     .into_iter()
