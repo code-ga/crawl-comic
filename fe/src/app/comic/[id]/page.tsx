@@ -32,6 +32,9 @@ export default function Page({ params }: { params: { id: string } }) {
           setComic({ data: null, error: data.error, loading: false });
           return;
         }
+        if (data.data.status === 404) {
+          notFound();
+        }
         console.log({ data });
         setComic({ data: data.data.data, error: data.error, loading: false });
       })
@@ -41,7 +44,7 @@ export default function Page({ params }: { params: { id: string } }) {
       .finally(() => {
         setComic((pre) => ({ ...pre, loading: false }));
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   if (loading) {
     return <Loading />;

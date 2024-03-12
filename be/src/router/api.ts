@@ -34,7 +34,7 @@ export const apiRoute =
                 200: BaseResponse(t.Array(Comic))
             }
         })
-        .get("/comic/:id", async ({ params }) => {
+        .get("/comic/:id", async ({ params, set }) => {
             console.log(params)
             const comic = await prisma.comic.findUnique({
                 where: {
@@ -55,6 +55,7 @@ export const apiRoute =
                 }
             })
             if (!comic) {
+                set.status = 404
                 return {
                     status: 404,
                     message: "Not found",
@@ -179,17 +180,20 @@ export const apiRoute =
                 }
             }
         )
-        .get("/chapter/:id", async ({ params }) => {
+        .get("/chapter/:id", async ({ params, set }) => {
             console.log(params)
             const chap = await prisma.chapter.findFirst({
                 where: {
                     id: params.id
                 }
             })
-            if (!chap) return {
-                status: 404,
-                message: "Chapter not found",
-                data: null
+            if (!chap) {
+                set.status = 404
+                return {
+                    status: 404,
+                    message: "Chapter not found",
+                    data: null
+                }
             }
             const filteredImages = []
             for (const url of chap.images) {
@@ -206,6 +210,7 @@ export const apiRoute =
                 }
             })
             if (!chapter) {
+                set.status = 404
                 return {
                     status: 404,
                     message: "Chapter not found",
@@ -226,6 +231,7 @@ export const apiRoute =
                     }
                 })
                 if (!comic) {
+                    set.status = 404
                     return {
                         status: 404,
                         message: "Comic not found",
@@ -326,17 +332,20 @@ export const apiRoute =
                 200: BaseResponse(t.Array(Comic))
             }
         })
-        .get("/refetch/comic/info/:id", async ({ params }) => {
+        .get("/refetch/comic/info/:id", async ({ params, set }) => {
             console.log(params)
             const comic = await prisma.comic.findFirst({
                 where: {
                     id: params.id
                 }
             })
-            if (!comic) return {
-                status: 404,
-                message: "Not found",
-                data: null
+            if (!comic) {
+                set.status = 404
+                return {
+                    status: 404,
+                    message: "Not found",
+                    data: null
+                }
             }
             const resp = await (await fetch(comic.url)).text()
             const parsed = (parseComicHtmlPage(resp))
@@ -371,19 +380,22 @@ export const apiRoute =
                 200: BaseResponse(ComicIncludeChapter)
             }
         })
-        .get("/refetch/comic/chaps/:id", async ({ params }) => {
+        .get("/refetch/comic/chaps/:id", async ({ params, set }) => {
             console.log(params)
             const comic = await prisma.comic.findFirst({
                 where: {
                     id: params.id
                 }
             })
-            if (!comic) return {
-                status: 404,
-                message: "Not found",
-                data: {
-                    fetching: false,
-                    message: "Not found"
+            if (!comic) {
+                set.status = 404
+                return {
+                    status: 404,
+                    message: "Not found",
+                    data: {
+                        fetching: false,
+                        message: "Not found"
+                    }
                 }
             }
             const url = await prisma.urls.findFirst({
@@ -393,12 +405,15 @@ export const apiRoute =
                     }
                 }
             })
-            if (!url) return {
-                status: 404,
-                message: "Not found",
-                data: {
-                    fetching: false,
-                    message: "Not found"
+            if (!url) {
+                set.status = 404
+                return {
+                    status: 404,
+                    message: "Not found",
+                    data: {
+                        fetching: false,
+                        message: "Not found"
+                    }
                 }
             }
             // if url.updatedDate > 2 days then return already fetched

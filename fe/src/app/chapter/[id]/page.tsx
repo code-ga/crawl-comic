@@ -40,7 +40,8 @@ export default function Page({ params }: { params: { id: string } }) {
       .finally(() => {
         setChapter((pre) => ({ ...pre, loading: false }));
       });
-  }, [app.api.chapter, params.id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   if (chapterLoading) {
     return <Loading />;
   }
@@ -56,6 +57,12 @@ export default function Page({ params }: { params: { id: string } }) {
         <div>
           <Link href={`/comic/${chapter.comicId}`} className="text-blue-500">
             Back to comic
+          </Link>
+        </div>
+        <div className="flex justify-center content-center">
+          <span className="mr-3">Cào tại : </span>
+          <Link href={chapter.url} className="text-blue-500" target="_blank">
+            {chapter.url}
           </Link>
         </div>
         <div>{chapter.name}</div>
@@ -89,8 +96,30 @@ export default function Page({ params }: { params: { id: string } }) {
             key={image}
             width={window.innerWidth / 2}
             height={window.innerHeight / 2}
+            // layout="fill" // required
+            objectFit="cover" // change to suit your needs
+            className="mx-auto"
           />
         ))}
+      </div>
+      <div className="text-center my-5">
+        {/* footer */}
+        {chapter.previousId && (
+          <Link
+            href={`/chapter/${chapter.previousId}`}
+            className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3"
+          >
+            Trang trước
+          </Link>
+        )}
+        {chapter.nextId && (
+          <Link
+            href={`/chapter/${chapter.nextId}`}
+            className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3"
+          >
+            Trang sau
+          </Link>
+        )}
       </div>
     </div>
   );
