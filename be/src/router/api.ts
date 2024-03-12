@@ -3,7 +3,7 @@ import { prisma } from "../db";
 import { parseComicHtmlPage } from "../utils/fetchComicInfo";
 import { BaseResponse, Chapter, Comic, ComicIncludeChapter } from "../typings";
 
-
+const acceptedHost = ["blogtruyenmoi.com"]
 
 export const apiRoute =
     new Elysia({
@@ -491,7 +491,7 @@ export const apiRoute =
                 })))
             }
         })
-        .get("/add/comic/source", async ({ query }) => {
+        .get("/add/comic/source", async ({ query ,set}) => {
             const urlDoc = await prisma.urls.findFirst({
                 where: {
                     url: {
@@ -504,6 +504,22 @@ export const apiRoute =
                     status: 200,
                     message: "Already added",
                 }
+            }
+            const hostname = new URL(query.url).hostname
+            if (!hostname) {
+                set.status = 400
+                return {
+                    status: 400,
+                    message: "Invalid url",
+                }
+            }
+            if (!acceptedHost.includes(hostname)) {
+                set.status = 400
+                return {
+                    status: 400,
+                    message: "Not accepted host",
+                }
+                
             }
             await prisma.urls.create({
                 data: {
