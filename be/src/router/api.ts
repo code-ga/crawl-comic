@@ -2,6 +2,7 @@ import { Elysia, t } from "elysia";
 import { prisma } from "../db";
 import { parseComicHtmlPage, processArrayComic } from "../utils/fetchComicInfo";
 import { BaseResponse, Chapter, Comic, ComicIncludeChapter } from "../typings";
+import { sortChapter } from "../utils";
 
 const acceptedHost = ["blogtruyenmoi.com"]
 
@@ -76,6 +77,7 @@ export const apiRoute =
                                 id: true,
                                 name: true,
                                 createdDate: true,
+                                updatedDate: true,
                                 previousId: true,
                                 nextId: true,
                                 url: true
@@ -94,6 +96,7 @@ export const apiRoute =
                 }
             }
 
+            comic.Chapter = sortChapter(comic.Chapter)
             const chapterUpdateInfo = []
             // [>2 element] => [{here} , {}]
             for (let i = 0; i < comic.Chapter.length; i++) {
@@ -130,28 +133,37 @@ export const apiRoute =
             }
             if (chapterUpdateInfo.length > 0)
                 await prisma.$transaction(chapterUpdateInfo)
-
+            const result = await prisma.comic.findUnique({
+                where: {
+                    id: params.id
+                },
+                include: {
+                    Chapter: {
+                        select: {
+                            id: true,
+                            name: true,
+                            createdDate: true,
+                            updatedDate: true,
+                            previousId: true,
+                            nextId: true,
+                            url: true
+                        },
+                        orderBy: { createdDate: 'desc' }
+                    }
+                }
+            })
+            if (!result) {
+                set.status = 404
+                return {
+                    status: 404,
+                    message: "Not found",
+                }
+            }
+            result.Chapter = sortChapter(result.Chapter)
             return {
                 status: 200,
                 message: "Fetched successfully",
-                data: await prisma.comic.findUnique({
-                    where: {
-                        id: params.id
-                    },
-                    include: {
-                        Chapter: {
-                            select: {
-                                id: true,
-                                name: true,
-                                createdDate: true,
-                                previousId: true,
-                                nextId: true,
-                                url: true
-                            },
-                            orderBy: { createdDate: 'desc' }
-                        }
-                    }
-                }) as any
+                data: result as any
             }
         }, {
             params: t.Object({
@@ -375,33 +387,42 @@ export const apiRoute =
             const resp = await (await fetch(comic.url)).text()
             const parsed = (parseComicHtmlPage(resp))
             console.log({ parsed })
+            const result = (await prisma.comic.update({
+                where: {
+                    id: params.id
+                },
+                data: {
+                    ...parsed
+                },
+                include: {
+                    Chapter: {
+                        select: {
+                            id: true,
+                            name: true,
+                            createdDate: true,
+                            updatedDate: true,
+                            previousId: true,
+                            nextId: true,
+                            url: true
+                        },
+                        orderBy: {
+                            createdDate: "desc"
+                        }
+                    }
+                }
+            }))
+            if (!result) {
+                set.status = 404
+                return {
+                    status: 404,
+                    message: "Not found",
+                }
+            }
+            result.Chapter = sortChapter(result.Chapter)
             return {
                 status: 200,
                 message: "Fetched successfully",
-                data: (await prisma.comic.update({
-                    where: {
-                        id: params.id
-                    },
-                    data: {
-                        ...parsed
-                    },
-                    include: {
-                        Chapter: {
-                            select: {
-                                id: true,
-                                name: true,
-                                createdDate: true,
-                                updatedDate: true,
-                                previousId: true,
-                                nextId: true,
-                                url: true
-                            },
-                            orderBy: {
-                                createdDate: "desc"
-                            }
-                        }
-                    }
-                })) as any
+                data: result as any
             }
         }, {
             params: t.Object({
