@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
 import { prisma } from "../db";
-import { parseComicHtmlPage } from "../utils/fetchComicInfo";
+import { parseComicHtmlPage, processArrayComic } from "../utils/fetchComicInfo";
 import { BaseResponse, Chapter, Comic, ComicIncludeChapter } from "../typings";
 
 const acceptedHost = ["blogtruyenmoi.com"]
@@ -15,7 +15,7 @@ export const apiRoute =
             return {
                 status: 200,
                 message: "Fetched successfully",
-                data: (await prisma.comic.findMany({
+                data: await processArrayComic(await prisma.comic.findMany({
                     skip: query.skip,
                     take: query.take,
                     orderBy: { createdDate: 'asc' },
@@ -166,7 +166,7 @@ export const apiRoute =
             return {
                 status: 200,
                 message: "Fetched successfully",
-                data: (await prisma.comic.findMany({
+                data: await processArrayComic(await prisma.comic.findMany({
                     where: {
                         name: {
                             contains: params.name
@@ -187,7 +187,7 @@ export const apiRoute =
             return {
                 status: 200,
                 message: "Fetched successfully",
-                data: (await prisma.comic.findMany({
+                data: await processArrayComic(await prisma.comic.findMany({
                     where: {
                         url: {
                             contains: query.url
@@ -338,7 +338,7 @@ export const apiRoute =
             return {
                 status: 200,
                 message: "Fetched successfully",
-                data: (await prisma.comic.findMany({
+                data: await processArrayComic(await prisma.comic.findMany({
                     skip: query.skip,
                     take: query.take,
                     orderBy: { createdDate: 'desc' },
@@ -491,7 +491,7 @@ export const apiRoute =
                 })))
             }
         })
-        .get("/add/comic/source", async ({ query ,set}) => {
+        .get("/add/comic/source", async ({ query, set }) => {
             const urlDoc = await prisma.urls.findFirst({
                 where: {
                     url: {
@@ -519,7 +519,7 @@ export const apiRoute =
                     status: 400,
                     message: "Not accepted host",
                 }
-                
+
             }
             await prisma.urls.create({
                 data: {
