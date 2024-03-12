@@ -71,6 +71,8 @@ export default function Page({ params }: { params: { id: string } }) {
         progress: undefined,
         theme: "dark",
       });
+      (e.target as HTMLButtonElement).disabled = false;
+      return;
     }
     router.refresh();
     toast.success("Update thành công", {
@@ -90,6 +92,7 @@ export default function Page({ params }: { params: { id: string } }) {
     e.preventDefault();
     console.log("refetch");
     const { data, error } = await app.api.refetch.comic.chaps[comic.id].get();
+    console.log({ data, error });
     if (error) {
       toast.error("Update thất bại", {
         position: "bottom-center",
@@ -101,6 +104,7 @@ export default function Page({ params }: { params: { id: string } }) {
         progress: undefined,
         theme: "dark",
       });
+      return;
     }
     if (data) {
       toast.success(data?.data?.message || "Update thành công", {
@@ -114,7 +118,6 @@ export default function Page({ params }: { params: { id: string } }) {
         theme: "dark",
       });
     }
-    console.log({ data, error });
   };
   return (
     <div className="m-3">

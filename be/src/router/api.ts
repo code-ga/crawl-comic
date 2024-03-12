@@ -69,43 +69,44 @@ export const apiRoute =
                     data: comic as any
                 }
             }
-            if (comic.Chapter.some((c) => !c.previousId && !c.nextId)) {
-                const chapterUpdateInfo = []
-                // [>2 element] => [{here} , {}]
-                for (let i = 0; i < comic.Chapter.length; i++) {
-                    const current = comic.Chapter[i]
-                    if (i != 0) {
-                        const previous = comic.Chapter[i - 1]
-                        if (!previous) break
-                        if (!current.previousId || previous.id != current.previousId) {
-                            chapterUpdateInfo.push(prisma.chapter.update({
-                                where: {
-                                    id: current.id
-                                },
-                                data: {
-                                    previousId: previous.id
-                                }
-                            }))
-                        }
-                    }
-                    // update next
 
-                    const next = comic.Chapter[i + 1]
-                    if (!next) break
-                    if (!current.nextId || next.id != current.nextId) {
+            const chapterUpdateInfo = []
+            // [>2 element] => [{here} , {}]
+            for (let i = 0; i < comic.Chapter.length; i++) {
+                const current = comic.Chapter[i]
+                if (i != 0) {
+                    const previous = comic.Chapter[i - 1]
+                    if (!previous) break
+                    if (!current.previousId || previous.id != current.previousId) {
                         chapterUpdateInfo.push(prisma.chapter.update({
                             where: {
                                 id: current.id
                             },
                             data: {
-                                nextId: next.id
+                                previousId: previous.id
                             }
                         }))
                     }
-
                 }
-                await prisma.$transaction(chapterUpdateInfo)
+                // update next
+
+                const next = comic.Chapter[i + 1]
+                if (!next) break
+                if (!current.nextId || next.id != current.nextId) {
+                    chapterUpdateInfo.push(prisma.chapter.update({
+                        where: {
+                            id: current.id
+                        },
+                        data: {
+                            nextId: next.id
+                        }
+                    }))
+                }
+
             }
+            if (chapterUpdateInfo.length > 0)
+                await prisma.$transaction(chapterUpdateInfo)
+
             return {
                 status: 200,
                 message: "Fetched successfully",
