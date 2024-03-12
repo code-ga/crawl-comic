@@ -17,6 +17,8 @@ use rand::Rng;
 
 pub mod blogtruyenmoi;
 
+pub static ACCEPTED_HOSTS: [&str; 1] = ["blogtruyenmoi.com"];
+
 pub fn process_url(url: &str, now_url: &str) -> Option<String> {
     if !url.starts_with("https://") && !url.starts_with("http://") {
         return None;
@@ -26,6 +28,9 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
         return None;
     }
     let host = host.unwrap();
+    if !ACCEPTED_HOSTS.contains(&host.as_str()) {
+        return None;
+    }
     if host.contains("blogtruyenmoi.com") {
         let url = url.trim().to_string();
         if url.starts_with("//id.blogtruyenmoi.com") {
@@ -80,6 +85,37 @@ pub async fn thread_worker(
         let job = rx.recv().await.unwrap();
         match job {
             ThreadMessage::Start(url, i_tries) => {
+                let hostname = get_host(&url).unwrap();
+                if ACCEPTED_HOSTS.contains(&hostname.as_str()) {
+                    {
+                        let tmp = client
+                            .lock()
+                            .await
+                            .urls()
+                            .update_many(
+                                vec![prisma::urls::url::equals(url.clone())],
+                                vec![
+                                    prisma::urls::fetched::set(true),
+                                    prisma::urls::fetching::set(false),
+                                ],
+                            )
+                            .exec()
+                            .await;
+                        if tmp.is_err() {
+                            {
+                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                    .await
+                                    .unwrap();
+                            }
+                            continue;
+                        }
+                    }
+                    tx.send(ThreadMessage::Done(vec![], url, false))
+                        .await
+                        .unwrap();
+                    continue;
+                }
+
                 let wait_time = rand::thread_rng().gen_range(1..10);
                 tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                 {

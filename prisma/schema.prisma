@@ -40,6 +40,8 @@ model Chapter {
   images      String[]
   createdDate String
   updatedDate DateTime @default(now())
+  nextId      String?
+  previousId  String?
   comic       Comic    @relation(fields: [comicId], references: [id])
 }
 
