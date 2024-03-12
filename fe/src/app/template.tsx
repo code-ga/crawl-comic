@@ -25,7 +25,7 @@ export default function Template({
         </div>
       </div>
       {children}
-      <footer className="w-full flex justify-center content-center py-4 bg-slate-900 h-full">
+      <footer className="w-full flex justify-center content-center py-4 bg-slate-900 h-full mt-3">
         {/* footer */}
         <h1 className="text-3xl">this is the footer {"=>>"}</h1>
       </footer>

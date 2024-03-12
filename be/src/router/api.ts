@@ -148,7 +148,7 @@ export const apiRoute =
                                 nextId: true,
                                 url: true
                             },
-                            orderBy: { name: 'desc' }
+                            orderBy: { createdDate: 'desc' }
                         }
                     }
                 }) as any
@@ -396,7 +396,9 @@ export const apiRoute =
                                 nextId: true,
                                 url: true
                             },
-                            orderBy: { updatedDate: 'desc' }
+                            orderBy: {
+                                createdDate: "desc"
+                            }
                         }
                     }
                 })) as any
