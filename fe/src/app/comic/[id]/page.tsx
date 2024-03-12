@@ -273,7 +273,7 @@ export default function Page({ params }: { params: { id: string } }) {
               </tr>
             </thead>
             <tbody>
-              {comic.Chapter.map((chapter) => (
+              {comic.Chapter.reverse().map((chapter) => (
                 <tr key={chapter.id}>
                   <td>
                     <Link
