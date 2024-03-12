@@ -406,7 +406,7 @@ export const apiRoute =
             const url = await prisma.urls.findFirst({
                 where: {
                     url: {
-                        contains: comic.url
+                        equals: comic.url
                     }
                 }
             })
