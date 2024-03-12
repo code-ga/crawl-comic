@@ -59,8 +59,30 @@ export default function Page({ params }: { params: { id: string } }) {
   ) => {
     e.preventDefault();
     (e.target as HTMLButtonElement).disabled = true;
-    await app.api.refetch.comic.info[comic.id].get();
+    const { error } = await app.api.refetch.comic.info[comic.id].get();
+    if (error) {
+      toast.error("Update thất bại", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    }
     router.refresh();
+    toast.success("Update thành công", {
+      position: "bottom-center",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: false,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
     (e.target as HTMLButtonElement).disabled = false;
   };
 

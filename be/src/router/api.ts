@@ -365,7 +365,10 @@ export const apiRoute =
                             select: {
                                 id: true,
                                 name: true,
-                                createdDate: true
+                                createdDate: true,
+                                updatedDate: true,
+                                previousId: true,
+                                nextId: true
                             },
                             orderBy: { updatedDate: 'desc' }
                         }
