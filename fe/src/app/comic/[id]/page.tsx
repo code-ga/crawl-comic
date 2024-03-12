@@ -45,7 +45,7 @@ export default function Page({ params }: { params: { id: string } }) {
         setComic((pre) => ({ ...pre, loading: false }));
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [params.id]);
   if (loading) {
     return <Loading />;
   }
@@ -229,7 +229,7 @@ export default function Page({ params }: { params: { id: string } }) {
             <div className="text-md mb-2 mt-7">
               {" "}
               <Link
-                href={`/chapter/${comic.Chapter[0].id}`}
+                href={`/chapter/${comic.Chapter[comic.Chapter.length - 1].id}`}
                 className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3"
               >
                 Đọc từ đầu

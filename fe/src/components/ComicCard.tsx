@@ -8,7 +8,7 @@ export const ComicCard = ({ comic }: { comic: ComicsApiReturn }) => {
     return null;
   }
   return (
-    <div className="flex flex-col gap-2 bg-slate-900 m-3 border border-slate-700 justify-center content-center">
+    <div className="flex flex-col gap-2 p-3 bg-slate-900 m-3 border border-slate-700 justify-center content-center">
       <div className="flex justify-center content-center">
         <Image
           src={cdnUrl+"/image?url=" + comic.thumbnail || ""}

@@ -38,10 +38,10 @@ export function ListComic({ app }: { app: AppApi }) {
       .finally(() => {
         setComic((pre) => ({ ...pre, loading: false }));
       });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page]);
   if (loading) {
-    return <Loading/>;
+    return <Loading />;
   }
   if (!data && error) {
     return <div>Server have some error</div>;

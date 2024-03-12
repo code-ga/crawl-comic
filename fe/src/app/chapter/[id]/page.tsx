@@ -41,7 +41,7 @@ export default function Page({ params }: { params: { id: string } }) {
         setChapter((pre) => ({ ...pre, loading: false }));
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [params.id]);
   if (chapterLoading) {
     return <Loading />;
   }
@@ -52,6 +52,7 @@ export default function Page({ params }: { params: { id: string } }) {
   console.log({ chapter });
   return (
     <div>
+      <button className="fixed text-center top-[50%] bg-blue-400 rotate-90">Phụ đề</button>
       <div className="text-center mb-4">
         {/* header */}
         <div>
@@ -94,11 +95,11 @@ export default function Page({ params }: { params: { id: string } }) {
             src={cdnUrl + "/image?url=" + image}
             alt={image}
             key={image}
-            width={window.innerWidth / 2}
+            width={window.innerWidth / 2 + 100}
             height={window.innerHeight / 2}
             // layout="fill" // required
             objectFit="cover" // change to suit your needs
-            className="mx-auto"
+            className="mx-auto w-auto h-auto"
           />
         ))}
       </div>
