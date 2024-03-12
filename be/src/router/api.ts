@@ -441,7 +441,7 @@ export const apiRoute =
             await prisma.urls.updateMany({
                 where: {
                     url: {
-                        contains: comic.url
+                        equals: comic.url
                     }
                 },
                 data: {
@@ -466,4 +466,32 @@ export const apiRoute =
                     message: t.String()
                 })))
             }
+        })
+        .get("/add/comic/source", async ({ query }) => {
+            const urlDoc = await prisma.urls.findFirst({
+                where: {
+                    url: {
+                        equals: query.url
+                    }
+                }
+            })
+            if (urlDoc) {
+                return {
+                    status: 200,
+                    message: "Already added",
+                }
+            }
+            await prisma.urls.create({
+                data: {
+                    url: query.url
+                }
+            })
+            return {
+                status: 200,
+                message: "Added successfully",
+            }
+        }, {
+            query: t.Object({
+                url: t.String()
+            })
         })

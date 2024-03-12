@@ -49,7 +49,7 @@ model Proxy {
 
 model Urls {
   url         String   @unique
-  id          String   @id
+  id          String   @id @default(uuid())
   fetched     Boolean  @default(false)
   fetching    Boolean  @default(false)
   createdDate DateTime @default(now())
