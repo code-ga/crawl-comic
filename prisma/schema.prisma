@@ -3,10 +3,6 @@ generator client {
   output   = "../src/prisma.rs"
 }
 
-generator clearDbClient {
-  provider = "cargo prisma"
-  output   = "../src/bin/prisma_client.rs"
-}
 
 datasource db {
   provider = "postgresql"
