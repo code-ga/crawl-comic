@@ -493,5 +493,8 @@ export const apiRoute =
         }, {
             query: t.Object({
                 url: t.String()
-            })
+            }),
+            response: {
+                200: (BaseResponse(t.Object({})))
+            }
         })
