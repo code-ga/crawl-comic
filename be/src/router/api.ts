@@ -170,7 +170,6 @@ export const apiRoute =
                     message: "Not found",
                 }
             }
-            result.Chapter = sortChapter(result.Chapter)
             return {
                 status: 200,
                 message: "Fetched successfully",
@@ -430,7 +429,6 @@ export const apiRoute =
                     message: "Not found",
                 }
             }
-            result.Chapter = sortChapter(result.Chapter)
             return {
                 status: 200,
                 message: "Fetched successfully",
