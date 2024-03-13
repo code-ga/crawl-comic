@@ -68,6 +68,7 @@ pub async fn parse_comic_page(
     let comic_id = comic_exec.id.to_string();
 
     let mut chapters = vec![];
+    let mut update_chapters = vec![];
     // regex for a chapter
     let  chapter_regex = Regex::new(r#"<p\s+id="chapter-(\d+)">\s+<span\s+class="title">\s+<a\s+id="\w+_\d+"\s+href="(.+)"\s+title=".+>(.+)<\/a>\s+<\/span>\s+<span\s+class="publishedDate">(.+)<\/span>"#).unwrap();
     let mut i = 0;
@@ -94,7 +95,10 @@ pub async fn parse_comic_page(
             let tmp = tmp.unwrap();
             if tmp.is_some() {
                 if tmp.unwrap().index != i {
-                    client.chapter().update_many(vec![prisma::chapter::url::equals(url.to_string())], vec![prisma::chapter::index::set(i)]).exec().await.unwrap();
+                    update_chapters.push(client.chapter().update_many(
+                        vec![prisma::chapter::url::equals(url.to_string())],
+                        vec![prisma::chapter::index::set(i)],
+                    ));
                 } else {
                     println!("chapter {} already exists", url);
                 }
@@ -112,7 +116,17 @@ pub async fn parse_comic_page(
         result.push(url.to_string());
         i += 1;
     }
-    client.chapter().create_many(chapters).exec().await.unwrap();
+    if client._batch(update_chapters).await.is_err() {
+        return None;
+    };
+    if (client.chapter().create_many(chapters))
+        .exec()
+        .await
+        .is_err()
+    {
+        return None;
+    };
+
     Some(result)
 }
 
