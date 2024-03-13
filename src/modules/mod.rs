@@ -37,6 +37,9 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
             // return Some(format!("https:{}", url).trim().to_string());
             return None;
         }
+        if url.ends_with("#bt-comment") {
+            return None;
+        }
         if url.starts_with("/c") {
             return Some(format!("https://blogtruyenmoi.com{}", url));
         }
