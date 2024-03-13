@@ -103,14 +103,6 @@ export const apiRoute =
             // [>2 element] => [{here} , {}]
             for (let i = 0; i < comic.Chapter.length; i++) {
                 const current = comic.Chapter[i]
-                chapterUpdateInfo.push(prisma.chapter.update({
-                    where: {
-                        id: current.id
-                    },
-                    data: {
-                        index: i
-                    }
-                }))
 
                 if (i != 0) {
                     const previous = comic.Chapter[i - 1]
