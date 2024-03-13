@@ -3,7 +3,6 @@ generator client {
   output   = "../src/prisma.rs"
 }
 
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -26,6 +25,8 @@ model Comic {
   updatedDate     DateTime  @updatedAt
   pythonFetchInfo Boolean   @default(false)
   chapters        Chapter[]
+
+  @@index([url])
 }
 
 model Chapter {
@@ -38,7 +39,10 @@ model Chapter {
   updatedDate DateTime @default(now())
   nextId      String?
   previousId  String?
+  index       Int      @default(0)
   comic       Comic    @relation(fields: [comicId], references: [id])
+
+  @@index([comicId, index])
 }
 
 model Urls {
