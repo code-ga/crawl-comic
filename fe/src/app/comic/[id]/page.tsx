@@ -273,19 +273,22 @@ export default function Page({ params }: { params: { id: string } }) {
               </tr>
             </thead>
             <tbody>
-              {comic.Chapter.reverse().map((chapter) => (
-                <tr key={chapter.id}>
-                  <td>
-                    <Link
-                      href={`/chapter/${chapter.id}`}
-                      className="text-blue-500"
-                    >
-                      {chapter.name}
-                    </Link>
-                  </td>
-                  <td>{chapter.createdDate}</td>
-                </tr>
-              ))}
+              {comic.Chapter.reverse().map(
+                (chapter) =>
+                  chapter && (
+                    <tr key={chapter.id}>
+                      <td>
+                        <Link
+                          href={`/chapter/${chapter.id}`}
+                          className="text-blue-500"
+                        >
+                          {chapter.name}
+                        </Link>
+                      </td>
+                      <td>{chapter.createdDate}</td>
+                    </tr>
+                  )
+              )}
             </tbody>
           </table>
         </div>
