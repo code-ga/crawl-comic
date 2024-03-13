@@ -32,7 +32,8 @@ export const ComicIncludeChapter = t.Composite([
             createdDate: t.String(),
             previousId: OptionalOrNull(t.String()),
             nextId: OptionalOrNull(t.String()),
-            url: t.String()
+            url: t.String(),
+            index: t.Number(),
         }))
     })
 ])

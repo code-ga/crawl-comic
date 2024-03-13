@@ -49,9 +49,10 @@ export const apiRoute =
                             createdDate: true,
                             previousId: true,
                             nextId: true,
-                            url: true
+                            url: true,
+                            index: true
                         },
-                        orderBy: { createdDate: 'desc' }
+                        orderBy: { index: 'desc' }
                     }
                 }
             })
@@ -80,9 +81,10 @@ export const apiRoute =
                                 updatedDate: true,
                                 previousId: true,
                                 nextId: true,
-                                url: true
+                                url: true,
+                                index: true
                             },
-                            orderBy: { createdDate: 'desc' }
+                            orderBy: { index: 'desc' }
                         }
                     }
                 })
@@ -101,6 +103,15 @@ export const apiRoute =
             // [>2 element] => [{here} , {}]
             for (let i = 0; i < comic.Chapter.length; i++) {
                 const current = comic.Chapter[i]
+                chapterUpdateInfo.push(prisma.chapter.update({
+                    where: {
+                        id: current.id
+                    },
+                    data: {
+                        index: i
+                    }
+                }))
+
                 if (i != 0) {
                     const previous = comic.Chapter[i - 1]
                     if (!previous) break
@@ -129,7 +140,6 @@ export const apiRoute =
                         }
                     }))
                 }
-
             }
             if (chapterUpdateInfo.length > 0)
                 await prisma.$transaction(chapterUpdateInfo)
@@ -146,9 +156,10 @@ export const apiRoute =
                             updatedDate: true,
                             previousId: true,
                             nextId: true,
-                            url: true
+                            url: true,
+                            index: true
                         },
-                        orderBy: { createdDate: 'desc' }
+                        orderBy: { index: 'desc' }
                     }
                 }
             })
@@ -403,10 +414,11 @@ export const apiRoute =
                             updatedDate: true,
                             previousId: true,
                             nextId: true,
-                            url: true
+                            url: true,
+                            index: true
                         },
                         orderBy: {
-                            createdDate: "desc"
+                            index: "desc"
                         }
                     }
                 }
