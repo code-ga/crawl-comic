@@ -2,7 +2,6 @@ import { Elysia, t } from "elysia";
 import { prisma } from "../db";
 import { parseComicHtmlPage, processArrayComic } from "../utils/fetchComicInfo";
 import { BaseResponse, Chapter, Comic, ComicIncludeChapter } from "../typings";
-import { sortChapter } from "../utils";
 
 const acceptedHost = ["blogtruyenmoi.com"]
 
@@ -52,7 +51,7 @@ export const apiRoute =
                             url: true,
                             index: true
                         },
-                        orderBy: { index: 'desc' }
+                        orderBy: { index: 'asc' }
                     }
                 }
             })
@@ -84,7 +83,7 @@ export const apiRoute =
                                 url: true,
                                 index: true
                             },
-                            orderBy: { index: 'desc' }
+                            orderBy: { index: 'asc' }
                         }
                     }
                 })
@@ -98,7 +97,6 @@ export const apiRoute =
                 }
             }
 
-            comic.Chapter = sortChapter(comic.Chapter)
             const chapterUpdateInfo = []
             // [>2 element] => [{here} , {}]
             for (let i = 0; i < comic.Chapter.length; i++) {
@@ -151,7 +149,7 @@ export const apiRoute =
                             url: true,
                             index: true
                         },
-                        orderBy: { index: 'desc' }
+                        orderBy: { index: 'asc' }
                     }
                 }
             })
@@ -409,7 +407,7 @@ export const apiRoute =
                             index: true
                         },
                         orderBy: {
-                            index: "desc"
+                            index: "asc"
                         }
                     }
                 }

@@ -19,7 +19,7 @@ export default function Template({
               className="text-blue-500"
               target="_blank"
             >
-              phụ đề cho hình ảnh
+              giúp chúng tôi đi
             </Link>
           </div>
         </div>

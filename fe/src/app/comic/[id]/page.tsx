@@ -139,8 +139,8 @@ export default function Page({ params }: { params: { id: string } }) {
         <div className="text-sm mb-2">
           Cập nhập cuối lúc : {comic.updatedDate.toLocaleString()}
         </div>
-        <div className="grid grid-cols-4">
-          <div className="col-span-1 ml-2">
+        <div className="grid md:grid-cols-4 sm:grid-cols-1">
+          <div className="md:col-span-1 ml-2 sm:col-span-1 sm:my-1 md:my-0">
             <Image
               src={cdnUrl + "/image?url=" + comic.thumbnail}
               alt={comic.name}
@@ -148,16 +148,20 @@ export default function Page({ params }: { params: { id: string } }) {
               height={300}
             />
           </div>
-          <div className="col-span-3 text-start ml-4">
-            <div className="text-md mb-2 flex text-wrap">
+          <div className="md:col-span-3 sm:col-span-1 text-start ml-4">
+            <div className="text-md mb-2 mt-2 flex text-wrap">
               <span className="text-lg">Thể loại: </span>
-              {Object.keys(comic.genre).map((genre, index) => (
-                <p key={genre}>
-                  <span className="border border-slate-700 bg-slate-700 mx-2 p-1 rounded-lg">
+              <br />
+              <p className="text-center sm:mt-4 md:mt-0">
+                {Object.keys(comic.genre).map((genre, index) => (
+                  <span
+                    key={genre}
+                    className="border border-slate-700 bg-slate-700 mx-2 p-1 rounded-lg"
+                  >
                     {genre}
                   </span>
-                </p>
-              ))}
+                ))}
+              </p>
             </div>
             <div className="text-md mb-2">
               <span>Trạng Thái : </span>
@@ -180,7 +184,7 @@ export default function Page({ params }: { params: { id: string } }) {
                   ? Object.keys(comic.translatorTeam).map((team) => (
                       <span
                         key={team}
-                        className="border border-slate-700 bg-slate-700 mx-2 p-1 rounded-lg"
+                        className="border border-slate-700 bg-slate-700 mx-2 p-1 rounded-lg "
                       >
                         {team}
                       </span>
@@ -230,18 +234,18 @@ export default function Page({ params }: { params: { id: string } }) {
               {" "}
               <Link
                 href={`/chapter/${comic.Chapter[comic.Chapter.length - 1].id}`}
-                className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3"
+                className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3 my-4"
               >
                 Đọc từ đầu
               </Link>
               <Link
                 href={`/chapter/${comic.Chapter[0].id}`}
-                className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3"
+                className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3 my-4"
               >
                 Đọc mới nhất
               </Link>
               <button
-                className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3"
+                className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3 my-4"
                 onClick={(e) => refetchComicInfo(e)}
               >
                 Refetch Comic
