@@ -103,6 +103,7 @@ pub async fn parse_comic_page(
                     println!("chapter {} already exists", url);
                 }
                 result.push(url.to_string());
+                i += 1;
                 continue;
             }
         }
