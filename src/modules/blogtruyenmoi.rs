@@ -96,10 +96,11 @@ pub async fn parse_comic_page(
             }
             let tmp = tmp.unwrap();
             if tmp.is_some() {
-                if tmp.unwrap().index != i {
+                let index = chapter_count.clone() as i32 - i;
+                if tmp.unwrap().index != index {
                     update_chapters.push(client.chapter().update_many(
                         vec![prisma::chapter::url::equals(url.to_string())],
-                        vec![prisma::chapter::index::set((i - chapter_count.clone() as i32).abs())],
+                        vec![prisma::chapter::index::set(index)],
                     ));
                 } else {
                     println!("chapter {} already exists", url);
