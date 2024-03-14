@@ -139,7 +139,7 @@ export default function Page({ params }: { params: { id: string } }) {
           Cập nhập cuối lúc : {comic.updatedDate.toLocaleString()}
         </div>
         <div className="grid md:grid-cols-4 sm:grid-cols-1">
-          <div className="md:col-span-1 ml-2 sm:col-span-1 sm:my-1 md:my-0">
+          <div className="md:col-span-1 mx-2 sm:col-span-1 sm:my-1 md:my-0 flex justify-center content-center">
             <Image
               src={cdnUrl + "/image?url=" + comic.thumbnail}
               alt={comic.name}
@@ -151,11 +151,11 @@ export default function Page({ params }: { params: { id: string } }) {
             <div className="text-md mb-2 mt-2 flex text-wrap">
               <span className="text-lg">Thể loại: </span>
               <br />
-              <p className="text-center sm:mt-4 md:mt-0 break-words">
+              <p className="text-center mx-2 md:mx-1 break-words">
                 {Object.keys(comic.genre).map((genre, index) => (
                   <span
                     key={genre}
-                    className="border border-slate-700 bg-slate-700 mx-2 p-1 rounded-lg block md:inline"
+                    className="border border-slate-700 bg-slate-700 mb-2 md:mb-0 md:mx-2 p-1 rounded-lg block md:inline"
                   >
                     {genre}
                   </span>
@@ -200,7 +200,7 @@ export default function Page({ params }: { params: { id: string } }) {
               </div>
             )}
             {Object.keys(comic.source).length > 0 && (
-              <div className="text-md mb-2">
+              <div className="text-md mb-2 break-words">
                 <span>Source: </span>
                 {Object.keys(comic.source).map((source) => (
                   <span
@@ -233,18 +233,18 @@ export default function Page({ params }: { params: { id: string } }) {
               {" "}
               <Link
                 href={`/chapter/${comic.Chapter[comic.Chapter.length - 1].id}`}
-                className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3 my-4"
+                className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md md:mx-3 mr-3 my-4 inline-block"
               >
                 Đọc từ đầu
               </Link>
               <Link
                 href={`/chapter/${comic.Chapter[0].id}`}
-                className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3 my-4"
+                className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md md:mx-3 my-4 inline-block"
               >
                 Đọc mới nhất
               </Link>
               <button
-                className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3 my-4"
+                className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md md:mx-3 my-4 inline-block"
                 onClick={(e) => refetchComicInfo(e)}
               >
                 Refetch Comic

@@ -28,12 +28,12 @@ export const ComicCard = ({ comic }: { comic: ComicsApiReturn }) => {
             ? comic.content.split(" ").slice(0, 100).join(" ")
             : "No content available"}
         </div>
-        <div className="text-sm mb-2">
-          Thể loại:
+        <div className="text-sm mb-2 break-words">
+          <span className="block md:inline mb-2 md:m-0">Thể loại:</span>
           {Object.keys(comic.genre).map((genre) => (
             <span
               key={genre}
-              className="border border-slate-700 bg-slate-700 mx-2 p-1 rounded-lg"
+              className="border border-slate-700 bg-slate-700 mx-2 p-1 rounded-lg mt-1 md:mt-0"
             >
               {genre}
             </span>

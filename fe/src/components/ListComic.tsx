@@ -48,7 +48,7 @@ export function ListComic({ app }: { app: AppApi }) {
   }
   const comics = data!;
   return (
-    <div className="col-span-3">
+    <div className="col-span-4 md:col-span-3">
       {comics?.map((comic) => (
         <ComicCard key={comic.id} comic={comic}></ComicCard>
       ))}

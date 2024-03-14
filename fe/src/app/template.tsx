@@ -14,7 +14,7 @@ export default function Template({
           <div>viết gì đây</div>
           <div>
             <Link
-              href="/dataset/image"
+              href="/help"
               title="bạn có thể giúp chúng tôi tạo phụ đề cho hình ảnh được ko"
               className="text-blue-500"
               target="_blank"

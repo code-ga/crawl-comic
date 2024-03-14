@@ -52,7 +52,9 @@ export default function Page({ params }: { params: { id: string } }) {
   console.log({ chapter });
   return (
     <div>
-      <button className="fixed text-center top-[50%] bg-blue-400 rotate-90">Phụ đề</button>
+      <button className="fixed text-center top-[50%] bg-blue-400 rotate-90">
+        Phụ đề
+      </button>
       <div className="text-center mb-4">
         {/* header */}
         <div>
@@ -61,13 +63,14 @@ export default function Page({ params }: { params: { id: string } }) {
           </Link>
         </div>
         <div className="flex justify-center content-center">
-          <span className="mr-3">Cào tại : </span>
+          <span className="mr-1 hidden sm:inline">Cào tại :</span>
           <Link href={chapter.url} className="text-blue-500" target="_blank">
             {chapter.url}
           </Link>
         </div>
         <div>{chapter.name}</div>
-        <div>Tạo ngày {chapter.createdDate}</div>
+        <div>Tạo ngày: {chapter.createdDate}</div>
+        <div>Update lần cuối lúc : {chapter.updatedDate.toString()}</div>
       </div>
       <div className="mb-4 text-center flex justify-center content-center">
         {/* navigation */}
