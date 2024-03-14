@@ -168,6 +168,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             let mut pending_url =
                 util::get_pending_urls(&client, num_of_threads - worker_rx.len(), "".to_string())
                     .await;
+            if pending_url.is_empty() {
+                continue;
+            }
             while !worker_rx.is_full() {
                 let pending_url = {
                     let tmp = pending_url.pop();
