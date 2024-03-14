@@ -35,7 +35,6 @@ export default function Page({ params }: { params: { id: string } }) {
         if (data.data.status === 404) {
           notFound();
         }
-        console.log({ data });
         setComic({ data: data.data.data, error: data.error, loading: false });
       })
       .catch((err) => {
@@ -74,7 +73,7 @@ export default function Page({ params }: { params: { id: string } }) {
       (e.target as HTMLButtonElement).disabled = false;
       return;
     }
-    router.refresh();
+    setComic((pre) => ({ ...pre, data: comic }));
     toast.success("Update thành công", {
       position: "bottom-center",
       autoClose: 5000,
@@ -134,7 +133,7 @@ export default function Page({ params }: { params: { id: string } }) {
         theme="dark"
         transition={Bounce}
       />
-      <div className="flex flex-col gap-2 p-3 bg-slate-900 m-3 justify-center content-center text-center rounded-lg shadow-2xl shadow-slate-500 border border-slate-700 hover:border-slate-500">
+      <div className="flex flex-col gap-2 md:p-3 py-4 bg-slate-900 m-3 justify-center content-center text-center rounded-lg shadow-2xl shadow-slate-500 border border-slate-700 hover:border-slate-500">
         <h1 className="text-2xl mb-2">{comic.name}</h1>
         <div className="text-sm mb-2">
           Cập nhập cuối lúc : {comic.updatedDate.toLocaleString()}
@@ -152,11 +151,11 @@ export default function Page({ params }: { params: { id: string } }) {
             <div className="text-md mb-2 mt-2 flex text-wrap">
               <span className="text-lg">Thể loại: </span>
               <br />
-              <p className="text-center sm:mt-4 md:mt-0">
+              <p className="text-center sm:mt-4 md:mt-0 break-words">
                 {Object.keys(comic.genre).map((genre, index) => (
                   <span
                     key={genre}
-                    className="border border-slate-700 bg-slate-700 mx-2 p-1 rounded-lg"
+                    className="border border-slate-700 bg-slate-700 mx-2 p-1 rounded-lg block md:inline"
                   >
                     {genre}
                   </span>
@@ -253,7 +252,7 @@ export default function Page({ params }: { params: { id: string } }) {
             </div>
           </div>
         </div>
-        <div className="text-md mb-2">
+        <div className="text-md mb-2 break-words mx-2">
           <div className="text-lg">Nội dung</div>
           <div>{comic.content ? comic.content : "No content available"}</div>
         </div>
@@ -277,7 +276,7 @@ export default function Page({ params }: { params: { id: string } }) {
               </tr>
             </thead>
             <tbody>
-              {comic.Chapter.reverse().map(
+              {comic.Chapter.sort((a, b) => b.index - a.index).map(
                 (chapter) =>
                   chapter && (
                     <tr key={chapter.id}>

@@ -95,7 +95,7 @@ export default function Page({ params }: { params: { id: string } }) {
             src={cdnUrl + "/image?url=" + image}
             alt={image}
             key={image}
-            width={window.innerWidth / 2 + 100}
+            width={window.innerWidth / 2 + 2000}
             height={window.innerHeight / 2}
             // layout="fill" // required
             objectFit="cover" // change to suit your needs
