@@ -4,18 +4,24 @@ use regex::Regex;
 use tokio::sync::Mutex;
 
 use crate::{
-    modules::blogtruyenmoi::{
-        is_comic_page as is_blogtruyenmoi_comic_page,
-        parse_chapter_page as parse_blogtruyenmoi_chapter_page,
-        parse_comic_page as parse_blogtruyenmoi_comic_page,
-    },
     prisma::{self, PrismaClient},
     types::thread_message::ThreadMessage,
     util::get_host,
 };
 use rand::Rng;
 
-pub mod blogtruyenmoi;
+mod blogtruyenmoi;
+use blogtruyenmoi::{
+    is_comic_page as is_blogtruyenmoi_comic_page,
+    parse_chapter_page as parse_blogtruyenmoi_chapter_page,
+    parse_comic_page as parse_blogtruyenmoi_comic_page,
+};
+mod nettruyenee;
+use nettruyenee::{
+    is_chapter_page as is_nettruyenee_chapter_page, is_comic_page as is_nettruyenee_comic_page,
+    parse_chapter_page as parse_nettruyenee_chapter_page,
+    parse_comic_page as parse_nettruyenee_comic_page,
+};
 
 pub static ACCEPTED_HOSTS: [&str; 2] = ["blogtruyenmoi.com", "nettruyenee.com"];
 
@@ -63,6 +69,17 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
                 );
             }
             return None;
+        }
+    }else if host.contains("nettruyenee.com") {
+        let url = url.trim().to_string();
+        if url.starts_with("https://www.nettruyenee.com/truyen-tranh/") {
+            return Some(url);
+        }
+        if url.starts_with("https://www.nettruyenee.com/tim-truyen?page="){
+            return Some(url);
+        }
+        if is_nettruyenee_chapter_page(&url, ""){
+            return Some(url);
         }
     }
 
@@ -259,27 +276,27 @@ pub async fn thread_worker(
                             //     .unwrap();
                             result.extend(tmp.unwrap());
                         }
-                        {
-                            let tmp = client
-                                .urls()
-                                .update_many(
-                                    vec![prisma::urls::url::equals(url.clone())],
-                                    vec![
-                                        prisma::urls::fetched::set(true),
-                                        prisma::urls::fetching::set(false),
-                                    ],
-                                )
-                                .exec()
-                                .await;
-                            if tmp.is_err() {
-                                {
-                                    tx.send(ThreadMessage::Retry(url.clone(), i_tries))
-                                        .await
-                                        .unwrap();
-                                }
-                                continue;
-                            }
-                        }
+                        // {
+                        //     let tmp = client
+                        //         .urls()
+                        //         .update_many(
+                        //             vec![prisma::urls::url::equals(url.clone())],
+                        //             vec![
+                        //                 prisma::urls::fetched::set(true),
+                        //                 prisma::urls::fetching::set(false),
+                        //             ],
+                        //         )
+                        //         .exec()
+                        //         .await;
+                        //     if tmp.is_err() {
+                        //         {
+                        //             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                        //                 .await
+                        //                 .unwrap();
+                        //         }
+                        //         continue;
+                        //     }
+                        // }
                     } else if is_blogtruyenmoi_comic_page(&html) {
                         // only chapter pending url because we had fetch comic page pending url before
                         let pending_url_comic = {
@@ -298,7 +315,35 @@ pub async fn thread_worker(
                         result.extend(pending_url_comic.clone());
                     }
                 } else if hostname.contains("nettruyenee.com") {
-                    todo!();
+                    if is_nettruyenee_comic_page(&url, &html) {
+                        let pending_url_comic = {
+                            let tmp =
+                                parse_nettruyenee_comic_page(&url, &html, client.clone()).await;
+                            if tmp.is_none() {
+                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                    .await
+                                    .unwrap();
+                                continue;
+                            }
+                            tmp.unwrap()
+                        };
+                        result.extend(pending_url_comic.clone());
+                    } else if is_nettruyenee_chapter_page(&url, &html) {
+                        let client = client.lock().await;
+                        let pending_url_chapter = {
+                            let tmp =
+                                parse_nettruyenee_chapter_page(&url, &html, &client)
+                                    .await;
+                            if tmp.is_none() {
+                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                    .await
+                                    .unwrap();
+                                continue;
+                            }
+                            tmp.unwrap()
+                        };
+                        result.extend(pending_url_chapter.clone());
+                    }
                 }
                 result = result
                     .into_iter()

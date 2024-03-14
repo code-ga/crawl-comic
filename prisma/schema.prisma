@@ -35,6 +35,7 @@ model Chapter {
   url         String   @unique
   comicId     String
   images      String[]
+  serverImage Json[]   @default([])
   createdDate String
   updatedDate DateTime @default(now())
   nextId      String?
