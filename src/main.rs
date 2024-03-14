@@ -41,40 +41,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     loop {
         let job = main_rx.recv().await.unwrap();
-        if worker_rx.is_empty() {
-            let wait_time = rand::thread_rng().gen_range(1..5);
-            tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
-            let mut pending_url = util::get_pending_urls(
-                &client,
-                num_of_threads - worker_rx.len(),
-                "".to_string(),
-            )
-            .await;
-            while !worker_rx.is_full() {
-                let pending_url = {
-                    let tmp = pending_url.pop();
-                    if tmp.is_none() {
-                        let wait_time = rand::thread_rng().gen_range(1..5);
-                        tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
-                        pending_url = util::get_pending_urls(
-                            &client,
-                            num_of_threads - worker_rx.len(),
-                            "".to_string(),
-                        )
-                        .await;
-                        continue;
-                    }
-                    tmp.unwrap()
-                };
-                worker_tx
-                    .send(types::thread_message::ThreadMessage::Start(
-                        pending_url.to_string(),
-                        0,
-                    ))
-                    .await
-                    .unwrap();
-            }
-        }
+
         match job {
             ThreadMessage::Stop(id) => {
                 // spawn new worker and replace old
@@ -194,6 +161,37 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 }
             }
             _ => {}
+        }
+        if worker_rx.is_empty() {
+            let wait_time = rand::thread_rng().gen_range(1..5);
+            tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
+            let mut pending_url =
+                util::get_pending_urls(&client, num_of_threads - worker_rx.len(), "".to_string())
+                    .await;
+            while !worker_rx.is_full() {
+                let pending_url = {
+                    let tmp = pending_url.pop();
+                    if tmp.is_none() {
+                        let wait_time = rand::thread_rng().gen_range(1..5);
+                        tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
+                        pending_url = util::get_pending_urls(
+                            &client,
+                            num_of_threads - worker_rx.len(),
+                            "".to_string(),
+                        )
+                        .await;
+                        continue;
+                    }
+                    tmp.unwrap()
+                };
+                worker_tx
+                    .send(types::thread_message::ThreadMessage::Start(
+                        pending_url.to_string(),
+                        0,
+                    ))
+                    .await
+                    .unwrap();
+            }
         }
     }
 
