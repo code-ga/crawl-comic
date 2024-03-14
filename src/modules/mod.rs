@@ -23,7 +23,7 @@ use nettruyenee::{
     parse_comic_page as parse_nettruyenee_comic_page,
 };
 
-pub static ACCEPTED_HOSTS: [&str; 2] = ["blogtruyenmoi.com", "nettruyenee.com","www.nettruyenee.com"];
+pub static ACCEPTED_HOSTS: [&str; 3] = ["blogtruyenmoi.com", "nettruyenee.com","www.nettruyenee.com"];
 
 pub fn process_url(url: &str, now_url: &str) -> Option<String> {
     if !url.starts_with("https://") && !url.starts_with("http://") {
