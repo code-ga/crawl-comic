@@ -20,7 +20,7 @@ export function ListComic({ app }: { app: AppApi }) {
     loading: true,
   });
   useEffect(() => {
-    app.api.comics
+    app.api.news
       .get({
         $query: { skip: page * comicPerPage, take: comicPerPage },
       })
