@@ -23,7 +23,11 @@ use nettruyenee::{
     parse_comic_page as parse_nettruyenee_comic_page,
 };
 
-pub static ACCEPTED_HOSTS: [&str; 3] = ["blogtruyenmoi.com", "nettruyenee.com","www.nettruyenee.com"];
+pub static ACCEPTED_HOSTS: [&str; 3] = [
+    "blogtruyenmoi.com",
+    "nettruyenee.com",
+    "www.nettruyenee.com",
+];
 
 pub fn process_url(url: &str, now_url: &str) -> Option<String> {
     if !url.starts_with("https://") && !url.starts_with("http://") {
@@ -199,10 +203,12 @@ pub async fn thread_worker(
 
                 println!("worker {} fetching {}", worker_id, url);
 
-                let rep = http_client
+                let mut rep = http_client
                     .get(url.clone())
-                    .header("User-Agent", "Mozilla/5.0")
-                    .header("Referrer", format!("https://{}/", hostname.to_string()));
+                    .header("User-Agent", "Mozilla/5.0");
+                if hostname.contains("blogtruyenmoi.com") {
+                    rep = rep.header("Referrer", format!("https://{}/", hostname.to_string()));
+                }
                 let resp = rep.send().await;
                 if resp.is_err() {
                     {
