@@ -70,15 +70,15 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
             }
             return None;
         }
-    }else if host.contains("nettruyenee.com") {
+    } else if host.contains("nettruyenee.com") {
         let url = url.trim().to_string();
         if url.starts_with("https://www.nettruyenee.com/truyen-tranh/") {
             return Some(url);
         }
-        if url.starts_with("https://www.nettruyenee.com/tim-truyen?page="){
+        if url.starts_with("https://www.nettruyenee.com/tim-truyen?page=") {
             return Some(url);
         }
-        if is_nettruyenee_chapter_page(&url, ""){
+        if is_nettruyenee_chapter_page(&url, "") {
             return Some(url);
         }
     }
@@ -202,7 +202,7 @@ pub async fn thread_worker(
                 let rep = http_client
                     .get(url.clone())
                     .header("User-Agent", "Mozilla/5.0")
-                    .header("Referrer", "https://blogtruyenmoi.com/");
+                    .header("Referrer", format!("https://{}/", hostname.to_string()));
                 let resp = rep.send().await;
                 if resp.is_err() {
                     {
@@ -331,9 +331,7 @@ pub async fn thread_worker(
                     } else if is_nettruyenee_chapter_page(&url, &html) {
                         let client = client.lock().await;
                         let pending_url_chapter = {
-                            let tmp =
-                                parse_nettruyenee_chapter_page(&url, &html, &client)
-                                    .await;
+                            let tmp = parse_nettruyenee_chapter_page(&url, &html, &client).await;
                             if tmp.is_none() {
                                 tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                     .await
