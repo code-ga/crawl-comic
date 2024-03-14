@@ -12,7 +12,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client: PrismaClient = PrismaClient::_builder().build().await.unwrap();
     let num_of_threads = 10;
     let init_url =
-        "https://www.nettruyenee.com/tim-truyen"
+        "https://nettruyenee.com/tim-truyen"
             .to_string();
     // worker to main channel
     let (main_tx, main_rx) = async_channel::bounded::<ThreadMessage>(num_of_threads);
