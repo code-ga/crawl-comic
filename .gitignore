@@ -17,3 +17,5 @@ Cargo.lock
 
 # your update script 
 update.sh
+# your stop worker script
+stop.sh

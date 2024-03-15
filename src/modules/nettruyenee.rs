@@ -76,6 +76,7 @@ pub async fn parse_comic_page(
     // get all chapters count
     let chapter_count = chapter_regex.captures_iter(page).count();
     for cap in chapter_regex.captures_iter(page) {
+        let index = chapter_count.clone() as i32 - i;
         // let id = cap[1].to_string();
         let mut url = cap[1].trim().to_string();
         if !is_chapter_page(&url, "") {
@@ -97,7 +98,6 @@ pub async fn parse_comic_page(
             }
             let tmp = tmp.unwrap();
             if tmp.is_some() {
-                let index = chapter_count.clone() as i32 - i;
                 if tmp.unwrap().index != index {
                     update_chapters.push(client.chapter().update_many(
                         vec![prisma::chapter::url::equals(url.to_string())],
@@ -116,7 +116,7 @@ pub async fn parse_comic_page(
             url.to_string(),
             comic_id.to_string(),
             "".to_owned(),
-            vec![prisma::chapter::index::set(i)],
+            vec![prisma::chapter::index::set(index)],
         ));
         result.push(url.to_string());
         i += 1;
