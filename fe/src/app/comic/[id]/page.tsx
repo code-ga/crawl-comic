@@ -232,13 +232,13 @@ export default function Page({ params }: { params: { id: string } }) {
             <div className="text-md mb-2 mt-7">
               {" "}
               <Link
-                href={`/chapter/${comic.Chapter[comic.Chapter.length - 1].id}`}
+                href={`/chapter/${comic.Chapter[0].id}`}
                 className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md md:mx-3 mr-3 my-4 inline-block"
               >
                 Đọc từ đầu
               </Link>
               <Link
-                href={`/chapter/${comic.Chapter[0].id}`}
+                href={`/chapter/${comic.Chapter[comic.Chapter.length - 1].id}`}
                 className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md md:mx-3 my-4 inline-block"
               >
                 Đọc mới nhất

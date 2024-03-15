@@ -3,7 +3,7 @@ import { prisma } from "../db";
 import { parseComicHtmlPage, processArrayComic } from "../utils/fetchComicInfo";
 import { BaseResponse, Chapter, Comic, ComicIncludeChapter } from "../typings";
 
-const acceptedHost = ["blogtruyenmoi.com"]
+const acceptedHost = ["blogtruyenmoi.com","www.nettruyenee.com"]
 
 export const apiRoute =
     new Elysia({
@@ -65,7 +65,7 @@ export const apiRoute =
             if (!comic.thumbnail) {
                 // refetch comic 
                 const resp = await (await fetch(comic.url)).text()
-                const parsed = (parseComicHtmlPage(resp))
+                const parsed = (parseComicHtmlPage(resp,comic.url))
                 comic = await prisma.comic.update({
                     where: {
                         id: params.id
@@ -385,7 +385,7 @@ export const apiRoute =
                 }
             }
             const resp = await (await fetch(comic.url)).text()
-            const parsed = (parseComicHtmlPage(resp))
+            const parsed = (parseComicHtmlPage(resp,comic.url))
             console.log({ parsed })
             const result = (await prisma.comic.update({
                 where: {

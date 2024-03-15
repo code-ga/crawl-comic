@@ -16,10 +16,12 @@ model Chapter {
   images      String[]
   createdDate String
   updatedDate DateTime @default(now())
-  Comic       Comic    @relation(fields: [comicId], references: [id])
-  previousId  String?
   nextId      String?
+  previousId  String?
   index       Int      @default(0)
+  serverImage Json[]   @default([])
+  Comic       Comic    @relation(fields: [comicId], references: [id])
+
   @@index([comicId, index])
 }
 
@@ -40,6 +42,7 @@ model Comic {
   updatedDate     DateTime
   pythonFetchInfo Boolean   @default(false)
   Chapter         Chapter[]
+
   @@index([url])
 }
 
