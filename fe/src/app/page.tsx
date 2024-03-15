@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { ListComic } from "../components/ListComic";
 import { beUrl } from "../constant";
 import { Loading } from "../components/loading";
+import { SideBar } from "../components/Sidebar";
 
 export default function Home() {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
@@ -12,8 +13,12 @@ export default function Home() {
   return (
     <div className="grid grid-cols-4 gap-4 text-center">
       {/* content */}
-      <div className="hidden md:block">Side Bar</div>
-      <Suspense fallback={<Loading/>}>
+      <div className="hidden md:block">
+        <Suspense fallback={<Loading />}>
+          <SideBar app={app}></SideBar>
+        </Suspense>
+      </div>
+      <Suspense fallback={<Loading />}>
         <ListComic app={app} />
       </Suspense>
     </div>
