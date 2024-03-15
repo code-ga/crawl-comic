@@ -6,10 +6,13 @@ import createSubscriber from "pg-listen"
 
 const subscriber = createSubscriber({
   connectionString: process.env.DATABASE_URL,
-})
+});
 
-await subscriber.connect()
-await subscriber.listenTo("new_update_or_create")
+  (async () => {
+    await subscriber.connect()
+    await subscriber.listenTo("new_update_or_create")
+  })();
+
 
 const PORT = Number(process.env.PORT) || 8080;
 const app = new Elysia()
