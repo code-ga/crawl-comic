@@ -250,7 +250,6 @@ pub async fn thread_worker(
                     tmp.unwrap()
                 };
 
-                // dbg!(&html);
                 // println!("worker {} fetched {}", worker_id, url);
                 let mut result = Vec::new();
                 let re = Regex::new(r#"href=["|']([^"']+)"#).unwrap();
@@ -321,24 +320,12 @@ pub async fn thread_worker(
                         result.extend(pending_url_comic.clone());
                     }
                 } else if hostname.contains("nettruyenee.com") {
-                    if is_nettruyenee_comic_page(&url, &html) {
-                        let pending_url_comic = {
-                            let tmp =
-                                parse_nettruyenee_comic_page(&url, &html, client.clone()).await;
-                            if tmp.is_none() {
-                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
-                                    .await
-                                    .unwrap();
-                                continue;
-                            }
-                            tmp.unwrap()
-                        };
-                        result.extend(pending_url_comic.clone());
-                    } else if is_nettruyenee_chapter_page(&url, &html) {
+                    if is_nettruyenee_chapter_page(&url, &html) {
                         let client = client.lock().await;
                         let pending_url_chapter = {
                             let tmp = parse_nettruyenee_chapter_page(&url, &html, &client).await;
                             if tmp.is_none() {
+                                println!("failed to parse chapter page {}", url);
                                 tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                     .await
                                     .unwrap();
@@ -347,6 +334,20 @@ pub async fn thread_worker(
                             tmp.unwrap()
                         };
                         result.extend(pending_url_chapter.clone());
+                    } else if is_nettruyenee_comic_page(&url, &html) {
+                        let pending_url_comic = {
+                            let tmp =
+                                parse_nettruyenee_comic_page(&html, &url, client.clone()).await;
+                            if tmp.is_none() {
+                                println!("failed to parse comic page {}", url);
+                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                    .await
+                                    .unwrap();
+                                continue;
+                            }
+                            tmp.unwrap()
+                        };
+                        result.extend(pending_url_comic.clone());
                     }
                 }
                 result = result

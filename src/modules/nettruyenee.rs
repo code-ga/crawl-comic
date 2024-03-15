@@ -39,7 +39,7 @@ pub async fn parse_comic_page(
         }
     };
     let mut update_field = vec![];
-    let title_regex = Regex::new(r#"<title>(.*?)</title>"#).unwrap();
+    let title_regex = Regex::new(r#"<title>\s+(.*?)\s+<\/title>"#).unwrap();
     let title = {
         let tmp = title_regex.captures(page);
         if tmp.is_none() {
@@ -70,19 +70,21 @@ pub async fn parse_comic_page(
     let mut chapters = vec![];
     let mut update_chapters = vec![];
     // regex for a chapter
-    let  chapter_regex = Regex::new(r#"<a\s+href="(https:\/\/www.nettruyenee.com\/truyen-tranh\/(.+)\/chap-(.+)\/(.+))"\s+data-id="(.+)">(.+)<\/a>"#).unwrap();
+    let chapter_regex =
+        Regex::new(r#"<a\s+href="([^"|"]+)"\s+data-id="([^"]+)">([^\/]+)<\/a>"#).unwrap();
     let mut i = 0;
     // get all chapters count
     let chapter_count = chapter_regex.captures_iter(page).count();
     for cap in chapter_regex.captures_iter(page) {
         // let id = cap[1].to_string();
-        let mut url = format!("https://blogtruyenmoi.com{}", cap[1].to_string())
-            .trim()
-            .to_string();
+        let mut url = cap[1].trim().to_string();
+        if !is_chapter_page(&url, "") {
+            continue;
+        };
         if url.contains("\" title=") {
             url = url.replace("\" title=\"", "").trim().to_string();
         }
-        let title = cap[5].to_string().trim().to_string();
+        let title = cap[3].to_string().trim().to_string();
         println!("found chapter url {}", url);
         {
             let tmp = client
