@@ -149,7 +149,7 @@ export default function Page({ params }: { params: { id: string } }) {
         {/* reader */}
         {images.map((image) => (
           <Image
-            src={cdnUrl + "/image?url=" + image}
+            src={image}
             alt={image}
             key={image}
             width={window.innerWidth / 2 + 2000}

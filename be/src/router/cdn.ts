@@ -12,13 +12,16 @@ export const cdnRoute = new Elysia({
             url = `https:${url}`
         }
         if (!url.startsWith("https::////")) {
-            url = url.replace("https::////","https://")
+            url = url.replace("https::////", "https://")
         }
         const resp = await fetch(url,
             {
                 headers: {
                     ...url.startsWith("https://i") ? {
                         "Referer": "https://blogtruyenmoi.com/"
+                    } : {},
+                    ...new URL(url).hostname == "i.ntcdntempv26.com" || new URL(url).hostname == "i28.ntcdntempv26.com" ? {
+                        "Referer": "https://nettruyenee.com/"
                     } : {},
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.142.86 Safari/537.36"
                 }
