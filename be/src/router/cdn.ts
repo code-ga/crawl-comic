@@ -11,7 +11,7 @@ export const cdnRoute = new Elysia({
         if (url.startsWith("//st.nettruyenee.com")) {
             url = `https:${url}`
         }
-        if (!url.startsWith("https::////")) {
+        if (url.startsWith("https::////")) {
             url = url.replace("https::////", "https://")
         }
         const resp = await fetch(url,
