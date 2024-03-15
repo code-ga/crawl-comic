@@ -18,7 +18,7 @@ export const SideBar = ({ app }: { app: AppApi }) => {
   }, []);
   console.log({ fetching });
   return (
-    <div className="text-center">
+    <div className="text-center" onBlur={() => setFetching(new Set())}>
       <p>Side Bar</p>
       <span className="my-2 mt-4">Server Fetching Urls</span>
       <div className="text-sm text-left p-3">
