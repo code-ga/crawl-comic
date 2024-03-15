@@ -10,6 +10,8 @@ import { Loading } from "../../../components/loading";
 
 export default function Page({ params }: { params: { id: string } }) {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
+  const [images, setImages] = useState<string[]>([]);
+  const [nowServer, setNowServer] = useState<string | null>(null);
 
   const [
     { data: chapterData, error: chapterError, loading: chapterLoading },
@@ -49,6 +51,37 @@ export default function Page({ params }: { params: { id: string } }) {
     notFound();
   }
   const chapter = chapterData!;
+  if (chapter.images.length > 0) {
+    setImages((pre) => {
+      for (const image of chapter.images) {
+        const url = cdnUrl + "/image?url=" + image;
+        if (!pre.includes(url)) {
+          pre.push(url);
+        }
+      }
+      return pre;
+    });
+  }
+  if (chapter.serverImage.length > 0) {
+    const preImages = [] as string[];
+    for (const image of chapter.serverImage) {
+      // key is the image server like 1 and 2 and value is the url just get value now
+      const url =
+        cdnUrl +
+        "/image?url=" +
+        image[nowServer || Object.keys(chapter.serverImage[0])[0] || ""];
+      if (!preImages.includes(url)) {
+        preImages.push(url);
+      }
+    }
+
+    if (JSON.stringify(preImages) != JSON.stringify(images)) {
+      setImages(preImages);
+    }
+  }
+  const selectImageServer = (server: string) => {
+    setNowServer(server);
+  };
   console.log({ chapter });
   return (
     <div>
@@ -92,8 +125,29 @@ export default function Page({ params }: { params: { id: string } }) {
         )}
       </div>
       <div className="text-center mb-4 mx-auto">
+        <div className="flex justify-center content-center my-4">
+          {chapter.serverImage
+            .reduce((pre, cur) => {
+              const server = Object.keys(cur);
+              server.forEach((s) => {
+                if (!pre.includes(s)) {
+                  pre.push(s);
+                }
+              });
+              return pre;
+            }, [] as string[])
+            .map((server, index) => (
+              <button
+                key={index}
+                className="bg-red-700 p-3 px-5 border border-slate-700 rounded-md mx-3"
+                onClick={() => selectImageServer(server)}
+              >
+                server {index + 1} ({server})
+              </button>
+            ))}
+        </div>
         {/* reader */}
-        {chapter.images.map((image) => (
+        {images.map((image) => (
           <Image
             src={cdnUrl + "/image?url=" + image}
             alt={image}

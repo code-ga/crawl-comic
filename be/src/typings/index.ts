@@ -50,6 +50,8 @@ export const Chapter = t.Object({
     comicId: t.String(),
     previousId: OptionalOrNull(t.String()),
     nextId: OptionalOrNull(t.String()),
+    index: t.Number(),
+    serverImage: t.Array(t.Record(t.String(), t.String()))
 })
 
 export type ChapterStatic = Static<typeof Chapter>
