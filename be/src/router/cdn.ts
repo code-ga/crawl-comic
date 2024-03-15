@@ -6,9 +6,11 @@ export const cdnRoute = new Elysia({
 })
     .get("/image", async ({ query }) => {
 
-        const url = query.url
-        console.log(url)
+        let url = query.url
         if (!url) return new Response("url not found", { status: 400 })
+        if (url.startsWith("//st.nettruyenee.com")) {
+            url = `https:${url}`
+        }
         const resp = await fetch(url,
             {
                 headers: {
