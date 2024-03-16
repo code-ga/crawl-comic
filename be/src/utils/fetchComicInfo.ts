@@ -94,13 +94,12 @@ export function parseComicHtmlPage(html: string, url: string): Comic {
         if (author.length) {
             result.author = {}
             const a_element = author.find('a')
-            if (a_element.length) a_element.find('a').each((_, link) => {
+            if (a_element.length) a_element.each((_, link) => {
                 result.author![$(link).text().trim()] = $(link).attr('href') || '';
             })
             else author.text().trim().split(';').forEach((author) => {
                 result.author![author.trim()] = '';
             })
-
         }
     }
 
