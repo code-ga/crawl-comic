@@ -353,9 +353,18 @@ export const apiRoute =
                 comic: await prisma.comic.count(),
                 chapter: await prisma.chapter.count({
                     where: {
-                        images: {
-                            isEmpty: false
-                        }
+                        OR: [
+                            {
+                                images: {
+                                    isEmpty: false
+                                }
+                            },
+                            {
+                                serverImage: {
+                                    isEmpty: false
+                                }
+                            }
+                        ]
                     }
                 })
             }
