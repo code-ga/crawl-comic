@@ -20,7 +20,7 @@ export const cdnRoute = new Elysia({
                     ...url.startsWith("https://i") ? {
                         "Referer": "https://blogtruyenmoi.com/"
                     } : {},
-                    ...new URL(url).hostname == "i.ntcdntempv26.com" || new URL(url).hostname == "i28.ntcdntempv26.com" ? {
+                    ...new URL(url).hostname == "i.ntcdntempv26.com" || (/i\d+.ntcdntempv26.com/g).test(url) ? {
                         "Referer": "https://nettruyenee.com/"
                     } : {},
                     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.142.86 Safari/537.36"
