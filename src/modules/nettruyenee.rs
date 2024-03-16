@@ -191,8 +191,8 @@ pub async fn parse_chapter_page(
     let images_url_regex = Regex::new(r#"<img\s+alt="[^"]+"\s+data-index="[^"]+"\s+src="([^"]+)"\s+data-original="[^"]+" data-cdn="([^"]+)"\s+\/>"#).unwrap();
     let mut images_urls = vec![];
     for cap in images_url_regex.captures_iter(&html) {
-        let url = "https:://".to_string() + (&cap[1].to_string());
-        let cdn = "https:://".to_string() + &(cap[2].to_string());
+        let url = "https:".to_string() + (&cap[1].to_string());
+        let cdn = "https:".to_string() + &(cap[2].to_string());
         images_urls.push(serde_json::json!({
             "url": url,
             "cdn": cdn
