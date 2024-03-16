@@ -270,7 +270,7 @@ export default function Page({ params }: { params: { id: string } }) {
             className="bg-red-700 p-1 px-3 border border-slate-700 rounded-md mx-3"
             onClick={(e) => refetchChapterList(e)}
           >
-            Refetch Chapter
+            Refetch Chapters
           </button>
         </div>
         <div>

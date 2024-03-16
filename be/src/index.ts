@@ -3,16 +3,18 @@ import { Elysia } from "elysia";
 import { appRoute } from "./router";
 import cors from "@elysiajs/cors";
 import createSubscriber from "pg-listen"
+import { prisma } from "./db";
 
 const subscriber = createSubscriber({
   connectionString: process.env.DATABASE_URL,
 });
 
-  (async () => {
-    await subscriber.connect()
-    await subscriber.listenTo("new_update_or_create")
-  })();
+(async () => {
+  await subscriber.connect()
+  await subscriber.listenTo("new_update_or_create")
+})();
 
+const wsIntervalMap = new Map<string, Timer>()
 
 const PORT = Number(process.env.PORT) || 8080;
 const app = new Elysia()
@@ -25,9 +27,18 @@ const app = new Elysia()
       subscriber.notifications.on("new_update_or_create", (data) => {
         ws.send(JSON.stringify(data))
       })
+      wsIntervalMap.set(ws.id, setInterval(async () => {
+        const fetchingUrl = await prisma.urls.findMany({
+          where: {
+            fetching: true
+          }
+        })
+        ws.send(JSON.stringify(fetchingUrl))
+      }, 1000 * 60 * 5)) // 1 min
     },
-    close: () => {
+    close: (ws) => {
       console.log("close");
+      clearInterval(wsIntervalMap.get(ws.id))
     },
     message: (msg) => {
       console.log("message", msg);

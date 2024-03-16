@@ -1,20 +1,55 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { AppApi } from "../typings";
+import { EdenWS } from "@elysiajs/eden/treaty";
 
 export const SideBar = ({ app }: { app: AppApi }) => {
   const [fetching, setFetching] = useState(new Set<string>());
+  const wsRef = useRef<
+    EdenWS<{
+      body: unknown;
+      params: never;
+      query: unknown;
+      headers: unknown;
+      response: unknown;
+    }>
+  >();
   useEffect(() => {
-    app.url.fetching.subscribe().on("message", (d) => {
-      const data = d.data as any;
-      setFetching((pre) => {
-        if (data.fetching) {
-          pre.add(data.url);
-        } else {
-          pre.delete(data.url);
+    wsRef.current = app.url.fetching
+      .subscribe()
+      .on("message", (d) => {
+        const data = d.data as any;
+        if (Array.isArray(data)) {
+          setFetching(new Set(data.map((d) => d.url)));
+          return;
         }
-        return new Set(pre);
+        setFetching((pre) => {
+          if (data.fetching) {
+            pre.add(data.url);
+          } else {
+            pre.delete(data.url);
+          }
+          return new Set(pre);
+        });
+      })
+      .on("close", () => {
+        wsRef.current = app.url.fetching.subscribe().on("message", (d) => {
+          const data = d.data as any;
+          // if data is array
+          if (Array.isArray(data)) {
+            setFetching(new Set(data.map((d) => d.url)));
+            return;
+          }
+          setFetching((pre) => {
+            if (data.fetching) {
+              pre.add(data.url);
+            } else {
+              pre.delete(data.url);
+            }
+            return new Set(pre);
+          });
+        });
       });
-    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   console.log({ fetching });
   return (
