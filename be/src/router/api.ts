@@ -3,7 +3,7 @@ import { prisma } from "../db";
 import { parseComicHtmlPage, processArrayComic } from "../utils/fetchComicInfo";
 import { BaseResponse, Chapter, Comic, ComicIncludeChapter } from "../typings";
 
-const acceptedHost = ["blogtruyenmoi.com","www.nettruyenee.com"]
+const acceptedHost = ["blogtruyenmoi.com", "www.nettruyenee.com"]
 
 export const apiRoute =
     new Elysia({
@@ -65,7 +65,7 @@ export const apiRoute =
             if (!comic.thumbnail) {
                 // refetch comic 
                 const resp = await (await fetch(comic.url)).text()
-                const parsed = (parseComicHtmlPage(resp,comic.url))
+                const parsed = (parseComicHtmlPage(resp, comic.url))
                 comic = await prisma.comic.update({
                     where: {
                         id: params.id
@@ -238,12 +238,27 @@ export const apiRoute =
                     filteredImages.push(url)
                 }
             };
+            const filteredServerImages = []
+            for (const url of chap.serverImage) {
+                if (!url) continue
+                const result = {} as Record<string, string>
+                for (const key in (url as Record<string, string>)) {
+                    const currentUrl = url[key as keyof typeof url] as string
+                    if (currentUrl.startsWith("https::////")) {
+                        result[key] = currentUrl.replace("https::////", "https://")
+                    } else {
+                        result[key] = currentUrl
+                    }
+                }
+                filteredServerImages.push(result)
+            };
             const chapter = await prisma.chapter.update({
                 where: {
                     id: params.id
                 },
                 data: {
-                    images: filteredImages
+                    images: filteredImages,
+                    serverImage: filteredServerImages
                 }
             })
             if (!chapter) {
@@ -385,7 +400,7 @@ export const apiRoute =
                 }
             }
             const resp = await (await fetch(comic.url)).text()
-            const parsed = (parseComicHtmlPage(resp,comic.url))
+            const parsed = (parseComicHtmlPage(resp, comic.url))
             console.log({ parsed })
             const result = (await prisma.comic.update({
                 where: {
