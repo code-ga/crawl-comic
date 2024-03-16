@@ -468,8 +468,8 @@ export const apiRoute =
                     }
                 }
             }
-            // if url.updatedDate > 2 days then return already fetched
-            if (url.updatedDate > new Date(Date.now() - 1000 * 60 * 60 * 24 * 2)) return {
+            // if url.updatedDate > 1 days then return already fetched
+            if (url.updatedDate > new Date(Date.now() - 1000 * 60 * 60 * 24 * 1)) return {
                 status: 200,
                 message: "Already fetched",
                 data: {
