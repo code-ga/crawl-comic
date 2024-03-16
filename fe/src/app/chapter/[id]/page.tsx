@@ -52,15 +52,16 @@ export default function Page({ params }: { params: { id: string } }) {
   }
   const chapter = chapterData!;
   if (chapter.images.length > 0) {
-    setImages((pre) => {
-      for (const image of chapter.images) {
-        const url = cdnUrl + "/image?url=" + image;
-        if (!pre.includes(url)) {
-          pre.push(url);
-        }
+    const preImages = [] as string[];
+    for (const image of chapter.images) {
+      const url = cdnUrl + "/image?url=" + image;
+      if (!preImages.includes(url)) {
+        preImages.push(url);
       }
-      return pre;
-    });
+    }
+    if (JSON.stringify(preImages) != JSON.stringify(images)) {
+      setImages(preImages);
+    }
   }
   if (chapter.serverImage.length > 0) {
     const preImages = [] as string[];
