@@ -76,6 +76,9 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
         }
     } else if host.contains("nettruyenee.com") {
         let url = url.trim().to_string();
+        if url.ends_with("#nt_listchapter") {
+            return None;
+        }
         if url.starts_with("https://www.nettruyenee.com/truyen-tranh/") {
             return Some(url);
         }
