@@ -23,7 +23,7 @@ pub async fn get_pending_urls(
                     prisma::urls::fetched::equals(false),
                 ])
                 .take(num_of_url.try_into().unwrap())
-                .order_by(prisma::urls::updated_at::order(prisma_client_rust::Direction::Asc)),
+                .order_by(prisma::urls::updated_date::order(prisma_client_rust::Direction::Asc)),
         ))
         .await
         .unwrap();
