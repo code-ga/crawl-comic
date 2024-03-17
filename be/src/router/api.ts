@@ -568,6 +568,76 @@ export const apiRoute =
             },
             detail: {
                 tags: ["Comic"],
+                description: "Server will be put comic into queue for worker will be fetch comic and chapter after ( Can be very long time for worker refetch )",
+            }
+        })
+        .get("/refetch/comic/chap/:id", async ({ params, set }) => {
+            console.log(params)
+            const comic = await prisma.chapter.findFirst({
+                where: {
+                    id: params.id
+                }
+            })
+            if (!comic) {
+                set.status = 404
+                return {
+                    status: 404,
+                    message: "Not found",
+                }
+            }
+            const url = await prisma.urls.findFirst({
+                where: {
+                    url: {
+                        equals: comic.url
+                    }
+                }
+            })
+            if (!url) {
+                set.status = 404
+                return {
+                    status: 404,
+                    message: "Not found",
+                }
+            }
+            // because just fetch one chapter so we don't need to check if url.updatedDate > 1 days
+            if (url.fetching) return {
+                status: 200,
+                message: "Already fetching",
+                data: {
+                    fetching: true,
+                    message: "Already fetching"
+                }
+            }
+            await prisma.urls.updateMany({
+                where: {
+                    url: {
+                        equals: comic.url
+                    }
+                },
+                data: {
+                    fetched: false
+                }
+            })
+            return {
+                status: 200,
+                message: "Fetched successfully",
+                data: {
+                    fetching: true,
+                    message: "Start fetching ( added to queue )"
+                }
+            }
+        }, {
+            params: t.Object({
+                id: t.String()
+            }),
+            response: {
+                200: (BaseResponse(t.Object({
+                    fetching: t.Boolean(),
+                    message: t.String()
+                })))
+            },
+            detail: {
+                tags: ["Comic"],
                 description: "Server will be put Chapter into queue for worker will be fetch after ( Can be very long time for worker refetch )",
             }
         })

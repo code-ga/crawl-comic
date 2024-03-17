@@ -7,6 +7,7 @@ import { beUrl, cdnUrl } from "../../../constant";
 import Link from "next/link";
 import Image from "next/image";
 import { Loading } from "../../../components/loading";
+import { Bounce, ToastContainer, toast } from "react-toastify";
 
 export default function Page({ params }: { params: { id: string } }) {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
@@ -83,9 +84,55 @@ export default function Page({ params }: { params: { id: string } }) {
   const selectImageServer = (server: string) => {
     setNowServer(server);
   };
+  const refetchChapterData = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
+    e.preventDefault();
+    (e.target as HTMLButtonElement).disabled = true;
+    const { error, data } = await app.api.refetch.comic.chap[chapter.id].get();
+    (e.target as HTMLButtonElement).disabled = false;
+    if (error) {
+      toast.error("Update thất bại", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+      return;
+    }
+    if (data) {
+      toast.success(data?.data?.message || "Update thành công", {
+        position: "bottom-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    }
+  };
   console.log({ chapter });
   return (
     <div>
+      <ToastContainer
+        position="bottom-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover={false}
+        theme="dark"
+        transition={Bounce}
+      />
       <button className="fixed text-center top-[50%] bg-blue-400 rotate-90">
         Phụ đề
       </button>
@@ -116,6 +163,12 @@ export default function Page({ params }: { params: { id: string } }) {
             Trang trước
           </Link>
         )}
+        <button
+          className="bg-red-700 p-1 px-3 border border-slate-700 rounded-md mx-3"
+          onClick={(e) => refetchChapterData(e)}
+        >
+          Refetch Chapters
+        </button>
         {chapter.nextId && (
           <Link
             href={`/chapter/${chapter.nextId}`}
