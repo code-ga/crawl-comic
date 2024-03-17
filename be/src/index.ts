@@ -20,6 +20,7 @@ const PORT = Number(process.env.PORT) || 8080;
 const app = new Elysia({
   name: "Comic Database",
 })
+  .use(cors())
   .use(swagger({
     version: "0.0.1-alpha",
     documentation: {
@@ -47,7 +48,7 @@ const app = new Elysia({
       ]
     }
   }))
-  .use(cors())
+
   .get("/", () => "Hello Elysia")
   .ws("/url/fetching", {
     open: (ws) => {
