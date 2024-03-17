@@ -14,6 +14,7 @@ const subscriber = createSubscriber({
   await subscriber.listenTo("new_update_or_create")
 })();
 
+///@ts-ignore
 const wsIntervalMap = new Map<string, Timer>()
 
 const PORT = Number(process.env.PORT) || 8080;
