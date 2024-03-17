@@ -4,15 +4,7 @@ import { EdenWS } from "@elysiajs/eden/treaty";
 
 export const SideBar = ({ app }: { app: AppApi }) => {
   const [fetching, setFetching] = useState(new Set<string>());
-  const wsRef = useRef<
-    EdenWS<{
-      body: unknown;
-      params: never;
-      query: unknown;
-      headers: unknown;
-      response: unknown;
-    }>
-  >();
+  const wsRef = useRef<EdenWS<any>>();
   useEffect(() => {
     wsRef.current = app.url.fetching
       .subscribe()
