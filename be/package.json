@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@elysiajs/cors": "1.0.0",
-    "@elysiajs/swagger": "^0.8.5",
+    "@elysiajs/swagger": "1.0.0",
     "@prisma/client": "5.10.2",
     "cheerio": "^1.0.0-rc.12",
     "elysia": "1.0.0",
