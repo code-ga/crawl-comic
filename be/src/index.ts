@@ -20,7 +20,6 @@ const PORT = Number(process.env.PORT) || 8080;
 const app = new Elysia({
   name: "Comic Database",
 })
-  ///@ts-ignore
   .use(cors())
   .use(swagger({
     version: "0.0.1-alpha",
