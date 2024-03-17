@@ -17,9 +17,7 @@ const subscriber = createSubscriber({
 const wsIntervalMap = new Map<string, any>()
 
 const PORT = Number(process.env.PORT) || 8080;
-const app = new Elysia({
-  name: "Comic Database",
-})
+const app = new Elysia()
   .use(cors())
   .use(swagger({
     version: "0.0.1-alpha",
