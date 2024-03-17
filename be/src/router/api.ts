@@ -8,7 +8,7 @@ const acceptedHost = ["blogtruyenmoi.com", "www.nettruyenee.com"]
 export const apiRoute =
     new Elysia({
         prefix: "/api",
-        name: "Api routing"
+        name: "Api routing",
     })
         .get("/comics", async ({ query }) => {
             console.log(query)
@@ -32,6 +32,10 @@ export const apiRoute =
             }),
             response: {
                 200: BaseResponse(t.Array(Comic))
+            },
+            detail: {
+                tags: ["Comic"],
+                description: "Fetch Comic ( Sort from old to new )",
             }
         })
         .get("/comic/:id", async ({ params, set }) => {
@@ -171,6 +175,10 @@ export const apiRoute =
             }),
             response: {
                 200: BaseResponse(ComicIncludeChapter)
+            },
+            detail: {
+                tags: ["Comic"],
+                description: "Fetch Comic by id",
             }
         })
         .get("/search/name/:name", async ({ params }) => {
@@ -192,6 +200,10 @@ export const apiRoute =
             }),
             response: {
                 200: BaseResponse(t.Array(Comic))
+            },
+            detail: {
+                tags: ["Comic"],
+                description: "Fetch Comic by name ( Could be many result )",
             }
         })
         .get("/search/url", async ({ query }) => {
@@ -214,6 +226,10 @@ export const apiRoute =
                 }),
                 response: {
                     200: BaseResponse(t.Array(Comic))
+                },
+                detail: {
+                    tags: ["Comic"],
+                    description: "Fetch Comic by url ( Could be many result )",
                 }
             }
         )
@@ -346,6 +362,10 @@ export const apiRoute =
             }),
             response: {
                 200: BaseResponse(Chapter)
+            },
+            detail: {
+                tags: ["Comic"],
+                description: "Fetch Chapter by id",
             }
         })
         .get("/stats", async () => {
@@ -391,6 +411,10 @@ export const apiRoute =
             }),
             response: {
                 200: BaseResponse(t.Array(Comic))
+            },
+            detail: {
+                tags: ["Comic"],
+                description: "Fetch latest comic ( Can be range )",
             }
         })
         .get("/refetch/comic/info/:id", async ({ params, set }) => {
@@ -454,6 +478,10 @@ export const apiRoute =
             }),
             response: {
                 200: BaseResponse(ComicIncludeChapter)
+            },
+            detail: {
+                tags: ["Comic"],
+                description: "Server will be refetch comic info",
             }
         })
         .get("/refetch/comic/chaps/:id", async ({ params, set }) => {
@@ -537,6 +565,10 @@ export const apiRoute =
                     fetching: t.Boolean(),
                     message: t.String()
                 })))
+            },
+            detail: {
+                tags: ["Comic"],
+                description: "Server will be put Chapter into queue for worker will be fetch after ( Can be very long time for worker refetch )",
             }
         })
         .get("/add/comic/source", async ({ query, set }) => {
@@ -584,5 +616,9 @@ export const apiRoute =
             }),
             response: {
                 200: (BaseResponse(t.Object({})))
+            },
+            detail: {
+                tags: ["Comic"],
+                description: "Server will be add new source to database and will be refetch it later by worker",
             }
         })

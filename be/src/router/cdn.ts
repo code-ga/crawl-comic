@@ -39,5 +39,9 @@ export const cdnRoute = new Elysia({
             query: t.Object({
                 url: t.String()
             })
+            , detail: {
+                tags: ["CDN"],
+                description: "Fetch image from url"
+        }
         }
     )

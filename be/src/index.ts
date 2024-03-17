@@ -17,8 +17,36 @@ const subscriber = createSubscriber({
 const wsIntervalMap = new Map<string, Timer>()
 
 const PORT = Number(process.env.PORT) || 8080;
-const app = new Elysia()
-  .use(swagger())
+const app = new Elysia({
+  name: "Comic Database",
+})
+  .use(swagger({
+    version: "0.0.1-alpha",
+    documentation: {
+      info: {
+        title: "Crawling comic api",
+        version: "0.0.1-alpha",
+        description: "This is the comic,manga,novel api for comic app. if you want to provide the own read comic ui you can use this api to that or some dataset to train the model.",
+        license: {
+          name: "Unlicense",
+        },
+        contact: {
+          name: "Siuu",
+          email: "nbth@nzmanga.io.vn",
+        },
+      },
+      tags: [
+        {
+          name: "Comic",
+          description: "Comic related api"
+        },
+        {
+          name: "CDN",
+          description: "CDN related api"
+        }
+      ]
+    }
+  }))
   .use(cors())
   .get("/", () => "Hello Elysia")
   .ws("/url/fetching", {
