@@ -8,7 +8,7 @@ export const cdnRoute = new Elysia({
 
         let url = query.url
         if (!url) return new Response("url not found", { status: 400 })
-        if (url.startsWith("//st.nettruyenee.com")) {
+        if (url.startsWith("//st.nettruyen")) {
             url = `https:${url}`
         }
         if (url.startsWith("https::////")) {
