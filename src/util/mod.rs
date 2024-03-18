@@ -9,8 +9,8 @@ pub async fn get_pending_urls(
 ) -> Vec<String> {
     let (_, urls) = client
         ._batch((
-            client.urls().update_many(
-                vec![prisma::urls::url::equals(now_fetched_url.clone())],
+            client.urls().update(
+                prisma::urls::UniqueWhereParam::UrlEquals(now_fetched_url.clone()),
                 vec![
                     prisma::urls::fetched::set(true),
                     prisma::urls::fetching::set(false),
@@ -30,8 +30,8 @@ pub async fn get_pending_urls(
     for u in urls {
         client
             .urls()
-            .update_many(
-                vec![prisma::urls::url::equals(u.url.clone())],
+            .update(
+                prisma::urls::UniqueWhereParam::UrlEquals(u.url.clone()),
                 vec![
                     prisma::urls::fetching::set(true),
                     prisma::urls::fetched::set(false),
@@ -90,7 +90,7 @@ pub async fn get_proxy(client: &PrismaClient) -> Option<prisma::proxy::Data> {
     return proxies;
 }
 
-pub fn get_host(url:&str) -> Option<String> {
+pub fn get_host(url: &str) -> Option<String> {
     let re = Regex::new(r#"https?://([^/]+)"#).unwrap();
     let cap = re.captures(url);
     if cap.is_none() {

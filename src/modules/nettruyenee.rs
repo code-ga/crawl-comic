@@ -166,8 +166,8 @@ pub async fn parse_chapter_page(
         } else if tmp.clone().unwrap().fetched == false && tmp.unwrap().fetching == true {
             client
                 .urls()
-                .update_many(
-                    vec![prisma::urls::url::equals(url.to_string())],
+                .update(
+                    prisma::urls::UniqueWhereParam::UrlEquals(url.to_string()),
                     vec![
                         prisma::urls::fetched::set(false),
                         prisma::urls::fetching::set(true),
@@ -213,8 +213,8 @@ pub async fn parse_chapter_page(
         .unwrap();
     client
         .urls()
-        .update_many(
-            vec![prisma::urls::url::equals(url.to_string())],
+        .update(
+            prisma::urls::UniqueWhereParam::UrlEquals(url.to_string()),
             vec![
                 prisma::urls::fetched::set(true),
                 prisma::urls::fetching::set(false),

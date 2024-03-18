@@ -119,8 +119,8 @@ pub async fn thread_worker(
                             .lock()
                             .await
                             .urls()
-                            .update_many(
-                                vec![prisma::urls::url::equals(url.clone())],
+                            .update(
+                                prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
                                 vec![
                                     prisma::urls::fetched::set(true),
                                     prisma::urls::fetching::set(false),
@@ -363,8 +363,8 @@ pub async fn thread_worker(
                         .lock()
                         .await
                         .urls()
-                        .update_many(
-                            vec![prisma::urls::url::equals(url.clone())],
+                        .update(
+                            prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
                             vec![
                                 prisma::urls::fetched::set(true),
                                 prisma::urls::fetching::set(false),

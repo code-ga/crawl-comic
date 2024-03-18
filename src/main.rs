@@ -92,8 +92,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 if i >= 10 {
                     client
                         .urls()
-                        .update_many(
-                            vec![prisma::urls::url::equals(url.to_string())],
+                        .update(
+                            prisma::urls::UniqueWhereParam::UrlEquals(url.to_string()),
                             vec![
                                 prisma::urls::is_error::set(true),
                                 prisma::urls::fetched::set(true),
