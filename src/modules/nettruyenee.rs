@@ -149,7 +149,8 @@ pub async fn parse_chapter_page(
         if tmp.is_err() {
             return None;
         }
-        if tmp.unwrap().is_none() {
+        let tmp = tmp.unwrap();
+        if tmp.is_none() {
             client
                 .urls()
                 .create(
@@ -162,7 +163,7 @@ pub async fn parse_chapter_page(
                 .exec()
                 .await
                 .unwrap();
-        } else {
+        } else if tmp.clone().unwrap().fetched == false && tmp.unwrap().fetching == true {
             client
                 .urls()
                 .update_many(
