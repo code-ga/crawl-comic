@@ -11,14 +11,29 @@ mod util;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client: PrismaClient = PrismaClient::_builder().build().await.unwrap();
     let num_of_threads = 10;
-    let init_url =
-        "https://nettruyenee.com/tim-truyen"
-            .to_string();
+    let init_url = "https://www.nettruyenff.com/tim-truyen".to_string();
+    {
+        let tmp = client
+            .urls()
+            .find_first(vec![prisma::urls::url::equals(init_url.clone())])
+            .exec()
+            .await
+            .unwrap();
+        if tmp.is_none() {
+            client
+                .urls()
+                .create(init_url.clone(), vec![])
+                .exec()
+                .await
+                .unwrap();
+        }
+    };
     // worker to main channel
     let (main_tx, main_rx) = async_channel::bounded::<ThreadMessage>(num_of_threads);
     // main to worker channel
     let (worker_tx, worker_rx) = async_channel::bounded::<ThreadMessage>(num_of_threads);
     // let rx = Arc::new(Mutex::new(worker_rx));
+
     let mut workers = Vec::new();
     for i in 0..num_of_threads {
         println!("spawn {}", i);

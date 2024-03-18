@@ -23,10 +23,12 @@ use nettruyenee::{
     parse_comic_page as parse_nettruyenee_comic_page,
 };
 
-pub static ACCEPTED_HOSTS: [&str; 3] = [
+pub static ACCEPTED_HOSTS: [&str; 5] = [
     "blogtruyenmoi.com",
     "nettruyenee.com",
     "www.nettruyenee.com",
+    "www.nettruyenff.com",
+    "nettruyenff.com",
 ];
 
 pub fn process_url(url: &str, now_url: &str) -> Option<String> {
@@ -112,6 +114,35 @@ pub async fn thread_worker(
         let job = rx.recv().await.unwrap();
         match job {
             ThreadMessage::Start(url, i_tries) => {
+                {
+                    let tmp = client
+                        .lock()
+                        .await
+                        .urls()
+                        .find_first(vec![
+                            prisma::urls::url::equals(url.clone()),
+                            prisma::urls::fetched::equals(true),
+                            prisma::urls::fetching::equals(false),
+                        ])
+                        .exec()
+                        .await;
+                    if tmp.is_err() {
+                        {
+                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                .await
+                                .unwrap();
+                        }
+                        continue;
+                    }
+                    if tmp.unwrap().is_some() {
+                        // already fetched emit done
+                        tx.send(ThreadMessage::Done(vec![], url.clone(), true))
+                            .await
+                            .unwrap();
+                        println!("worker {} already fetched {}", worker_id, url);
+                        continue;
+                    }
+                };
                 let hostname = get_host(&url).unwrap();
                 if !ACCEPTED_HOSTS.contains(&hostname.as_str()) {
                     {
@@ -145,37 +176,6 @@ pub async fn thread_worker(
 
                 let wait_time = rand::thread_rng().gen_range(1..10);
                 tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
-                {
-                    let tmp = client
-                        .lock()
-                        .await
-                        .urls()
-                        .find_first(vec![
-                            prisma::urls::url::equals(url.clone()),
-                            prisma_client_rust::operator::or(vec![
-                                prisma::urls::fetched::equals(true),
-                                prisma::urls::fetching::equals(false),
-                            ]),
-                        ])
-                        .exec()
-                        .await;
-                    if tmp.is_err() {
-                        {
-                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
-                                .await
-                                .unwrap();
-                        }
-                        continue;
-                    }
-                    if tmp.unwrap().is_some() {
-                        // already fetched emit done
-                        tx.send(ThreadMessage::Done(vec![], url.clone(), true))
-                            .await
-                            .unwrap();
-                        println!("worker {} already fetched {}", worker_id, url);
-                        continue;
-                    }
-                };
 
                 let (http_client, _) = {
                     let client = client.lock().await;
