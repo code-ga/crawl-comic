@@ -140,44 +140,6 @@ pub async fn parse_chapter_page(
     html: &str,
     client: &PrismaClient,
 ) -> Option<Vec<String>> {
-    {
-        let tmp = client
-            .urls()
-            .find_first(vec![prisma::urls::url::equals(url.to_string().clone())])
-            .exec()
-            .await;
-        if tmp.is_err() {
-            return None;
-        }
-        let tmp = tmp.unwrap();
-        if tmp.is_none() {
-            client
-                .urls()
-                .create(
-                    url.to_string().clone(),
-                    vec![
-                        prisma::urls::fetched::set(false),
-                        prisma::urls::fetching::set(true),
-                    ],
-                )
-                .exec()
-                .await
-                .unwrap();
-        } else if tmp.clone().unwrap().fetched == false && tmp.unwrap().fetching == true {
-            client
-                .urls()
-                .update(
-                    prisma::urls::UniqueWhereParam::UrlEquals(url.to_string()),
-                    vec![
-                        prisma::urls::fetched::set(false),
-                        prisma::urls::fetching::set(true),
-                    ],
-                )
-                .exec()
-                .await
-                .unwrap();
-        }
-    }
     println!("fetching chapter {}", url);
     let created_date = {
         let created_date_re = Regex::new(r#"<i>\[Cập nhật lúc:\s+(.+)\]<\/i>"#).unwrap();
@@ -206,18 +168,6 @@ pub async fn parse_chapter_page(
             vec![
                 prisma::chapter::server_image::set(images_urls),
                 prisma::chapter::created_date::set(created_date),
-            ],
-        )
-        .exec()
-        .await
-        .unwrap();
-    client
-        .urls()
-        .update(
-            prisma::urls::UniqueWhereParam::UrlEquals(url.to_string()),
-            vec![
-                prisma::urls::fetched::set(true),
-                prisma::urls::fetching::set(false),
             ],
         )
         .exec()

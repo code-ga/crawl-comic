@@ -139,44 +139,6 @@ pub async fn parse_chapter_page(
     html: &str,
     client: &PrismaClient,
 ) -> Option<Vec<String>> {
-    {
-        let tmp = client
-            .urls()
-            .find_first(vec![prisma::urls::url::equals(url.to_string().clone())])
-            .exec()
-            .await;
-        if tmp.is_err() {
-            return None;
-        }
-        let tmp = tmp.unwrap();
-        if tmp.is_none() {
-            client
-                .urls()
-                .create(
-                    url.to_string().clone(),
-                    vec![
-                        prisma::urls::fetched::set(false),
-                        prisma::urls::fetching::set(true),
-                    ],
-                )
-                .exec()
-                .await
-                .unwrap();
-        } else if tmp.clone().unwrap().fetched == false && tmp.unwrap().fetching == false {
-            client
-                .urls()
-                .update(
-                    prisma::urls::UniqueWhereParam::UrlEquals(url.to_string()),
-                    vec![
-                        prisma::urls::fetched::set(false),
-                        prisma::urls::fetching::set(true),
-                    ],
-                )
-                .exec()
-                .await
-                .unwrap();
-        }
-    }
     println!("fetching chapter {}", url);
     let result = Vec::new();
 
@@ -194,18 +156,6 @@ pub async fn parse_chapter_page(
         .update_many(
             vec![prisma::chapter::url::equals(url.to_string())],
             vec![prisma::chapter::images::set(images_urls)],
-        )
-        .exec()
-        .await
-        .unwrap();
-    client
-        .urls()
-        .update(
-            prisma::urls::UniqueWhereParam::UrlEquals(url.to_string()),
-            vec![
-                prisma::urls::fetched::set(true),
-                prisma::urls::fetching::set(false),
-            ],
         )
         .exec()
         .await

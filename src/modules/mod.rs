@@ -353,11 +353,6 @@ pub async fn thread_worker(
                         result.extend(pending_url_comic.clone());
                     }
                 }
-                result = result
-                    .into_iter()
-                    .collect::<std::collections::HashSet<_>>()
-                    .into_iter()
-                    .collect();
                 {
                     let tmp = client
                         .lock()
@@ -380,7 +375,12 @@ pub async fn thread_worker(
                         }
                         continue;
                     }
-                }
+                };
+                result = result
+                    .into_iter()
+                    .collect::<std::collections::HashSet<_>>()
+                    .into_iter()
+                    .collect();
                 tx.send(ThreadMessage::Done(result, url, false))
                     .await
                     .unwrap();
