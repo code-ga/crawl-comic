@@ -70,7 +70,7 @@ export function parseComicHtmlPage(html: string, url: string): Comic {
                 }
             });
         }
-    } else if (url.includes("nettruyenee.com")) {
+    } else if (url.includes("nettruyen")) {
         const thumbnail = $("#item-detail > div.detail-info > div > div.col-xs-4.col-image > img")
         if (thumbnail.length) {
             result.thumbnail = thumbnail.attr('src');
@@ -78,6 +78,10 @@ export function parseComicHtmlPage(html: string, url: string): Comic {
         const status = $("#item-detail > div.detail-info > div > div.col-xs-8.col-info > ul > li.status.row > p.col-xs-8");
         if (status.length) {
             result.status = status.text().trim();
+        }
+        const anotherName = $("#item-detail > div.detail-info > div > div.col-xs-8.col-info > ul > li.othername.row > h2")
+        if (anotherName.length) {
+            result.anotherName = anotherName.text().trim().split(';');
         }
         const genre = $("#item-detail > div.detail-info > div > div.col-xs-8.col-info > ul > li.kind.row > p.col-xs-8")
         if (genre.length) {
