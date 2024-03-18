@@ -24,7 +24,8 @@ export const apiRoute =
         }, {
             query: t.Object({
                 skip: t.Numeric({
-                    default: 0
+                    default: 0,
+                    minimum: 0
                 }),
                 take: t.Numeric({
                     default: 10
@@ -403,7 +404,8 @@ export const apiRoute =
         }, {
             query: t.Object({
                 skip: t.Numeric({
-                    default: 0
+                    default: 0,
+                    minimum: 0
                 }),
                 take: t.Numeric({
                     default: 10

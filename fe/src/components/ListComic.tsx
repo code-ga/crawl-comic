@@ -1,7 +1,7 @@
 "use client";
 import { use, useCallback, useEffect, useMemo, useState } from "react";
 import { ComicCard } from "../components/ComicCard";
-import { useSearchParams } from "next/navigation";
+import { notFound, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AppApi, ComicsApiReturn } from "../typings";
 import { Loading } from "./loading";
@@ -10,6 +10,9 @@ const comicPerPage = 10;
 export function ListComic({ app }: { app: AppApi }) {
   const searchParams = useSearchParams();
   const page = Number(searchParams.get("page") || 0);
+  if (page < 0) {
+    notFound();
+  }
   const [{ data, error, loading }, setComic] = useState<{
     data?: ComicsApiReturn[] | null;
     error: any;
