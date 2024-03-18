@@ -24,9 +24,8 @@ export const SideBar = ({ app }: { app: AppApi }) => {
         });
       })
       .on("close", () => {
-        wsRef.current = app.url.fetching.subscribe().on("message", (d) => {
+        wsRef.current?.subscribe((d) => {
           const data = d.data as any;
-          // if data is array
           if (Array.isArray(data)) {
             setFetching(new Set(data.map((d) => d.url)));
             return;
