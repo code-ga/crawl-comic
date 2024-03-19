@@ -15,7 +15,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     {
         let tmp = client
             .urls()
-            .find_first(vec![prisma::urls::url::equals(init_url.clone())])
+            .find_unique(prisma::urls::UniqueWhereParam::UrlEquals(init_url.clone()))
             .exec()
             .await
             .unwrap();

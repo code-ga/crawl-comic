@@ -21,7 +21,7 @@ pub async fn parse_comic_page(
     let db_comic = {
         let tmp = client
             .comic()
-            .find_first(vec![prisma::comic::url::equals(url.to_string())])
+            .find_unique(prisma::comic::UniqueWhereParam::UrlEquals(url.to_string()))
             .exec()
             .await;
         if tmp.is_err() {
@@ -90,7 +90,7 @@ pub async fn parse_comic_page(
         {
             let tmp = client
                 .chapter()
-                .find_first(vec![prisma::chapter::url::equals(url.to_string())])
+                .find_unique(prisma::chapter::UniqueWhereParam::UrlEquals(url.to_string()))
                 .exec()
                 .await;
             if tmp.is_err() {

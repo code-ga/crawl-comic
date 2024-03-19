@@ -61,7 +61,7 @@ pub async fn filters_urls(url: String, client: &PrismaClient) -> Option<String> 
     let url_in_db = {
         let tmp = client
             .urls()
-            .find_first(vec![prisma::urls::url::equals(url.clone())])
+            .find_unique(prisma::urls::UniqueWhereParam::UrlEquals(url.clone()))
             .exec()
             .await;
         if tmp.is_err() {
