@@ -76,15 +76,15 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
             }
             return None;
         }
-    } else if host.contains("nettruyenee.com") {
+    } else if host.contains("nettruyen") {
         let url = url.trim().to_string();
         if url.ends_with("#nt_listchapter") {
             return None;
         }
-        if url.starts_with("https://www.nettruyenee.com/truyen-tranh/") {
+        if url.starts_with("https://www.nettruyen") && url.contains(".com/truyen-tranh/") {
             return Some(url);
         }
-        if url.starts_with("https://www.nettruyenee.com/tim-truyen?page=") {
+        if url.starts_with("https://www.nettruyen") && url.contains(".com/tim-truyen?page=") {
             return Some(url);
         }
         if is_nettruyenee_chapter_page(&url, "") {
@@ -114,34 +114,6 @@ pub async fn thread_worker(
         let job = rx.recv().await.unwrap();
         match job {
             ThreadMessage::Start(url, i_tries) => {
-                // {
-                //     let tmp = client
-                //         .lock()
-                //         .await
-                //         .urls()
-                //         .find_first(vec![prisma::urls::url::equals(url.clone())])
-                //         .exec()
-                //         .await;
-                //     if tmp.is_err() {
-                //         {
-                //             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
-                //                 .await
-                //                 .unwrap();
-                //         }
-                //         continue;
-                //     }
-                //     let tmp = tmp.unwrap();
-                //     if let Some(tmp) = tmp {
-                //         if tmp.fetched {
-                //             // already fetched emit done
-                //             tx.send(ThreadMessage::Done(vec![], url.clone(), true))
-                //                 .await
-                //                 .unwrap();
-                //             println!("worker {} already fetched {}", worker_id, url);
-                //             continue;
-                //         }
-                //     }
-                // };
                 let hostname = get_host(&url).unwrap();
                 if !ACCEPTED_HOSTS.contains(&hostname.as_str()) {
                     {

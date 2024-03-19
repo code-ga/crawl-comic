@@ -1,4 +1,5 @@
 use crate::prisma::{self, PrismaClient};
+use prisma_client_rust::raw;
 use rand::Rng;
 use regex::Regex;
 
@@ -16,13 +17,19 @@ pub async fn get_pending_urls(
                     prisma::urls::fetching::set(false),
                 ],
             ),
-            client
-                .urls()
-                .find_many(vec![
-                    prisma::urls::fetching::equals(false),
-                    prisma::urls::fetched::equals(false),
-                ])
-                .take(num_of_url.try_into().unwrap()),
+            // client
+            //     .urls()
+            //     .find_many(vec![
+            //         prisma::urls::fetching::equals(false),
+            //         prisma::urls::fetched::equals(false),
+            //     ])
+            //     .take(num_of_url.try_into().unwrap()),
+            client._query_raw::<prisma::urls::Data>(raw!(
+                "SELECT * FROM \"public\".\"Urls\" WHERE (fetched={} AND fetching={}) LIMIT {}",
+                prisma_client_rust::PrismaValue::Boolean(false),
+                prisma_client_rust::PrismaValue::Boolean(false),
+                num_of_url.try_into().unwrap()
+            )),
         ))
         .await
         .unwrap();
