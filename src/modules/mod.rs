@@ -121,8 +121,10 @@ pub async fn thread_worker(
                         .urls()
                         .find_first(vec![
                             prisma::urls::url::equals(url.clone()),
-                            prisma::urls::fetched::equals(true),
-                            prisma::urls::fetching::equals(false),
+                            prisma_client_rust::operator::or(vec![
+                                prisma::urls::fetched::equals(true),
+                                prisma::urls::fetching::equals(true),
+                            ]),
                         ])
                         .exec()
                         .await;
