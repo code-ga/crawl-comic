@@ -119,13 +119,7 @@ pub async fn thread_worker(
                         .lock()
                         .await
                         .urls()
-                        .find_first(vec![
-                            prisma::urls::url::equals(url.clone()),
-                            prisma_client_rust::operator::or(vec![
-                                prisma::urls::fetched::equals(true),
-                                prisma::urls::fetching::equals(true),
-                            ]),
-                        ])
+                        .find_first(vec![prisma::urls::url::equals(url.clone())])
                         .exec()
                         .await;
                     if tmp.is_err() {
@@ -136,13 +130,16 @@ pub async fn thread_worker(
                         }
                         continue;
                     }
-                    if tmp.unwrap().is_some() {
-                        // already fetched emit done
-                        tx.send(ThreadMessage::Done(vec![], url.clone(), true))
-                            .await
-                            .unwrap();
-                        println!("worker {} already fetched {}", worker_id, url);
-                        continue;
+                    let tmp = tmp.unwrap();
+                    if let Some(tmp) = tmp {
+                        if tmp.fetched {
+                            // already fetched emit done
+                            tx.send(ThreadMessage::Done(vec![], url.clone(), true))
+                                .await
+                                .unwrap();
+                            println!("worker {} already fetched {}", worker_id, url);
+                            continue;
+                        }
                     }
                 };
                 let hostname = get_host(&url).unwrap();
