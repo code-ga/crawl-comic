@@ -39,6 +39,8 @@ export const SideBar = ({ app }: { app: AppApi }) => {
             return new Set(pre);
           });
         });
+      }).on("open", () => {
+        setFetching(new Set());
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
