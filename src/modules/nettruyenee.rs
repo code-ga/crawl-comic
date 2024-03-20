@@ -6,8 +6,16 @@ use tokio::sync::Mutex;
 
 use crate::prisma::{self, PrismaClient};
 
+use super::NETTRUYEN_HOSTS;
+
 pub fn is_comic_page(url: &str, _page: &str) -> bool {
-    url.starts_with("https://www.nettruyenee.com/truyen-tranh/")
+    let regex = Regex::new(
+        &format!(
+            r#"https:\/\/{}\/truyen-tranh\/(.+)"#,
+            NETTRUYEN_HOSTS.join("|")
+        )
+    ).unwrap();
+    regex.is_match(url)
 }
 
 pub async fn parse_comic_page(
@@ -90,7 +98,9 @@ pub async fn parse_comic_page(
         {
             let tmp = client
                 .chapter()
-                .find_unique(prisma::chapter::UniqueWhereParam::UrlEquals(url.to_string()))
+                .find_unique(prisma::chapter::UniqueWhereParam::UrlEquals(
+                    url.to_string(),
+                ))
                 .exec()
                 .await;
             if tmp.is_err() {
@@ -177,8 +187,14 @@ pub async fn parse_chapter_page(
 }
 
 pub fn is_chapter_page(url: &str, _html: &str) -> bool {
-    let re = Regex::new(r#"https:\/\/www.nettruyenee.com\/truyen-tranh\/(.+)\/chap-(.+)\/(.+)"#)
-        .unwrap();
+    let re = Regex::new(
+        format!(
+            r#"https:\/\/{}\/truyen-tranh\/(.+)\/chap-(.+)\/(.+)"#,
+            NETTRUYEN_HOSTS.join("|")
+        )
+        .as_str(),
+    )
+    .unwrap();
     if re.is_match(url) {
         return true;
     } else {

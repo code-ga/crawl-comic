@@ -30,6 +30,12 @@ pub static ACCEPTED_HOSTS: [&str; 5] = [
     "www.nettruyenff.com",
     "nettruyenff.com",
 ];
+pub static NETTRUYEN_HOSTS: [&str; 4] = [
+    "nettruyenee.com",
+    "www.nettruyenee.com",
+    "nettruyenff.com",
+    "www.nettruyenff.com",
+];
 
 pub fn process_url(url: &str, now_url: &str) -> Option<String> {
     if !url.starts_with("https://") && !url.starts_with("http://") {
@@ -81,10 +87,16 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
         if url.ends_with("#nt_listchapter") {
             return None;
         }
-        if url.starts_with("https://www.nettruyen") && url.contains(".com/truyen-tranh/") {
+        if Regex::new(format!("https://{}/truyen-tranh/", host).as_str())
+            .unwrap()
+            .is_match(&url)
+        {
             return Some(url);
         }
-        if url.starts_with("https://www.nettruyen") && url.contains(".com/tim-truyen?page=") {
+        if Regex::new(format!("https://{}/tim-truyen?page=", host).as_str())
+            .unwrap()
+            .is_match(&url)
+        {
             return Some(url);
         }
         if is_nettruyenee_chapter_page(&url, "") {
