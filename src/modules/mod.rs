@@ -305,7 +305,7 @@ pub async fn thread_worker(
                         };
                         result.extend(pending_url_comic.clone());
                     }
-                } else if hostname.contains("nettruyenee.com") {
+                } else if hostname.contains("nettruyen") {
                     if is_nettruyenee_chapter_page(&url, &html) {
                         let client = client.lock().await;
                         let pending_url_chapter = {
