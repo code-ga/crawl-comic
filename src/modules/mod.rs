@@ -87,16 +87,10 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
         if url.ends_with("#nt_listchapter") {
             return None;
         }
-        if Regex::new(format!("https://{}/truyen-tranh/", host).as_str())
-            .unwrap()
-            .is_match(&url)
-        {
+        if url.starts_with(format!("https://{}/truyen-tranh/", host).as_str()) {
             return Some(url);
         }
-        if Regex::new(format!("https://{}/tim-truyen?page=", host).as_str())
-            .unwrap()
-            .is_match(&url)
-        {
+        if url.starts_with(format!("https://{}/tim-truyen?page=", host).as_str()) {
             return Some(url);
         }
         if is_nettruyenee_chapter_page(&url, "") {

@@ -11,7 +11,7 @@ use super::NETTRUYEN_HOSTS;
 pub fn is_comic_page(url: &str, _page: &str) -> bool {
     let regex = Regex::new(
         &format!(
-            r#"https:\/\/[{}]\/truyen-tranh\/(.+)"#,
+            r#"https:\/\/({})\/truyen-tranh\/(.+)"#,
             NETTRUYEN_HOSTS.join("|")
         )
     ).unwrap();
@@ -190,13 +190,14 @@ pub async fn parse_chapter_page(
 pub fn is_chapter_page(url: &str, _html: &str) -> bool {
     let re = Regex::new(
         format!(
-            r#"https:\/\/[{}]\/truyen-tranh\/(.+)\/chap-(.+)\/(.+)"#,
+            r#"https:\/\/({})\/truyen-tranh\/(.+)\/chap-(.+)\/(.+)"#,
             NETTRUYEN_HOSTS.join("|")
         )
         .as_str(),
     )
     .unwrap();
     if re.is_match(url) {
+        println!("{} is chapter page", url);
         return true;
     } else {
         return false;
