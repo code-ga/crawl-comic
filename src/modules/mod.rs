@@ -38,9 +38,9 @@ pub static NETTRUYEN_HOSTS: [&str; 4] = [
 ];
 
 pub fn process_url(url: &str, now_url: &str) -> Option<String> {
-    if !url.starts_with("https://") && !url.starts_with("http://") {
-        return None;
-    }
+    // if !url.starts_with("https://") && !url.starts_with("http://") {
+    //     return None;
+    // }
     let host = get_host(now_url);
     if host.is_none() {
         return None;
@@ -83,8 +83,19 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
             return None;
         }
     } else if host.contains("nettruyen") {
+        let url_host = get_host(&url);
+        if url_host.is_none() {
+            return None;
+        }
+        let url_host = url_host.unwrap();
+        if !NETTRUYEN_HOSTS.contains(&url_host.as_str()) {
+            return None;
+        }
         let url = url.trim().to_string();
         if url.ends_with("#nt_listchapter") {
+            return None;
+        }
+        if url.ends_with("#nt_comment") {
             return None;
         }
         if url.starts_with(format!("https://{}/truyen-tranh/", host).as_str()) {
