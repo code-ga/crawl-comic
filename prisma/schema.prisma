@@ -1,7 +1,7 @@
 generator client {
   provider             = "prisma-client-py"
-  recursive_type_depth = "-1"
   interface            = "asyncio"
+  recursive_type_depth = "-1"
 }
 
 datasource db {
@@ -26,6 +26,8 @@ model Comic {
   updatedDate     DateTime  @updatedAt
   pythonFetchInfo Boolean   @default(false)
   chapters        Chapter[]
+
+  @@index([url])
 }
 
 model Chapter {
@@ -36,7 +38,13 @@ model Chapter {
   images      String[]
   createdDate String
   updatedDate DateTime @default(now())
+  nextId      String?
+  previousId  String?
+  index       Int      @default(0)
+  serverImage Json[]   @default([])
   comic       Comic    @relation(fields: [comicId], references: [id])
+
+  @@index([comicId, index])
 }
 
 model Proxy {
@@ -53,4 +61,5 @@ model Urls {
   fetching    Boolean  @default(false)
   createdDate DateTime @default(now())
   isError     Boolean  @default(false)
+  updatedDate DateTime @default(now())
 }
