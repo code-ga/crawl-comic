@@ -35,15 +35,16 @@ model Chapter {
   url         String   @unique
   comicId     String
   images      String[]
-  serverImage Json[]   @default([])
   createdDate String
   updatedDate DateTime @default(now())
   nextId      String?
   previousId  String?
   index       Int      @default(0)
+  serverImage Json[]   @default([])
   comic       Comic    @relation(fields: [comicId], references: [id])
 
   @@index([comicId, index])
+  @@index([url])
 }
 
 model Urls {
@@ -54,6 +55,10 @@ model Urls {
   createdDate DateTime @default(now())
   isError     Boolean  @default(false)
   updatedDate DateTime @default(now())
+
+  @@index([fetched])
+  @@index([fetching])
+  @@index([url])
 }
 
 model Proxy {
@@ -67,4 +72,6 @@ model Html {
   url  String @unique
   id   String @id @default(uuid())
   html String
+
+  @@index([url])
 }
