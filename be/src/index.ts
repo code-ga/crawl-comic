@@ -5,11 +5,20 @@ import cors from "@elysiajs/cors";
 import createSubscriber from "pg-listen"
 import { prisma } from "./db";
 
+
 const subscriber = createSubscriber({
   connectionString: process.env.DATABASE_URL,
 });
 
 (async () => {
+  await prisma.urls.updateMany({
+    where: {
+      fetching: true
+    },
+    data: {
+      fetching: false
+    }
+  })
   await subscriber.connect()
   await subscriber.listenTo("new_update_or_create")
 })();
