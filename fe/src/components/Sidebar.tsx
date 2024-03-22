@@ -39,14 +39,15 @@ export const SideBar = ({ app }: { app: AppApi }) => {
             return new Set(pre);
           });
         });
-      }).on("open", () => {
+      })
+      .on("open", () => {
         setFetching(new Set());
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   console.log({ fetching });
   return (
-    <div className="text-center" onBlur={() => setFetching(new Set())}>
+    <div className="text-center sticky top-0 h-dvh overflow-hidden">
       <p>Side Bar</p>
       <span className="my-2 mt-4">Server Fetching Urls</span>
       <div className="text-sm text-left p-3">
