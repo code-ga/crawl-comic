@@ -58,6 +58,7 @@ async def main():
             if cachedHtml:
                 print(f"parsing url {comic_in_db.url} - {comic_in_db.id}")
                 await parseComicHtmlPage(cachedHtml.html, c)
+                await db.html.delete(where={"url": {"equals": c.url}})
                 await asyncio.sleep(1)
             else:
                 async with aiohttp.ClientSession() as session:
