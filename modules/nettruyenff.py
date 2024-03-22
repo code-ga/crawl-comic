@@ -60,8 +60,6 @@ def parseComicHtmlPage(html: str, comic_in_db: Comic):
             for author_text in author.text.strip().split(";"):
                 result["author"][author_text.strip()] = ""
 
-    print(result)
-
     for key, value in result.items():
         if isinstance(value, dict):
             result[key] = Json(value)

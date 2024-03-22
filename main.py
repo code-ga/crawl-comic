@@ -35,12 +35,13 @@ async def parseComicHtmlPage(html: str, comic_in_db: Prisma.comic):
         comic = parseComicHtmlPage_blogtruyenmoi(html, comic_in_db)
     elif "nettruyen" in comic_in_db.url:
         comic = parseComicHtmlPage_nettruyenff(html, comic_in_db)
+    comic["id"] = comic_in_db.id
     return comic
 
 
 async def fetching_comic(url: str, comic_in_db: Prisma.comic):
-    cachedHtml = await Html.prisma().find_unique(where={"url": {"equals": url}})
-    comic = {}
+    cachedHtml = await Html.prisma().find_first(where={"url": {"equals": url}})
+    comic = {"id": comic_in_db.id}
     if cachedHtml:
         print(f"parsing url {comic_in_db.url} - {comic_in_db.id}")
         comic = await parseComicHtmlPage(cachedHtml.html, comic_in_db)
@@ -59,14 +60,14 @@ async def fetching_comic(url: str, comic_in_db: Prisma.comic):
                     await asyncio.sleep(1)
                 elif response.status == 404 and "nettruyen" in comic_in_db.url:
                     print("comic not found")
-                    comic = {"pythonFetchInfo": True}
+                    comic = {"pythonFetchInfo": True, "id": comic_in_db.id}
                 elif response.status == 404:
                     print("comic not found")
-                    comic = {"pythonFetchInfo": True}
+                    comic = {"pythonFetchInfo": True, "id": comic_in_db.id}
                 else:
                     print(f"failed to fetch url {comic_in_db.url} - {comic_in_db.id}")
-                    comic = {"pythonFetchInfo": True}
-    return comic if comic else {"pythonFetchInfo": True}
+                    comic = {"pythonFetchInfo": True, "id": comic_in_db.id}
+    return comic if comic else {"pythonFetchInfo": True, "id": comic_in_db.id}
 
 
 async def main():
@@ -79,14 +80,19 @@ async def main():
         )
         if not comic_in_db:
             break
-        for c in await asyncio.gather(*([fetching_comic(c.url, c) for c in comic_in_db])):
+        for c in await asyncio.gather(
+            *([fetching_comic(c.url, c) for c in comic_in_db])
+        ):
+            update_data = c.copy()
+            update_data.pop("id")
+            print(update_data)
             updated = await Comic.prisma().update(
-                where={"id": comic_in_db.id},
-                data=c,
+                where={"id": c["id"]},
+                data=update_data,
             )
             if index and updated:
                 index.add_documents([updated])
-            print("updated comic", comic_in_db.id)
+            print("updated comic", c["id"])
 
     await db.disconnect()
 
