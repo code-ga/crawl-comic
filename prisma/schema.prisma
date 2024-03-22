@@ -62,3 +62,9 @@ model Proxy {
   password String?
   username String?
 }
+
+model Html {
+  url  String @unique
+  id   String @id @default(uuid())
+  html String
+}

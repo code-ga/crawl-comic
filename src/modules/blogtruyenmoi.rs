@@ -88,7 +88,9 @@ pub async fn parse_comic_page(
         {
             let tmp = client
                 .chapter()
-                .find_unique(prisma::chapter::UniqueWhereParam::UrlEquals(url.to_string()))
+                .find_unique(prisma::chapter::UniqueWhereParam::UrlEquals(
+                    url.to_string(),
+                ))
                 .exec()
                 .await;
             if tmp.is_err() {
@@ -130,6 +132,28 @@ pub async fn parse_comic_page(
     {
         return None;
     };
+
+    if !comic_exec.python_fetch_info {
+        let tmp = client
+            .html()
+            .find_unique(prisma::html::UniqueWhereParam::UrlEquals(url.to_string()))
+            .exec()
+            .await;
+        if tmp.is_err() {
+            return None;
+        }
+        let tmp = tmp.unwrap();
+        if tmp.is_none() {
+            if let Err(_) = client
+                .html()
+                .create(url.to_string(), page.to_string(), vec![])
+                .exec()
+                .await
+            {
+                return None;
+            }
+        }
+    }
 
     Some(result)
 }

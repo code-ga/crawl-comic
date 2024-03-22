@@ -223,7 +223,43 @@ pub async fn thread_worker(
                     println!(
                         "worker {} failed {} status : {}",
                         worker_id,
-                        url,
+                        url.to_string(),
+                        resp.unwrap().status()
+                    );
+                    continue;
+                } else if resp.as_ref().unwrap().status().as_u16().eq(&404) {
+                    {
+                        let tmp = client
+                            .lock()
+                            .await
+                            .urls()
+                            .update(
+                                prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
+                                vec![
+                                    prisma::urls::fetched::set(true),
+                                    prisma::urls::fetching::set(false),
+                                ],
+                            )
+                            .exec()
+                            .await;
+                        if tmp.is_err() {
+                            {
+                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                    .await
+                                    .unwrap();
+                            }
+                            continue;
+                        }
+                    };
+                    {
+                        tx.send(ThreadMessage::Done(vec![], url.to_string(), true))
+                            .await
+                            .unwrap();
+                    }
+                    println!(
+                        "worker {} done {} status : {}",
+                        worker_id,
+                        url.to_string(),
                         resp.unwrap().status()
                     );
                     continue;
@@ -267,32 +303,8 @@ pub async fn thread_worker(
                             continue;
                         }
                         if tmp.is_some() {
-                            // tx.send(ThreadMessage::Done(tmp.unwrap(), url.clone(), false))
-                            //     .await
-                            //     .unwrap();
                             result.extend(tmp.unwrap());
                         }
-                        // {
-                        //     let tmp = client
-                        //         .urls()
-                        //         .update_many(
-                        //             vec![prisma::urls::url::equals(url.clone())],
-                        //             vec![
-                        //                 prisma::urls::fetched::set(true),
-                        //                 prisma::urls::fetching::set(false),
-                        //             ],
-                        //         )
-                        //         .exec()
-                        //         .await;
-                        //     if tmp.is_err() {
-                        //         {
-                        //             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
-                        //                 .await
-                        //                 .unwrap();
-                        //         }
-                        //         continue;
-                        //     }
-                        // }
                     } else if is_blogtruyenmoi_comic_page(&html) {
                         // only chapter pending url because we had fetch comic page pending url before
                         let pending_url_comic = {

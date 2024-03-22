@@ -9,12 +9,11 @@ use crate::prisma::{self, PrismaClient};
 use super::NETTRUYEN_HOSTS;
 
 pub fn is_comic_page(url: &str, _page: &str) -> bool {
-    let regex = Regex::new(
-        &format!(
-            r#"https:\/\/({})\/truyen-tranh\/(.+)"#,
-            NETTRUYEN_HOSTS.join("|")
-        )
-    ).unwrap();
+    let regex = Regex::new(&format!(
+        r#"https:\/\/({})\/truyen-tranh\/(.+)"#,
+        NETTRUYEN_HOSTS.join("|")
+    ))
+    .unwrap();
     regex.is_match(url)
 }
 
@@ -142,6 +141,28 @@ pub async fn parse_comic_page(
     {
         return None;
     };
+
+    if !comic_exec.python_fetch_info {
+        let tmp = client
+            .html()
+            .find_unique(prisma::html::UniqueWhereParam::UrlEquals(url.to_string()))
+            .exec()
+            .await;
+        if tmp.is_err() {
+            return None;
+        }
+        let tmp = tmp.unwrap();
+        if tmp.is_none() {
+            if let Err(_) = client
+                .html()
+                .create(url.to_string(), page.to_string(), vec![])
+                .exec()
+                .await
+            {
+                return None;
+            }
+        }
+    }
 
     Some(result)
 }
