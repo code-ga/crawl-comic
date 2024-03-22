@@ -2,6 +2,7 @@ import { Elysia, t } from "elysia";
 import { prisma } from "../db";
 import { parseComicHtmlPage, processArrayComic } from "../utils/fetchComicInfo";
 import { BaseResponse, Chapter, Comic, ComicIncludeChapter } from "../typings";
+import { MeiliSearch } from "meilisearch"
 
 const acceptedHost = ["blogtruyenmoi.com", "www.nettruyenee.com"]
 
@@ -10,7 +11,11 @@ export const apiRoute =
         prefix: "/api",
         name: "Api routing",
     })
-        .get("/comics", async ({ query }) => {
+        .decorate("meili", process.env.MEILISEARCH_HOST ? new MeiliSearch({
+            host: process.env.MEILISEARCH_HOST,
+            apiKey: process.env.MEILISEARCH_API_KEY,
+        }) : undefined)
+        .get("/comics", async ({ query, meili }) => {
             console.log(query)
             return {
                 status: 200,
@@ -19,7 +24,7 @@ export const apiRoute =
                     skip: query.skip,
                     take: query.take,
                     orderBy: { createdDate: 'asc' },
-                })) as any
+                }), meili) as any
             }
         }, {
             query: t.Object({
@@ -39,7 +44,7 @@ export const apiRoute =
                 description: "Fetch Comic ( Sort from old to new )",
             }
         })
-        .get("/comic/:id", async ({ params, set }) => {
+        .get("/comic/:id", async ({ params, set, meili }) => {
             console.log(params)
             let comic = await prisma.comic.findUnique({
                 where: {
@@ -92,6 +97,13 @@ export const apiRoute =
                         }
                     }
                 })
+                const index = meili?.index("Comic_meilisearch")
+                if (index) {
+                    await index.addDocuments([{
+                        ...comic,
+                        Chapter: undefined
+                    }])
+                }
             }
             console.log(comic)
             if (comic.Chapter.length <= 1) {
@@ -182,22 +194,29 @@ export const apiRoute =
                 description: "Fetch Comic by id",
             }
         })
-        .get("/search/name/:name", async ({ params }) => {
-            console.log(params)
+        .get("/search", async ({ query, meili }) => {
+            console.log(query)
+            const meiliResult = (await meili?.index("Comic_meilisearch").search(query.query))
             return {
                 status: 200,
                 message: "Fetched successfully",
                 data: await processArrayComic(await prisma.comic.findMany({
                     where: {
-                        name: {
-                            contains: params.name
-                        }
+                        ...(meiliResult ? {
+                            id: {
+                                in: meiliResult?.hits.map(hit => hit.id) || []
+                            }
+                        } : {
+                            name: {
+                                contains: query.query
+                            }
+                        })
                     }
-                })) as any
+                }), meili) as any
             }
         }, {
-            params: t.Object({
-                name: t.String()
+            query: t.Object({
+                query: t.String()
             }),
             response: {
                 200: BaseResponse(t.Array(Comic))
@@ -207,7 +226,7 @@ export const apiRoute =
                 description: "Fetch Comic by name ( Could be many result )",
             }
         })
-        .get("/search/url", async ({ query }) => {
+        .get("/search/url", async ({ query, meili }) => {
             console.log(query)
             return {
                 status: 200,
@@ -218,7 +237,7 @@ export const apiRoute =
                             contains: query.url
                         }
                     }
-                })) as any
+                }), meili) as any
             }
         },
             {
@@ -390,7 +409,7 @@ export const apiRoute =
                 })
             }
         })
-        .get("/news", async ({ query }) => {
+        .get("/news", async ({ query, meili }) => {
             console.log(query)
             return {
                 status: 200,
@@ -399,7 +418,7 @@ export const apiRoute =
                     skip: query.skip,
                     take: query.take,
                     orderBy: { createdDate: 'desc' },
-                })) as any
+                }), meili) as any
             }
         }, {
             query: t.Object({
@@ -419,7 +438,7 @@ export const apiRoute =
                 description: "Fetch latest comic ( Can be range )",
             }
         })
-        .get("/refetch/comic/info/:id", async ({ params, set }) => {
+        .get("/refetch/comic/info/:id", async ({ params, set, meili }) => {
             console.log(params)
             const comic = await prisma.comic.findFirst({
                 where: {
@@ -462,6 +481,13 @@ export const apiRoute =
                     }
                 }
             }))
+            const index = meili?.index("Comic_meilisearch")
+            if (index) {
+                await index.addDocuments([{
+                    ...result,
+                    Chapter: undefined
+                }])
+            }
             if (!result) {
                 set.status = 404
                 return {

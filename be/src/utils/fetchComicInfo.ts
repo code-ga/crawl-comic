@@ -1,6 +1,7 @@
 import { Comic as PrismaComic } from "@prisma/client";
 import * as cheerio from 'cheerio'; // Assuming cheerio for parsing
 import { prisma } from "../db";
+import MeiliSearch from "meilisearch";
 
 interface Comic {
     author?: { [name: string]: string };
@@ -111,18 +112,22 @@ export function parseComicHtmlPage(html: string, url: string): Comic {
     return result;
 }
 
-export function processArrayComic(comic: PrismaComic[]) {
+export function processArrayComic(comic: PrismaComic[] , meili?:MeiliSearch) {
     return Promise.all(comic.map(async (c) => {
         if (!c.thumbnail) {
             // refetch comic update in db and return
             const resp = await (await fetch(c.url)).text()
             const parsed = (parseComicHtmlPage(resp, c.url))
-            return await prisma.comic.update({
+            const updated = await prisma.comic.update({
                 where: {
                     id: c.id
                 },
                 data: parsed
             })
+            const index = meili?.index("Comic_meilisearch")
+            if (index) {
+                await index.addDocuments([updated])
+            }
         }
         return c
     }))

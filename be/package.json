@@ -16,6 +16,7 @@
     "@prisma/client": "5.10.2",
     "cheerio": "^1.0.0-rc.12",
     "elysia": "1.0.0",
+    "meilisearch": "^0.38.0",
     "pg-listen": "^1.7.0"
   },
   "devDependencies": {

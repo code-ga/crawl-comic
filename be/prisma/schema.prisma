@@ -23,6 +23,7 @@ model Chapter {
   Comic       Comic    @relation(fields: [comicId], references: [id])
 
   @@index([comicId, index])
+  @@index([url])
 }
 
 model Comic {
@@ -61,4 +62,16 @@ model Urls {
   createdDate DateTime @default(now())
   isError     Boolean  @default(false)
   updatedDate DateTime @default(now()) @updatedAt
+
+  @@index([fetched])
+  @@index([fetching])
+  @@index([url])
+}
+
+model Html {
+  url  String @unique
+  id   String @id
+  html String
+
+  @@index([url])
 }
