@@ -50,6 +50,11 @@ pub async fn parse_comic_page(
     if !db_comic.name.eq(&title) {
         update_field.push(prisma::comic::name::set(title));
     }
+    let (_, comic_info) = parse_blog_truyen_moi_html_page(&page.to_string());
+    // append comic info to update field
+    for s in comic_info {
+        update_field.push(s.clone());
+    }
     let comic_exec = {
         let tmp = client
             .comic()
@@ -185,4 +190,157 @@ pub async fn parse_chapter_page(
         .await
         .unwrap();
     Some(result)
+}
+
+use scraper::{Html, Selector};
+use serde_json::json;
+use std::collections::HashMap;
+
+pub fn parse_blog_truyen_moi_html_page(
+    html: &str,
+) -> (
+    HashMap<String, serde_json::Value>,
+    Vec<prisma::comic::SetParam>,
+) {
+    let mut result = HashMap::new();
+    let mut update_data = Vec::new();
+    let document = Html::parse_document(html);
+
+    // fetch content, thumbnail
+    // title fetch before
+    let content_selector = Selector::parse(
+        "#wrapper > section.main-content > div > div.col-md-8 > section > div.detail > div.content",
+    )
+    .unwrap();
+    let content = document.select(&content_selector).next();
+    if let Some(content) = content {
+        let content = content.inner_html().trim().to_string();
+        update_data.push(prisma::comic::content::set(Some(content.to_string())));
+        result.insert("content".to_string(), json!(content.to_string()));
+    }
+    let thumbnail_selector = Selector::parse(
+        "#wrapper > section.main-content > div > div.col-md-8 > section > div.thumbnail > img",
+    )
+    .unwrap();
+    let thumbnail = document.select(&thumbnail_selector).next();
+    if let Some(thumbnail) = thumbnail {
+        let thumbnail = thumbnail.value().attr("src").unwrap().trim().to_string();
+        update_data.push(prisma::comic::thumbnail::set(Some(thumbnail.to_string())));
+        result.insert("thumbnail".to_string(), json!(thumbnail.to_string()));
+    }
+
+    // fetch another information
+    let description_selector = Selector::parse(
+        "#wrapper > section.main-content > div > div.col-md-8 > section > div.description",
+    )
+    .unwrap();
+    let description = document.select(&description_selector).next();
+    if let Some(description) = description {
+        let p_selector = Selector::parse("p").unwrap();
+        let ps = description.select(&p_selector);
+        for p in ps {
+            let child_text = p.text().collect::<String>().trim().to_string();
+            if child_text.starts_with("Tên khác:") {
+                // remove prefix "Tên khác:" from string
+                let another_name = {
+                    let temp = child_text.to_string();
+                    let split_child_text = temp.split(":").collect::<Vec<&str>>();
+                    split_child_text.clone()[1..]
+                        .join(":")
+                        .split(",")
+                        .map(|x| x.trim().to_string())
+                        .collect::<Vec<_>>()
+                        .clone()
+                };
+                update_data.push(prisma::comic::another_name::set(another_name.clone()));
+                result.insert("anotherName".to_string(), json!(another_name));
+            } else if child_text.starts_with("Tác giả:") {
+                let author_list_selector = Selector::parse("a").unwrap();
+                let author_list = p.select(&author_list_selector);
+                let mut author = HashMap::new();
+                for a in author_list {
+                    let child_text = a.text().collect::<String>();
+                    let url = a.value().attr("href").unwrap();
+                    author.insert(child_text, url.to_string());
+                }
+                update_data.push(prisma::comic::author::set(json!(author.clone())));
+                result.insert("author".to_string(), json!(author));
+            } else if child_text.starts_with("Nguồn:") {
+                let source_list_selector = Selector::parse("a").unwrap();
+                let source_list = p.select(&source_list_selector);
+                let mut source = HashMap::new();
+                for a in source_list {
+                    let child_text = a.text().collect::<String>();
+                    let url = a.value().attr("href").unwrap();
+                    source.insert(child_text, url.to_string());
+                }
+                update_data.push(prisma::comic::source::set(json!(source.clone())));
+                result.insert("source".to_string(), json!(source));
+            } else if child_text.starts_with("Nhóm dịch:") {
+                let translator_link_selector = Selector::parse("a").unwrap();
+                let translator_link = p.select(&translator_link_selector);
+                let mut translator = HashMap::new();
+                for a in translator_link {
+                    let child_text = a.text().collect::<String>();
+                    let url = a.value().attr("href").unwrap();
+                    translator.insert(child_text, url.to_string());
+                }
+                update_data.push(prisma::comic::translator_team::set(json!(
+                    translator.clone()
+                )));
+                result.insert("translatorTeam".to_string(), json!(translator));
+            } else if child_text.starts_with("Đăng bởi:") {
+                let posted_by_list_selector = Selector::parse("a").unwrap();
+                let posted_by_list = p.select(&posted_by_list_selector);
+                let mut posted_by = HashMap::new();
+                for a in posted_by_list {
+                    let child_text = a.text().collect::<String>();
+                    let url = a.value().attr("href").unwrap();
+                    posted_by.insert(child_text, url.to_string());
+                }
+                update_data.push(prisma::comic::posted_by::set(json!(posted_by.clone())));
+                result.insert("postedBy".to_string(), json!(posted_by));
+                let status_selector = Selector::parse("span").unwrap();
+                let status = p.select(&status_selector).next();
+                if let Some(status) = status {
+                    let status = status.text().collect::<String>();
+                    update_data.push(prisma::comic::status::set(status.trim().to_string()));
+                    result.insert("status".to_string(), json!(status.trim().to_string()));
+                }
+            } else if child_text.starts_with("Thể loại:") {
+                let genre_list_selector = Selector::parse("a").unwrap();
+                let genre_list = p.select(&genre_list_selector);
+                let mut genre = HashMap::new();
+                for a in genre_list {
+                    let child_text = a.text().collect::<String>();
+                    let url = a.value().attr("href").unwrap();
+                    genre.insert(child_text, url.to_string());
+                }
+                update_data.push(prisma::comic::genre::set(json!(genre.clone())));
+                result.insert("genre".to_string(), json!(genre));
+            }
+        }
+    }
+    (result, update_data)
+}
+
+mod test {
+    #[allow(unused_imports)]
+    use serde_json::json;
+
+    #[tokio::test]
+    async fn test_parse_blog_truyen_moi_html_page() {
+        let client = reqwest::Client::new();
+        let html = client
+            .get("https://blogtruyenmoi.com/34464/kiyota-san-muon-bi-vay-ban")
+            .header("User-Agent", "Mozilla/5.0")
+            .header("Referrer", "https://blogtruyenmoi.com/")
+            .send()
+            .await
+            .unwrap();
+        let html = html.text().await.unwrap();
+        let (result, _) = super::parse_blog_truyen_moi_html_page(&html);
+        // print out result
+        println!("{:?}", json!(result));
+    }
 }
