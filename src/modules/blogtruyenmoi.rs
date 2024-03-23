@@ -203,7 +203,7 @@ pub fn parse_blog_truyen_moi_html_page(
     Vec<prisma::comic::SetParam>,
 ) {
     let mut result = HashMap::new();
-    let mut update_data = Vec::new();
+    let mut update_data = vec![prisma::comic::python_fetch_info::set(true)];
     let document = Html::parse_document(html);
 
     // fetch content, thumbnail
