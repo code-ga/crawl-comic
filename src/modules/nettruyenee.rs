@@ -1,6 +1,8 @@
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 
 use regex::Regex;
+use scraper::{Html, Selector};
+use serde_json::json;
 use tokio::sync::Mutex;
 // use lazy_static::lazy_static;
 
@@ -57,6 +59,11 @@ pub async fn parse_comic_page(
     };
     if !db_comic.name.eq(&title) {
         update_field.push(prisma::comic::name::set(title));
+    }
+    let (_, comic_info) = parse_net_truyen_html_page(&page.to_string());
+    // append comic info to update field
+    for s in comic_info {
+        update_field.push(s.clone());
     }
     let comic_exec = {
         let tmp = client
@@ -222,5 +229,115 @@ pub fn is_chapter_page(url: &str, _html: &str) -> bool {
         return true;
     } else {
         return false;
+    }
+}
+
+pub fn parse_net_truyen_html_page(
+    html: &str,
+) -> (
+    HashMap<String, serde_json::Value>,
+    Vec<prisma::comic::SetParam>,
+) {
+    let mut result = HashMap::new();
+    let mut update_data = vec![prisma::comic::python_fetch_info::set(true)];
+    let document = Html::parse_document(html);
+
+    // fetch content, thumbnail
+    // title fetch before
+    let content_selector = Selector::parse("#item-detail > div.detail-content > p").unwrap();
+    let content = document.select(&content_selector).next();
+    if let Some(content) = content {
+        let content = content.inner_html().trim().to_string();
+        update_data.push(prisma::comic::content::set(Some(content.to_string())));
+        result.insert("content".to_string(), json!(content.to_string()));
+    }
+    let thumbnail_selector =
+        Selector::parse("#item-detail > div.detail-info > div > div.col-xs-4.col-image > img")
+            .unwrap();
+    let thumbnail = document.select(&thumbnail_selector).next();
+    if let Some(thumbnail) = thumbnail {
+        let thumbnail = thumbnail.value().attr("src").unwrap().trim().to_string();
+        update_data.push(prisma::comic::thumbnail::set(Some(thumbnail.to_string())));
+        result.insert("thumbnail".to_string(), json!(thumbnail.to_string()));
+    }
+
+    let another_name_selector = Selector::parse(
+        "#item-detail > div.detail-info > div > div.col-xs-8.col-info > ul > li.othername.row > h2",
+    )
+    .unwrap();
+    let another_name = document.select(&another_name_selector).next();
+    if let Some(another_name) = another_name {
+        let another_name = another_name
+            .text()
+            .collect::<String>()
+            .trim()
+            .to_string()
+            .split(";")
+            .map(|s| s.trim().to_string())
+            .collect::<Vec<String>>();
+        update_data.push(prisma::comic::another_name::set(another_name.clone()));
+        result.insert("another_name".to_string(), json!(another_name.clone()));
+    }
+
+    let genre_selector = Selector::parse(
+        "#item-detail > div.detail-info > div > div.col-xs-8.col-info > ul > li.kind.row > p.col-xs-8"
+    ).unwrap();
+    let genre = document.select(&genre_selector).next();
+    if let Some(p) = genre {
+        let genre_list_selector = Selector::parse("a").unwrap();
+        let genre_list = p.select(&genre_list_selector);
+        let mut genre = HashMap::new();
+        for a in genre_list {
+            let child_text = a.text().collect::<String>();
+            let url = a.value().attr("href").unwrap();
+            genre.insert(child_text, url.to_string());
+        }
+        update_data.push(prisma::comic::genre::set(json!(genre.clone())));
+        result.insert("genre".to_string(), json!(genre));
+    }
+
+    let author_selector = Selector::parse(
+        "#item-detail > div.detail-info > div > div.col-xs-8.col-info > ul > li.author.row > p.col-xs-8"
+    ).unwrap();
+    let author = document.select(&author_selector).next();
+    if let Some(p) = author {
+        let author_list_selector = Selector::parse("a").unwrap();
+        let author_list = p.select(&author_list_selector);
+        let mut author = HashMap::new();
+        if author_list.clone().count() > 0 {
+            for a in author_list {
+                let child_text = a.text().collect::<String>();
+                let url = a.value().attr("href").unwrap();
+                author.insert(child_text, url.to_string());
+            }
+        } else {
+            for a in p.text().collect::<String>().trim().split(";") {
+                author.insert(a.to_string(), "".to_string());
+            }
+        }
+        update_data.push(prisma::comic::author::set(json!(author.clone())));
+        result.insert("author".to_string(), json!(author));
+    }
+
+    (result, update_data)
+}
+
+mod test {
+    #[allow(unused_imports)]
+    use serde_json::json;
+
+    #[tokio::test]
+    async fn test_parse_net_truyen_html_page() {
+        let client = reqwest::Client::new();
+        let html = client
+            .get("https://www.nettruyenff.com/truyen-tranh/samurai-kiem-tre-107900")
+            .header("User-Agent", "Mozilla/5.0")
+            .send()
+            .await
+            .unwrap();
+        let html = html.text().await.unwrap();
+        let (result, _) = super::parse_net_truyen_html_page(&html);
+        // print out result
+        println!("{:?}", json!(result));
     }
 }
