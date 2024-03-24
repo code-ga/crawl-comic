@@ -11,6 +11,38 @@ import { Bounce, toast } from "react-toastify";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Loading } from "../../../components/loading";
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { id: string };
+}): Promise<Metadata> {
+  const app = edenTreaty<ElysiaServerApi>(beUrl);
+  const { data, error } = await app.api.comic[params.id].get();
+  const comic = data?.data;
+  if (error || !comic) {
+    notFound();
+  }
+  return {
+    title: comic.name,
+    description: `${comic.content || "No Content provided"} - Fetched From ${
+      new URL(comic.url).host
+    }`,
+    assets: [`${cdnUrl}/image?url=${comic.thumbnail}`],
+    openGraph: {
+      title: comic.name,
+      description: comic.content || "",
+      images: [
+        {
+          url: `${cdnUrl}/image?url=${comic.thumbnail}`,
+          width: 800,
+          height: 600,
+        },
+      ],
+    },
+  };
+}
 
 export default function Page({ params }: { params: { id: string } }) {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
