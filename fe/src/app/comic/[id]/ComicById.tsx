@@ -1,3 +1,4 @@
+"use client";
 import { edenTreaty } from "@elysiajs/eden";
 import Link from "next/link";
 import { notFound } from "next/navigation";
