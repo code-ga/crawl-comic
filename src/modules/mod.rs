@@ -30,11 +30,13 @@ pub static ACCEPTED_HOSTS: [&str; 5] = [
     "www.nettruyenff.com",
     "nettruyenff.com",
 ];
-pub static NETTRUYEN_HOSTS: [&str; 4] = [
+pub static NETTRUYEN_HOSTS: [&str; 6] = [
     "nettruyenee.com",
     "www.nettruyenee.com",
     "nettruyenff.com",
     "www.nettruyenff.com",
+    "nettruyenbb.com",
+    "www.nettruyenbb.com",
 ];
 
 pub fn process_url(url: &str, now_url: &str) -> Option<String> {
@@ -91,7 +93,7 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
         if !NETTRUYEN_HOSTS.contains(&url_host.as_str()) {
             return None;
         }
-        let url = url.trim().to_string();
+        let url = url.trim().to_string().replace("www.", "");
         if url.ends_with("#nt_listchapter") {
             return None;
         }
@@ -207,12 +209,20 @@ pub async fn thread_worker(
                             .await
                             .unwrap();
                     }
+                    println!(
+                        "worker {} failed {} fetching error {:#?}",
+                        worker_id,
+                        url.to_string(),
+                        resp.unwrap_err().to_string()
+                    );
                     continue;
                 }
-                if resp.as_ref().unwrap().status().is_success() == false
-                    && resp.as_ref().unwrap().status().as_u16().eq(&404) == false
+                let resp_unwrap = resp.unwrap();
+
+                if resp_unwrap.status().is_success() == false
+                    && resp_unwrap.status().as_u16().eq(&404) == false
                 {
-                    if resp.as_ref().unwrap().status().as_u16().eq(&429) {
+                    if resp_unwrap.status().as_u16().eq(&429) {
                         tokio::time::sleep(std::time::Duration::from_secs(5)).await;
                     }
                     {
@@ -220,14 +230,16 @@ pub async fn thread_worker(
                             .await
                             .unwrap();
                     }
+
                     println!(
                         "worker {} failed {} status : {}",
                         worker_id,
                         url.to_string(),
-                        resp.unwrap().status()
+                        resp_unwrap.status()
                     );
+                    dbg!(&resp_unwrap.text().await);
                     continue;
-                } else if resp.as_ref().unwrap().status().as_u16().eq(&404) {
+                } else if resp_unwrap.status().as_u16().eq(&404) {
                     {
                         let tmp = client
                             .lock()
@@ -260,12 +272,12 @@ pub async fn thread_worker(
                         "worker {} done {} status : {}",
                         worker_id,
                         url.to_string(),
-                        resp.unwrap().status()
+                        resp_unwrap.status()
                     );
                     continue;
                 }
                 let html = {
-                    let tmp = resp.unwrap().text().await;
+                    let tmp = resp_unwrap.text().await;
                     if tmp.is_err() {
                         {
                             tx.send(ThreadMessage::Retry(url.clone(), i_tries))

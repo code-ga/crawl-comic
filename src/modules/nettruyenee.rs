@@ -330,7 +330,7 @@ mod test {
     async fn test_parse_net_truyen_html_page() {
         let client = reqwest::Client::new();
         let html = client
-            .get("https://www.nettruyenff.com/truyen-tranh/samurai-kiem-tre-107900")
+            .get("https://nettruyenee.com/truyen-tranh/samurai-kiem-tre-107900")
             .header("User-Agent", "Mozilla/5.0")
             .send()
             .await

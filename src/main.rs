@@ -11,7 +11,7 @@ mod util;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client: PrismaClient = PrismaClient::_builder().build().await.unwrap();
     let num_of_threads = 10;
-    let init_url = "https://www.nettruyenff.com/tim-truyen".to_string();
+    let init_url = "https://nettruyenbb.com/tim-truyen".to_string();
     {
         let tmp = client
             .urls()
