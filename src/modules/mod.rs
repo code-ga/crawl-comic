@@ -203,7 +203,7 @@ pub async fn thread_worker(
 
                 let mut rep = http_client
                     .get(url.clone())
-                    .header("User-Agent", "Mozilla/5.0");
+                    .header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36");
                 if hostname.contains("blogtruyenmoi.com") {
                     rep = rep.header("Referrer", format!("https://{}/", hostname.to_string()));
                 }
