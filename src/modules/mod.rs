@@ -23,12 +23,14 @@ use nettruyenee::{
     parse_comic_page as parse_nettruyenee_comic_page,
 };
 
-pub static ACCEPTED_HOSTS: [&str; 5] = [
+pub static ACCEPTED_HOSTS: [&str; 7] = [
     "blogtruyenmoi.com",
     "nettruyenee.com",
     "www.nettruyenee.com",
     "www.nettruyenff.com",
     "nettruyenff.com",
+    "nettruyenbb.com",
+    "www.nettruyenbb.com",
 ];
 pub static NETTRUYEN_HOSTS: [&str; 6] = [
     "nettruyenee.com",
@@ -134,7 +136,10 @@ pub async fn thread_worker(
         match job {
             ThreadMessage::Start(url, i_tries) => {
                 let hostname = get_host(&url).unwrap();
-                if !ACCEPTED_HOSTS.contains(&hostname.as_str()) {
+                if !ACCEPTED_HOSTS.contains(&hostname.as_str())
+                    && !NETTRUYEN_HOSTS.contains(&hostname.as_str())
+                {
+                    println!("{} is not accepted host", hostname);
                     {
                         let tmp = client
                             .lock()

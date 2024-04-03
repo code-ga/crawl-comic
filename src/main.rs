@@ -90,6 +90,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         let job = main_rx.recv().await.unwrap();
+        // println!("job {:?}", job);
         match job {
             ThreadMessage::Stop(id) => {
                 // spawn new worker and replace old
