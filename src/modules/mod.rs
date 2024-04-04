@@ -130,7 +130,6 @@ pub async fn thread_worker(
     };
 
     let client = Arc::new(Mutex::new(client));
-    let mut bypasser = cloudflare_bypasser::Bypasser::default();
 
     loop {
         let job = rx.recv().await.unwrap();
@@ -201,16 +200,6 @@ pub async fn thread_worker(
                 };
 
                 println!("worker {} fetching {}", worker_id, url);
-                let (cookie, user_agent);
-                {
-                    loop {
-                        if let Ok((c, ua)) = bypasser.bypass(&url) {
-                            cookie = c;
-                            user_agent = ua;
-                            break;
-                        }
-                    }
-                };
 
                 let mut rep = http_client
                     .get(url.clone())
