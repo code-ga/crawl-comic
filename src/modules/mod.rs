@@ -214,8 +214,7 @@ pub async fn thread_worker(
 
                 let mut rep = http_client
                     .get(url.clone())
-                    .header(reqwest::header::USER_AGENT, user_agent)
-                    .header(reqwest::header::COOKIE, cookie);
+                    .header("User-Agent", "Mozilla/5.0");
                 if hostname.contains("blogtruyenmoi.com") {
                     rep = rep.header("Referrer", format!("https://{}/", hostname.to_string()));
                 }
