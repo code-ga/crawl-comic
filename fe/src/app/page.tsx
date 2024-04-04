@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <div className="grid grid-cols-4 gap-4 text-center">
       {/* content */}
-      <div className="hidden md:flex">
+      <div className="hidden md:flex w-full">
         <Suspense fallback={<Loading />}>
           <SideBar app={app}></SideBar>
         </Suspense>

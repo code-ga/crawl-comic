@@ -36,6 +36,8 @@ export const SideBar = ({ app }: { app: AppApi }) => {
             } else {
               pre.delete(data.url);
             }
+
+            
             return new Set(pre);
           });
         });
