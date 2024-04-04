@@ -1,3 +1,6 @@
+extern crate cloudflare_bypasser;
+extern crate reqwest;
+
 use prisma::PrismaClient;
 use rand::Rng;
 

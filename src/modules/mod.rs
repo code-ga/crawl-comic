@@ -130,6 +130,7 @@ pub async fn thread_worker(
     };
 
     let client = Arc::new(Mutex::new(client));
+    let mut bypasser = cloudflare_bypasser::Bypasser::default();
 
     loop {
         let job = rx.recv().await.unwrap();
@@ -200,10 +201,21 @@ pub async fn thread_worker(
                 };
 
                 println!("worker {} fetching {}", worker_id, url);
+                let (cookie, user_agent);
+                {
+                    loop {
+                        if let Ok((c, ua)) = bypasser.bypass(&url) {
+                            cookie = c;
+                            user_agent = ua;
+                            break;
+                        }
+                    }
+                };
 
                 let mut rep = http_client
                     .get(url.clone())
-                    .header("User-Agent", "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36");
+                    .header(reqwest::header::USER_AGENT, user_agent)
+                    .header(reqwest::header::COOKIE, cookie);
                 if hostname.contains("blogtruyenmoi.com") {
                     rep = rep.header("Referrer", format!("https://{}/", hostname.to_string()));
                 }
