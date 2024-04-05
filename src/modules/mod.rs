@@ -116,6 +116,43 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
     None
 }
 
+pub async fn get_http_client(
+    client: &PrismaClient,
+) -> Result<(reqwest::Client, Option<prisma::proxy::Data>), Box<dyn std::error::Error + Send + Sync>>
+{
+    let proxy = crate::util::get_proxy(&client).await;
+    let mut http_client = reqwest::ClientBuilder::new();
+    if proxy.is_some() {
+        let proxy = proxy.clone().unwrap();
+        println!("using proxy {} - {}", proxy.id, proxy.url);
+        http_client = http_client.proxy({
+            let mut client_proxy = reqwest::Proxy::all(proxy.url.to_string().trim().to_string())?;
+            if proxy.username.is_some() && proxy.password.is_some() {
+                client_proxy =
+                    client_proxy.basic_auth(&proxy.username.unwrap(), &proxy.password.unwrap())
+            }
+            client_proxy
+        });
+    }
+    let nettruyen_dns = vec![
+        std::net::SocketAddr::new(
+            std::net::IpAddr::V4(std::net::Ipv4Addr::new(172, 67, 136, 13)),
+            443,
+        ),
+        std::net::SocketAddr::new(
+            std::net::IpAddr::V4(std::net::Ipv4Addr::new(104, 21, 46, 67)),
+            443,
+        ),
+    ];
+    Ok((
+        http_client
+            .resolve_to_addrs("nettruyenbb.com", nettruyen_dns.clone().as_slice())
+            .resolve_to_addrs("www.nettruyenbb.com", nettruyen_dns.clone().as_slice())
+            .build()?,
+        proxy,
+    ))
+}
+
 pub async fn thread_worker(
     tx: async_channel::Sender<ThreadMessage>,
     rx: async_channel::Receiver<ThreadMessage>,
@@ -174,29 +211,17 @@ pub async fn thread_worker(
 
                 let (http_client, _) = {
                     let client = client.lock().await;
-                    let proxy = crate::util::get_proxy(&client).await;
-                    let mut http_client = reqwest::ClientBuilder::new();
-                    if proxy.is_some() {
-                        let proxy = proxy.clone().unwrap();
-                        println!("using proxy {} - {}", proxy.id, proxy.url);
-                        http_client = http_client.proxy({
-                            let client_proxy =
-                                reqwest::Proxy::all(proxy.url.to_string().trim().to_string());
-                            if client_proxy.is_err() {
-                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
-                                    .await
-                                    .unwrap();
-                                continue;
-                            }
-                            let mut client_proxy = client_proxy.unwrap();
-                            if proxy.username.is_some() && proxy.password.is_some() {
-                                client_proxy = client_proxy
-                                    .basic_auth(&proxy.username.unwrap(), &proxy.password.unwrap())
-                            }
-                            client_proxy
-                        });
+                    if let Ok(r) = get_http_client(&client).await {
+                        r
+                    } else {
+                        {
+                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                .await
+                                .unwrap();
+                        }
+                        println!("worker {} failed to get http client", worker_id);
+                        continue;
                     }
-                    (http_client.build().unwrap(), proxy)
                 };
 
                 println!("worker {} fetching {}", worker_id, url);

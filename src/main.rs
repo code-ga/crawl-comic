@@ -1,3 +1,8 @@
+use std::{
+    panic, process,
+    sync::{Arc, Mutex},
+};
+
 use prisma::PrismaClient;
 use rand::Rng;
 
@@ -34,6 +39,34 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let (worker_tx, worker_rx) = async_channel::bounded::<ThreadMessage>(num_of_threads);
     // let rx = Arc::new(Mutex::new(worker_rx));
 
+    let fetching_url = Arc::new(Mutex::new(std::collections::HashSet::new()));
+    fetching_url
+        .clone()
+        .lock()
+        .unwrap()
+        .insert(init_url.clone());
+
+    {
+        let fetching_url = fetching_url.clone();
+        let orig_hook = panic::take_hook();
+        panic::set_hook(Box::new(move |panic_info| {
+            // invoke the default handler and exit the process
+            orig_hook(panic_info);
+            let _ = async {
+                let client: PrismaClient = PrismaClient::_builder().build().await.unwrap();
+                // update fetched = false for fetching url
+                let mut update_data = vec![];
+                for url in &fetching_url.clone().lock().unwrap().clone() {
+                    update_data.push(client.urls().update(
+                        prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
+                        vec![prisma::urls::fetched::set(false)],
+                    ));
+                }
+                let _ = client._batch(update_data).await;
+            };
+            process::exit(1);
+        }));
+    }
     let mut workers = Vec::new();
     for i in 0..num_of_threads {
         println!("spawn {}", i);
@@ -54,6 +87,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .await
         .unwrap();
 
+    let fetching_url = fetching_url.clone();
     loop {
         if worker_rx.is_empty() {
             let wait_time = rand::thread_rng().gen_range(1..5);
@@ -79,6 +113,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                         tmp.unwrap()
                     };
+
+                    fetching_url.lock().unwrap().insert(pending_url.to_string());
                     worker_tx
                         .send(types::thread_message::ThreadMessage::Start(
                             pending_url.to_string(),
@@ -117,6 +153,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .exec()
                         .await
                         .unwrap();
+                    fetching_url.lock().unwrap().remove(&url);
                     let mut pending_urls = util::get_pending_urls(
                         &client,
                         num_of_threads - worker_rx.len(),
@@ -141,6 +178,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             }
                             tmp.unwrap()
                         };
+                        fetching_url.lock().unwrap().insert(pending_url.to_string());
                         // let wait_time = rand::thread_rng().gen_range(1..5);
                         // tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                         worker_tx
@@ -173,6 +211,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         .unwrap();
                 }
 
+                fetching_url.lock().unwrap().remove(&comic_url);
+
                 let wait_time = rand::thread_rng().gen_range(1..5);
                 tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                 // sleep 1s
@@ -200,6 +240,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         }
                         tmp.unwrap()
                     };
+                    fetching_url.lock().unwrap().insert(pending_url.to_string());
                     worker_tx
                         .send(types::thread_message::ThreadMessage::Start(
                             pending_url.to_string(),
