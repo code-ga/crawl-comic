@@ -67,6 +67,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             process::exit(1);
         }));
     }
+
     let mut workers = Vec::new();
     for i in 0..num_of_threads {
         println!("spawn {}", i);
@@ -88,7 +89,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap();
 
     let fetching_url = fetching_url.clone();
-    loop {
+
+    let term = Arc::new(std::sync::atomic::AtomicBool::new(false));
+    signal_hook::flag::register(signal_hook::consts::SIGINT, Arc::clone(&term)).unwrap();
+    while !term.load(std::sync::atomic::Ordering::Relaxed) {
         if worker_rx.is_empty() {
             let wait_time = rand::thread_rng().gen_range(1..5);
             tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
@@ -253,6 +257,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             _ => {}
         }
     }
-
+    println!("finished");
+    for w in workers {
+        worker_tx.send(types::thread_message::ThreadMessage::Exited(w.id)).await.unwrap();
+        println!("worker joined");
+    }
+    let _ = async {
+        let client: PrismaClient = PrismaClient::_builder().build().await.unwrap();
+        // update fetched = false for fetching url
+        let mut update_data = vec![];
+        for url in &fetching_url.clone().lock().unwrap().clone() {
+            update_data.push(client.urls().update(
+                prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
+                vec![prisma::urls::fetched::set(false)],
+            ));
+        }
+        let _ = client._batch(update_data).await;
+    };
+    process::exit(0);
     // Ok(())
 }

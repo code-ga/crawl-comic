@@ -427,6 +427,11 @@ pub async fn thread_worker(
                     .await
                     .unwrap();
             }
+            ThreadMessage::Exited(i) => {
+                if i == worker_id {
+                    break;
+                }
+            }
             _ => {}
         }
     }

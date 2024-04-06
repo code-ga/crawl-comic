@@ -4,4 +4,5 @@ pub enum ThreadMessage {
     Done(Vec<String>, String, bool),
     Stop(usize),
     Retry(String,i32),
+    Exited(usize),
 }
