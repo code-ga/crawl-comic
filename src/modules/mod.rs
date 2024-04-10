@@ -153,6 +153,107 @@ pub async fn get_http_client(
     ))
 }
 
+async fn fetch_page_with_reqwest(
+    client: &PrismaClient,
+    hostname: &str,
+    worker_id: usize,
+    url: String,
+) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    let (http_client, _) = get_http_client(client).await?;
+
+    let mut rep = http_client
+        .get(url.clone())
+        .header("User-Agent", "Mozilla/5.0");
+    if hostname.contains("blogtruyenmoi.com") {
+        rep = rep.header("Referrer", format!("https://{}/", hostname.to_string()));
+    }
+    let resp = rep.send().await;
+    if let Err(e) = resp {
+        println!(
+            "worker {} failed {} fetching error {:#?}",
+            worker_id,
+            url.to_string(),
+            e.to_string()
+        );
+        return Err(Box::new(e));
+    }
+    let resp_unwrap = resp.unwrap();
+
+    if resp_unwrap.status().is_success() == false && resp_unwrap.status().as_u16().eq(&404) == false
+    {
+        if resp_unwrap.status().as_u16().eq(&429) {
+            tokio::time::sleep(std::time::Duration::from_secs(5)).await;
+        }
+
+        println!(
+            "worker {} failed {} status : {}",
+            worker_id,
+            url.to_string(),
+            resp_unwrap.status()
+        );
+        dbg!(&resp_unwrap.text().await);
+        return Err(Box::new(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!("worker {} failed {}", worker_id, url,),
+        )));
+    } else if resp_unwrap.status().as_u16().eq(&404) {
+        {
+            let tmp = client
+                .urls()
+                .update(
+                    prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
+                    vec![
+                        prisma::urls::fetched::set(true),
+                        prisma::urls::fetching::set(false),
+                    ],
+                )
+                .exec()
+                .await;
+            if let Err(e) = tmp {
+                return Err(Box::new(e));
+            }
+        };
+        println!(
+            "worker {} done {} status : {}",
+            worker_id,
+            url.to_string(),
+            resp_unwrap.status()
+        );
+        return Ok("".to_string());
+    }
+    let html = {
+        let tmp = resp_unwrap.text().await;
+        if let Err(e) = tmp {
+            return Err(Box::new(e));
+        }
+        tmp.unwrap()
+    };
+    Ok(html)
+}
+
+fn fetch_page_with_headless_browser(
+    client: &PrismaClient,
+    hostname: &str,
+    worker_id: usize,
+    url: String,
+) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    let browser = headless_chrome::Browser::default()?;
+    let tab = browser.new_tab()?;
+    tab.navigate_to(&url)?;
+}
+
+async fn fetch_page(
+    client: &PrismaClient,
+    hostname: &str,
+    worker_id: usize,
+    url: String,
+) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    if let Ok(html) = fetch_page_with_reqwest(client, hostname, worker_id, url.clone()).await {
+        return Ok(html);
+    } else {
+        unimplemented!("not implemented");
+    }
+}
 pub async fn thread_worker(
     tx: async_channel::Sender<ThreadMessage>,
     rx: async_channel::Receiver<ThreadMessage>,
@@ -209,114 +310,28 @@ pub async fn thread_worker(
                 let wait_time = rand::thread_rng().gen_range(1..10);
                 tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
 
-                let (http_client, _) = {
-                    let client = client.lock().await;
-                    if let Ok(r) = get_http_client(&client).await {
-                        r
-                    } else {
-                        {
-                            tx.send(ThreadMessage::Retry(url.clone(), i_tries))
-                                .await
-                                .unwrap();
-                        }
-                        println!("worker {} failed to get http client", worker_id);
-                        continue;
-                    }
-                };
-
                 println!("worker {} fetching {}", worker_id, url);
-
-                let mut rep = http_client
-                    .get(url.clone())
-                    .header("User-Agent", "Mozilla/5.0");
-                if hostname.contains("blogtruyenmoi.com") {
-                    rep = rep.header("Referrer", format!("https://{}/", hostname.to_string()));
-                }
-                let resp = rep.send().await;
-                if resp.is_err() {
-                    {
-                        tx.send(ThreadMessage::Retry(url.clone(), i_tries))
-                            .await
-                            .unwrap();
-                    }
-                    println!(
-                        "worker {} failed {} fetching error {:#?}",
-                        worker_id,
-                        url.to_string(),
-                        resp.unwrap_err().to_string()
-                    );
-                    continue;
-                }
-                let resp_unwrap = resp.unwrap();
-
-                if resp_unwrap.status().is_success() == false
-                    && resp_unwrap.status().as_u16().eq(&404) == false
-                {
-                    if resp_unwrap.status().as_u16().eq(&429) {
-                        tokio::time::sleep(std::time::Duration::from_secs(5)).await;
-                    }
-                    {
-                        tx.send(ThreadMessage::Retry(url.clone(), i_tries))
-                            .await
-                            .unwrap();
-                    }
-
-                    println!(
-                        "worker {} failed {} status : {}",
-                        worker_id,
-                        url.to_string(),
-                        resp_unwrap.status()
-                    );
-                    dbg!(&resp_unwrap.text().await);
-                    continue;
-                } else if resp_unwrap.status().as_u16().eq(&404) {
-                    {
-                        let tmp = client
-                            .lock()
-                            .await
-                            .urls()
-                            .update(
-                                prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
-                                vec![
-                                    prisma::urls::fetched::set(true),
-                                    prisma::urls::fetching::set(false),
-                                ],
-                            )
-                            .exec()
-                            .await;
-                        if tmp.is_err() {
-                            {
-                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                let html = {
+                    let client = client.lock().await;
+                    match fetch_page(&client, &hostname, worker_id, url.clone()).await {
+                        Ok(html) => {
+                            if html.len() > 0 {
+                                html
+                            } else {
+                                tx.send(ThreadMessage::Done(vec![], url, false))
                                     .await
                                     .unwrap();
+                                continue;
                             }
-                            continue;
                         }
-                    };
-                    {
-                        tx.send(ThreadMessage::Done(vec![], url.to_string(), true))
-                            .await
-                            .unwrap();
-                    }
-                    println!(
-                        "worker {} done {} status : {}",
-                        worker_id,
-                        url.to_string(),
-                        resp_unwrap.status()
-                    );
-                    continue;
-                }
-                let html = {
-                    let tmp = resp_unwrap.text().await;
-                    if tmp.is_err() {
-                        {
+                        Err(_e) => {
+                            println!("worker {} failed {}", worker_id, url);
                             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                 .await
                                 .unwrap();
+                            continue;
                         }
-                        continue;
                     }
-                    tmp.unwrap()
                 };
 
                 // println!("worker {} fetched {}", worker_id, url);

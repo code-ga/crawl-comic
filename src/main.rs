@@ -258,9 +258,15 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
     println!("finished");
-    for w in workers {
-        worker_tx.send(types::thread_message::ThreadMessage::Exited(w.id)).await.unwrap();
+    for w in &workers {
+        worker_tx
+            .send(types::thread_message::ThreadMessage::Exited(w.id))
+            .await
+            .unwrap();
         println!("worker joined");
+    }
+    for w in workers {
+        w.join_handle.await.unwrap();
     }
     let _ = async {
         let client: PrismaClient = PrismaClient::_builder().build().await.unwrap();
@@ -276,4 +282,32 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     };
     process::exit(0);
     // Ok(())
+}
+
+mod tests {
+
+    #[tokio::test]
+    async fn test_request_cf_reqwest() {
+        let client = reqwest::Client::new();
+        let resp = client.get("https://nowsecure.nl").send().await;
+        assert!(resp.is_ok());
+    }
+    #[tokio::test]
+    async fn test_request_cf_headless_chrome() {
+        use headless_chrome::protocol::cdp::Page::CaptureScreenshotFormatOption;
+        let browser = headless_chrome::Browser::new(headless_chrome::LaunchOptions {
+            enable_logging: true,
+            ..Default::default()
+        })
+        .unwrap();
+        let tab = browser.new_tab().unwrap();
+        let _ = tab.navigate_to("https://nettruyenus.com/").unwrap();
+        let _jpeg = tab
+            .capture_screenshot(CaptureScreenshotFormatOption::Jpeg, None, None, true)
+            .unwrap();
+        tab.wait_for_element("#header > div > div > div > div.navbar-form.navbar-left.hidden-xs.search-box.comicsearchbox > div > input").unwrap();
+        // write image to file
+        let image = image::load_from_memory(&_jpeg).unwrap();
+        image.save("nowsecure.jpg").unwrap();
+    }
 }
