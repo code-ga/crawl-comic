@@ -241,7 +241,7 @@ fn fetch_page_with_headless_browser(
     let browser =
         headless_chrome::Browser::new(headless_chrome::LaunchOptionsBuilder::default().build()?)?;
     let tab = browser.new_tab()?;
-    tab.navigate_to(&url)?;
+    tab.navigate_to(&url);
     if NETTRUYEN_HOSTS.contains(&hostname) {
         tab.wait_for_element("#aspnetForm > main > div")?;
     } else {
