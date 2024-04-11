@@ -240,6 +240,7 @@ fn fetch_page_with_headless_browser(
     let browser = headless_chrome::Browser::default()?;
     let tab = browser.new_tab()?;
     tab.navigate_to(&url)?;
+    Ok(Default::default())
 }
 
 async fn fetch_page(
