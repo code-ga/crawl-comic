@@ -232,15 +232,26 @@ async fn fetch_page_with_reqwest(
 }
 
 fn fetch_page_with_headless_browser(
-    client: &PrismaClient,
+    _client: &PrismaClient,
     hostname: &str,
-    worker_id: usize,
+    _worker_id: usize,
     url: String,
 ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-    let browser = headless_chrome::Browser::default()?;
+    let browser = headless_chrome::Browser::new(
+        headless_chrome::LaunchOptionsBuilder::default()
+            .enable_gpu(false)
+            .headless(true)
+            .sandbox(false)
+            .build()?,
+    )?;
     let tab = browser.new_tab()?;
     tab.navigate_to(&url)?;
-    Ok(Default::default())
+    if NETTRUYEN_HOSTS.contains(&hostname) {
+        tab.wait_for_element("#aspnetForm > main > div")?;
+    } else {
+        unimplemented!("not yet implemented");
+    }
+    Ok(tab.get_content()?)
 }
 
 async fn fetch_page(
@@ -252,7 +263,7 @@ async fn fetch_page(
     if let Ok(html) = fetch_page_with_reqwest(client, hostname, worker_id, url.clone()).await {
         return Ok(html);
     } else {
-        unimplemented!("not implemented");
+        return fetch_page_with_headless_browser(client, hostname, worker_id, url.clone());
     }
 }
 pub async fn thread_worker(
