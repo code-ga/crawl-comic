@@ -238,15 +238,21 @@ fn fetch_page_with_headless_browser(
     url: String,
 ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
     println!("fetching with headless {}", url);
-    let browser =
-        headless_chrome::Browser::new(headless_chrome::LaunchOptionsBuilder::default().build()?)?;
+    let browser = headless_chrome::Browser::new(
+        headless_chrome::LaunchOptionsBuilder::default()
+            .args(vec![std::ffi::OsStr::new(
+                "--disable-blink-features=AutomationControlled",
+            )])
+            .build()?,
+    )?;
     let tab = browser.new_tab()?;
-    tab.navigate_to(&url);
+    tab.navigate_to(&url)?;
     if NETTRUYEN_HOSTS.contains(&hostname) {
         tab.wait_for_element("#aspnetForm > main > div")?;
     } else {
         unimplemented!("not yet implemented");
     }
+
     Ok(tab.get_content()?)
 }
 
@@ -332,8 +338,8 @@ pub async fn thread_worker(
                                 continue;
                             }
                         }
-                        Err(_e) => {
-                            println!("worker {} failed {}", worker_id, url);
+                        Err(e) => {
+                            println!("worker {} failed {} error {:#?}", worker_id, url, e);
                             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                 .await
                                 .unwrap();
