@@ -238,13 +238,8 @@ fn fetch_page_with_headless_browser(
     url: String,
 ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
     println!("fetching with headless {}", url);
-    let browser = headless_chrome::Browser::new(
-        headless_chrome::LaunchOptionsBuilder::default()
-            .enable_gpu(false)
-            .headless(true)
-            .sandbox(false)
-            .build()?,
-    )?;
+    let browser =
+        headless_chrome::Browser::new(headless_chrome::LaunchOptionsBuilder::default().build()?)?;
     let tab = browser.new_tab()?;
     tab.navigate_to(&url)?;
     if NETTRUYEN_HOSTS.contains(&hostname) {
