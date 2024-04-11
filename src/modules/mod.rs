@@ -237,6 +237,7 @@ fn fetch_page_with_headless_browser(
     _worker_id: usize,
     url: String,
 ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    println!("fetching with headless {}", url);
     let browser = headless_chrome::Browser::new(
         headless_chrome::LaunchOptionsBuilder::default()
             .enable_gpu(false)
