@@ -231,29 +231,41 @@ async fn fetch_page_with_reqwest(
     Ok(html)
 }
 
-fn fetch_page_with_headless_browser(
+async fn fetch_page_with_headless_browser(
     _client: &PrismaClient,
     hostname: &str,
     _worker_id: usize,
     url: String,
 ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
     println!("fetching with headless {}", url);
-    let browser = headless_chrome::Browser::new(
-        headless_chrome::LaunchOptionsBuilder::default()
-            .args(vec![std::ffi::OsStr::new(
-                "--disable-blink-features=AutomationControlled",
-            )])
-            .build()?,
-    )?;
-    let tab = browser.new_tab()?;
-    tab.navigate_to(&url)?;
+    let driver = undetected_chromedriver::chrome().await.unwrap();
+    driver.goto(&url).await?;
     if NETTRUYEN_HOSTS.contains(&hostname) {
-        tab.wait_for_element("#aspnetForm > main > div")?;
+        loop {
+            match driver
+                .find(undetected_chromedriver::By::XPath(
+                    "/html/body/form/main/div[2]",
+                ))
+                .await
+            {
+                Err(e) => match e {
+                    undetected_chromedriver::WebDriverError::NoSuchElement(_) => {
+                        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                        continue;
+                    }
+                    _ => {
+                        return Err(Box::new(e));
+                    }
+                },
+                Ok(_) => break,
+            }
+        }
     } else {
         unimplemented!("not yet implemented");
     }
-
-    Ok(tab.get_content()?)
+    let html = driver.source().await?;
+    driver.quit().await?;
+    Ok(html)
 }
 
 async fn fetch_page(
@@ -265,7 +277,7 @@ async fn fetch_page(
     if let Ok(html) = fetch_page_with_reqwest(client, hostname, worker_id, url.clone()).await {
         return Ok(html);
     } else {
-        return fetch_page_with_headless_browser(client, hostname, worker_id, url.clone());
+        return fetch_page_with_headless_browser(client, hostname, worker_id, url.clone()).await;
     }
 }
 pub async fn thread_worker(

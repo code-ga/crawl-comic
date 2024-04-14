@@ -293,21 +293,14 @@ mod tests {
         assert!(resp.is_ok());
     }
     #[tokio::test]
-    async fn test_request_cf_headless_chrome() {
-        use headless_chrome::protocol::cdp::Page::CaptureScreenshotFormatOption;
-        let browser = headless_chrome::Browser::new(headless_chrome::LaunchOptions {
-            enable_logging: true,
-            ..Default::default()
-        })
-        .unwrap();
-        let tab = browser.new_tab().unwrap();
-        let _ = tab.navigate_to("https://nettruyenus.com/").unwrap();
-        let _jpeg = tab
-            .capture_screenshot(CaptureScreenshotFormatOption::Jpeg, None, None, true)
-            .unwrap();
-        tab.wait_for_element("#header > div > div > div > div.navbar-form.navbar-left.hidden-xs.search-box.comicsearchbox > div > input").unwrap();
-        // write image to file
-        let image = image::load_from_memory(&_jpeg).unwrap();
-        image.save("nowsecure.jpg").unwrap();
+    async fn test_request_cf_headless_chrome() -> Result<(), Box<dyn std::error::Error>> {
+        use undetected_chromedriver::chrome;
+        let driver = chrome().await?;
+        driver.goto("https://nowsecure.nl").await?;
+        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
+        let png = driver.screenshot_as_png().await?;
+        let image = image::load_from_memory(&png)?;
+        image.save("image.png")?;
+        Ok(())
     }
 }
