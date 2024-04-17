@@ -1,9 +1,6 @@
 pipeline {
     agent { 
-        docker {
-            image 'rust:latest'
-            args '-u root' 
-        }    
+        label 'docker'  
     }
     stages {
         stage('Checkout') {
@@ -11,16 +8,30 @@ pipeline {
                 checkout scm
             }
         }
-
-        stage('Build') {
-            steps {
-                sh 'cargo prisma generate && cargo build --release --bin prisma && cargo build --release --bin crawl-comic-worker'
-                archiveArtifacts artifacts: 'target/release/crawl-comic-worker', fingerprint: true
-                archiveArtifacts artifacts: 'target/release/prisma',fingerprint: true
-                // compress prisma folder
-                sh 'tar -zcvf prisma.tar.gz prisma'
-                archiveArtifacts artifacts: 'prisma.tar.gz', fingerprint: true
+        stage('Login docker'){
+            environment {
+                DOCKER_LOGIN_INFO = credentials("ShartubeImageToken")
             }
+            steps {
+                sh ('echo $DOCKER_LOGIN_INFO_PSW | docker login -u $DOCKER_LOGIN_INFO_USR --password-stdin')
+                echo 'Login Completed'
+            }
+            
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t tritranduc11/crawl-comic-worker .'
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                sh 'docker push tritranduc11/crawl-comic-worker'
+            }
+        }
+    }
+    post {
+        always { 
+            sh "docker logout"
         }
     }
 }

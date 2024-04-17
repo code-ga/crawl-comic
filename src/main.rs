@@ -258,15 +258,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     }
     println!("finished");
+    while worker_rx.len() > 0 {
+        let _ = dbg!(worker_rx.recv().await);
+    }
     for w in &workers {
-        worker_tx
+        let _ = worker_tx
             .send(types::thread_message::ThreadMessage::Exited(w.id))
-            .await
-            .unwrap();
-        println!("worker joined");
+            .await;
     }
     for w in workers {
         w.join_handle.await.unwrap();
+        println!("worker joined");
     }
     let _ = async {
         let client: PrismaClient = PrismaClient::_builder().build().await.unwrap();
@@ -293,7 +295,8 @@ mod tests {
         assert!(resp.is_ok());
     }
     #[tokio::test]
-    async fn test_request_cf_headless_chrome() -> Result<(), Box<dyn std::error::Error>> {
+    async fn test_request_cf_headless_chrome(
+    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         use undetected_chromedriver::chrome;
         let driver = chrome().await?;
         driver.goto("https://nowsecure.nl").await?;
