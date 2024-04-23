@@ -3,34 +3,36 @@ use std::{
     sync::{Arc, Mutex},
 };
 
-use prisma::PrismaClient;
 use rand::Rng;
 
 use types::thread_message::ThreadMessage;
 
+pub mod db;
 mod modules;
 pub mod prisma;
 mod types;
 mod util;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client: PrismaClient = PrismaClient::_builder().build().await.unwrap();
+    let client = db::DbUtils::new().await.unwrap();
     let num_of_threads = 10;
     let init_url = "https://nettruyenbb.com/tim-truyen".to_string();
     {
-        let tmp = client
-            .urls()
-            .find_unique(prisma::urls::UniqueWhereParam::UrlEquals(init_url.clone()))
-            .exec()
-            .await
-            .unwrap();
+        // let tmp = client
+        //     .urls()
+        //     .find_unique(prisma::urls::UniqueWhereParam::UrlEquals(init_url.clone()))
+        //     .exec()
+        //     .await
+        //     .unwrap();
+        let tmp = client.find_url_doc_by_url(&init_url.clone()).await.unwrap();
         if tmp.is_none() {
-            client
-                .urls()
-                .create(init_url.clone(), vec![])
-                .exec()
-                .await
-                .unwrap();
+            // client
+            //     .urls()
+            //     .create(init_url.clone(), vec![])
+            //     .exec()
+            //     .await
+            //     .unwrap();
+            client.create_url_doc(&init_url.clone()).await.unwrap();
         }
     };
     // worker to main channel
@@ -53,13 +55,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             // invoke the default handler and exit the process
             orig_hook(panic_info);
             let _ = async {
-                let client: PrismaClient = PrismaClient::_builder().build().await.unwrap();
+                let client = db::DbUtils::new().await.unwrap();
                 // update fetched = false for fetching url
                 let mut update_data = vec![];
                 for url in &fetching_url.clone().lock().unwrap().clone() {
-                    update_data.push(client.urls().update(
-                        prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
-                        vec![prisma::urls::fetched::set(false)],
+                    // update_data.push(client.urls().update(
+                    //     prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
+                    //     vec![prisma::urls::fetched::set(false)],
+                    // ));
+                    update_data.push(client.update_url_doc_daft(
+                        url.to_string(),
+                        vec![db::UpdateUrlDocFields::Fetched(false)],
                     ));
                 }
                 let _ = client._batch(update_data).await;
@@ -70,7 +76,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut workers = Vec::new();
     for i in 0..num_of_threads {
-        println!("spawn {}", i);
+        log::info!("spawn {}", i);
         let tx = main_tx.clone();
         let rx = worker_rx.clone();
         let worker = tokio::spawn(async move {
@@ -96,23 +102,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         if worker_rx.is_empty() {
             let wait_time = rand::thread_rng().gen_range(1..5);
             tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
-            let mut pending_url =
-                util::get_pending_urls(&client, num_of_threads - worker_rx.len(), "".to_string())
-                    .await;
+            let mut pending_url = client
+                .get_pending_urls(num_of_threads - worker_rx.len(), "".to_string())
+                .await;
             if !pending_url.is_empty() {
                 while !worker_rx.is_full() {
                     let pending_url = {
                         let tmp = pending_url.pop();
                         if tmp.is_none() {
-                            // let wait_time = rand::thread_rng().gen_range(1..5);
-                            // tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
-                            // pending_url = util::get_pending_urls(
-                            //     &client,
-                            //     num_of_threads - worker_rx.len(),
-                            //     "".to_string(),
-                            // )
-                            // .await;
-                            // continue;
                             break;
                         }
                         tmp.unwrap()
@@ -130,7 +127,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         }
         let job = main_rx.recv().await.unwrap();
-        // println!("job {:?}", job);
+        // log::info!("job {:?}", job);
         match job {
             ThreadMessage::Stop(id) => {
                 // spawn new worker and replace old
@@ -145,25 +142,32 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let wait_time = rand::thread_rng().gen_range(1..5);
                 tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                 if i >= 10 {
+                    // client
+                    //     .urls()
+                    //     .update(
+                    //         prisma::urls::UniqueWhereParam::UrlEquals(url.to_string()),
+                    //         vec![
+                    //             prisma::urls::is_error::set(true),
+                    //             prisma::urls::fetched::set(true),
+                    //         ],
+                    //     )
+                    //     .exec()
+                    //     .await
+                    //     .unwrap();
                     client
-                        .urls()
-                        .update(
-                            prisma::urls::UniqueWhereParam::UrlEquals(url.to_string()),
+                        .update_url_doc(
+                            url.to_string(),
                             vec![
-                                prisma::urls::is_error::set(true),
-                                prisma::urls::fetched::set(true),
+                                db::UpdateUrlDocFields::Fetched(true),
+                                db::UpdateUrlDocFields::IsError(true),
                             ],
                         )
-                        .exec()
                         .await
                         .unwrap();
                     fetching_url.lock().unwrap().remove(&url);
-                    let mut pending_urls = util::get_pending_urls(
-                        &client,
-                        num_of_threads - worker_rx.len(),
-                        url.clone(),
-                    )
-                    .await;
+                    let mut pending_urls = client
+                        .get_pending_urls(num_of_threads - worker_rx.len(), url.clone())
+                        .await;
                     // dbg!(&pending_urls);
                     while !worker_rx.is_full() {
                         let pending_url = {
@@ -171,12 +175,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                             if tmp.is_none() {
                                 let wait_time = rand::thread_rng().gen_range(1..5);
                                 tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
-                                pending_urls = util::get_pending_urls(
-                                    &client,
-                                    num_of_threads - worker_rx.len(),
-                                    url.clone(),
-                                )
-                                .await;
+                                pending_urls = client
+                                    .get_pending_urls(num_of_threads - worker_rx.len(), url.clone())
+                                    .await;
                                 continue;
                                 // break;
                             }
@@ -195,7 +196,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     }
                     continue;
                 }
-                println!("retry {}", url);
+                log::info!("retry {}", url);
                 worker_tx
                     .send(types::thread_message::ThreadMessage::Start(url, i + 1))
                     .await
@@ -203,16 +204,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             ThreadMessage::Done(worker_pending_url, comic_url, _) => {
                 for u in worker_pending_url {
-                    let url = util::filters_urls(u, &client).await;
+                    let url = client.filters_urls(u).await;
                     if url.is_none() {
                         continue;
                     };
-                    client
-                        .urls()
-                        .create(url.unwrap().to_string(), vec![])
-                        .exec()
-                        .await
-                        .unwrap();
+                    // client
+                    //     .urls()
+                    //     .create(url.unwrap().to_string(), vec![])
+                    //     .exec()
+                    //     .await
+                    //     .unwrap();
+                    client.create_url_doc(&url.unwrap().to_string()).await.unwrap();
                 }
 
                 fetching_url.lock().unwrap().remove(&comic_url);
@@ -220,12 +222,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 let wait_time = rand::thread_rng().gen_range(1..5);
                 tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
                 // sleep 1s
-                let mut pending_urls = util::get_pending_urls(
-                    &client,
-                    num_of_threads - worker_rx.len(),
-                    comic_url.clone(),
-                )
-                .await;
+                let mut pending_urls = client
+                    .get_pending_urls(num_of_threads - worker_rx.len(), comic_url.clone())
+                    .await;
                 // dbg!(&pending_urls);
                 while !worker_rx.is_full() {
                     let pending_url = {
@@ -233,12 +232,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                         if tmp.is_none() {
                             let wait_time = rand::thread_rng().gen_range(1..5);
                             tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
-                            pending_urls = util::get_pending_urls(
-                                &client,
-                                num_of_threads - worker_rx.len(),
-                                comic_url.clone(),
-                            )
-                            .await;
+                            pending_urls = client
+                                .get_pending_urls(
+                                    num_of_threads - worker_rx.len(),
+                                    comic_url.clone(),
+                                )
+                                .await;
                             continue;
                             // break;
                         }
@@ -257,7 +256,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             _ => {}
         }
     }
-    println!("finished");
+    log::info!("finished");
     while worker_rx.len() > 0 {
         let _ = dbg!(worker_rx.recv().await);
     }
@@ -268,16 +267,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     for w in workers {
         w.join_handle.await.unwrap();
-        println!("worker joined");
+        log::info!("worker joined");
     }
     let _ = async {
-        let client: PrismaClient = PrismaClient::_builder().build().await.unwrap();
+        let client = db::DbUtils::new().await.unwrap();
         // update fetched = false for fetching url
         let mut update_data = vec![];
         for url in &fetching_url.clone().lock().unwrap().clone() {
-            update_data.push(client.urls().update(
-                prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
-                vec![prisma::urls::fetched::set(false)],
+            // update_data.push(client.urls().update(
+            //     prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
+            //     vec![prisma::urls::fetched::set(false)],
+            // ));
+            update_data.push(client.update_url_doc_daft(
+                url.to_string(),
+                vec![db::UpdateUrlDocFields::Fetched(false)],
             ));
         }
         let _ = client._batch(update_data).await;

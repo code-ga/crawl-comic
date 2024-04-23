@@ -4,7 +4,7 @@ use regex::Regex;
 use tokio::sync::Mutex;
 
 use crate::{
-    prisma::{self, PrismaClient},
+    db::{DbUtils, UpdateUrlDocFields},
     types::thread_message::ThreadMessage,
     util::get_host,
 };
@@ -117,14 +117,16 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
 }
 
 pub async fn get_http_client(
-    client: &PrismaClient,
-) -> Result<(reqwest::Client, Option<prisma::proxy::Data>), Box<dyn std::error::Error + Send + Sync>>
-{
-    let proxy = crate::util::get_proxy(&client).await;
+    client: &DbUtils,
+) -> Result<
+    (reqwest::Client, Option<crate::db::DbProxyData>),
+    Box<dyn std::error::Error + Send + Sync>,
+> {
+    let proxy = client.get_proxy().await;
     let mut http_client = reqwest::ClientBuilder::new();
     if proxy.is_some() {
         let proxy = proxy.clone().unwrap();
-        println!("using proxy {} - {}", proxy.id, proxy.url);
+        log::info!("using proxy {} - {}", proxy.id, proxy.url);
         http_client = http_client.proxy({
             let mut client_proxy = reqwest::Proxy::all(proxy.url.to_string().trim().to_string())?;
             if proxy.username.is_some() && proxy.password.is_some() {
@@ -154,7 +156,7 @@ pub async fn get_http_client(
 }
 
 async fn fetch_page_with_reqwest(
-    client: &PrismaClient,
+    client: &DbUtils,
     hostname: &str,
     worker_id: usize,
     url: String,
@@ -169,7 +171,7 @@ async fn fetch_page_with_reqwest(
     }
     let resp = rep.send().await;
     if let Err(e) = resp {
-        println!(
+        log::info!(
             "worker {} failed {} fetching error {:#?}",
             worker_id,
             url.to_string(),
@@ -185,7 +187,7 @@ async fn fetch_page_with_reqwest(
             tokio::time::sleep(std::time::Duration::from_secs(5)).await;
         }
 
-        println!(
+        log::info!(
             "worker {} failed {} status : {}",
             worker_id,
             url.to_string(),
@@ -198,22 +200,31 @@ async fn fetch_page_with_reqwest(
         )));
     } else if resp_unwrap.status().as_u16().eq(&404) {
         {
+            // let tmp = client
+            //     .urls()
+            //     .update(
+            //         prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
+            //         vec![
+            //             prisma::urls::fetched::set(true),
+            //             prisma::urls::fetching::set(false),
+            //         ],
+            //     )
+            //     .exec()
+            //     .await;
             let tmp = client
-                .urls()
-                .update(
-                    prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
+                .update_url_doc(
+                    url.to_string(),
                     vec![
-                        prisma::urls::fetched::set(true),
-                        prisma::urls::fetching::set(false),
+                        UpdateUrlDocFields::Fetched(true),
+                        UpdateUrlDocFields::Fetching(false),
                     ],
                 )
-                .exec()
                 .await;
             if let Err(e) = tmp {
                 return Err(Box::new(e));
             }
         };
-        println!(
+        log::info!(
             "worker {} done {} status : {}",
             worker_id,
             url.to_string(),
@@ -232,12 +243,12 @@ async fn fetch_page_with_reqwest(
 }
 
 async fn fetch_page_with_headless_browser(
-    _client: &PrismaClient,
+    _client: &DbUtils,
     hostname: &str,
     _worker_id: usize,
     url: String,
 ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-    println!("fetching with headless {}", url);
+    log::info!("fetching with headless {}", url);
     let driver = undetected_chromedriver::chrome().await.unwrap();
     driver.goto(&url).await?;
     if NETTRUYEN_HOSTS.contains(&hostname) {
@@ -269,7 +280,7 @@ async fn fetch_page_with_headless_browser(
 }
 
 async fn fetch_page(
-    client: &PrismaClient,
+    client: &DbUtils,
     hostname: &str,
     worker_id: usize,
     url: String,
@@ -285,8 +296,8 @@ pub async fn thread_worker(
     rx: async_channel::Receiver<ThreadMessage>,
     worker_id: usize,
 ) {
-    let client: PrismaClient = {
-        let tmp = PrismaClient::_builder().build().await;
+    let client = {
+        let tmp = DbUtils::new().await;
         if tmp.is_err() {
             tx.send(ThreadMessage::Stop(worker_id)).await.unwrap();
         }
@@ -303,20 +314,31 @@ pub async fn thread_worker(
                 if !ACCEPTED_HOSTS.contains(&hostname.as_str())
                     && !NETTRUYEN_HOSTS.contains(&hostname.as_str())
                 {
-                    println!("{} is not accepted host", hostname);
+                    log::info!("{} is not accepted host", hostname);
                     {
+                        // let tmp = client
+                        //     .lock()
+                        //     .await
+                        //     .urls()
+                        //     .update(
+                        //         prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
+                        //         vec![
+                        //             prisma::urls::fetched::set(true),
+                        //             prisma::urls::fetching::set(false),
+                        //         ],
+                        //     )
+                        //     .exec()
+                        //     .await;
                         let tmp = client
                             .lock()
                             .await
-                            .urls()
-                            .update(
-                                prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
+                            .update_url_doc(
+                                url.clone(),
                                 vec![
-                                    prisma::urls::fetched::set(true),
-                                    prisma::urls::fetching::set(false),
+                                    UpdateUrlDocFields::Fetched(true),
+                                    UpdateUrlDocFields::Fetching(false),
                                 ],
                             )
-                            .exec()
                             .await;
                         if tmp.is_err() {
                             {
@@ -336,7 +358,7 @@ pub async fn thread_worker(
                 let wait_time = rand::thread_rng().gen_range(1..10);
                 tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
 
-                println!("worker {} fetching {}", worker_id, url);
+                log::info!("worker {} fetching {}", worker_id, url);
                 let html = {
                     let client = client.lock().await;
                     match fetch_page(&client, &hostname, worker_id, url.clone()).await {
@@ -351,7 +373,7 @@ pub async fn thread_worker(
                             }
                         }
                         Err(e) => {
-                            println!("worker {} failed {} error {:#?}", worker_id, url, e);
+                            log::info!("worker {} failed {} error {:#?}", worker_id, url, e);
                             tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                 .await
                                 .unwrap();
@@ -360,7 +382,7 @@ pub async fn thread_worker(
                     }
                 };
 
-                // println!("worker {} fetched {}", worker_id, url);
+                // log::info!("worker {} fetched {}", worker_id, url);
                 let mut result = Vec::new();
                 let re = Regex::new(r#"href=["|']([^"']+)"#).unwrap();
                 for cap in re.captures_iter(&html) {
@@ -411,7 +433,7 @@ pub async fn thread_worker(
                         let pending_url_chapter = {
                             let tmp = parse_nettruyenee_chapter_page(&url, &html, &client).await;
                             if tmp.is_none() {
-                                println!("failed to parse chapter page {}", url);
+                                log::info!("failed to parse chapter page {}", url);
                                 tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                     .await
                                     .unwrap();
@@ -425,7 +447,7 @@ pub async fn thread_worker(
                             let tmp =
                                 parse_nettruyenee_comic_page(&html, &url, client.clone()).await;
                             if tmp.is_none() {
-                                println!("failed to parse comic page {}", url);
+                                log::info!("failed to parse comic page {}", url);
                                 tx.send(ThreadMessage::Retry(url.clone(), i_tries))
                                     .await
                                     .unwrap();
@@ -437,18 +459,29 @@ pub async fn thread_worker(
                     }
                 }
                 {
+                    // let tmp = client
+                    //     .lock()
+                    //     .await
+                    //     .urls()
+                    //     .update(
+                    //         prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
+                    //         vec![
+                    //             prisma::urls::fetched::set(true),
+                    //             prisma::urls::fetching::set(false),
+                    //         ],
+                    //     )
+                    //     .exec()
+                    //     .await;
                     let tmp = client
                         .lock()
                         .await
-                        .urls()
-                        .update(
-                            prisma::urls::UniqueWhereParam::UrlEquals(url.clone()),
+                        .update_url_doc(
+                            url.clone(),
                             vec![
-                                prisma::urls::fetched::set(true),
-                                prisma::urls::fetching::set(false),
+                                UpdateUrlDocFields::Fetched(true),
+                                UpdateUrlDocFields::Fetching(false),
                             ],
                         )
-                        .exec()
                         .await;
                     if tmp.is_err() {
                         {

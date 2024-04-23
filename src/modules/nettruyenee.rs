@@ -6,7 +6,7 @@ use serde_json::json;
 use tokio::sync::Mutex;
 // use lazy_static::lazy_static;
 
-use crate::prisma::{self, PrismaClient};
+use crate::db::{ChapterUpdateField, DbUtils, UpdateComicDocField};
 
 use super::NETTRUYEN_HOSTS;
 
@@ -22,24 +22,25 @@ pub fn is_comic_page(url: &str, _page: &str) -> bool {
 pub async fn parse_comic_page(
     page: &str,
     url: &str,
-    client: Arc<Mutex<PrismaClient>>,
+    client: Arc<Mutex<DbUtils>>,
 ) -> Option<Vec<String>> {
-    println!("parsing comic page {}", url);
+    log::info!("parsing comic page {}", url);
     let client = client.lock().await;
     let mut result = Vec::new();
     // fetch all urls from page
     let db_comic = {
-        let tmp = client
-            .comic()
-            .find_unique(prisma::comic::UniqueWhereParam::UrlEquals(url.to_string()))
-            .exec()
-            .await;
+        // let tmp = client
+        //     .comic()
+        //     .find_unique(prisma::comic::UniqueWhereParam::UrlEquals(url.to_string()))
+        //     .exec()
+        //     .await;
+        let tmp = client.comic_by_url(url.to_string()).await;
         if tmp.is_err() {
             return None;
         }
         let tmp = tmp.unwrap();
         if tmp.is_none() {
-            if let Ok(comic) = client.comic().create(url.to_string(), vec![]).exec().await {
+            if let Ok(comic) = client.create_empty_comic(url.to_string()).await {
                 comic
             } else {
                 return None;
@@ -58,22 +59,22 @@ pub async fn parse_comic_page(
         tmp.unwrap()[1].to_string() + " - NetTruyenEe.com"
     };
     if !db_comic.name.eq(&title) {
-        update_field.push(prisma::comic::name::set(title));
+        update_field.push(UpdateComicDocField::Name(title));
     }
     let (_, comic_info) = parse_net_truyen_html_page(&page.to_string());
-    // append comic info to update field
-    for s in comic_info {
-        update_field.push(s.clone());
+    for f in comic_info {
+        update_field.push(f.clone());
     }
     let comic_exec = {
-        let tmp = client
-            .comic()
-            .update(
-                prisma::comic::UniqueWhereParam::UrlEquals(db_comic.url),
-                update_field,
-            )
-            .exec()
-            .await;
+        // let tmp = client
+        //     .comic()
+        //     .update(
+        //         prisma::comic::UniqueWhereParam::UrlEquals(db_comic.url),
+        //         update_field,
+        //     )
+        //     .exec()
+        //     .await;
+        let tmp = client.update_comic_by_url(db_comic.url, update_field).await;
         if tmp.is_err() {
             return None;
         }
@@ -101,39 +102,51 @@ pub async fn parse_comic_page(
             url = url.replace("\" title=\"", "").trim().to_string();
         }
         let title = cap[3].to_string().trim().to_string();
-        println!("found chapter url {}", url);
+        log::info!("found chapter url {}", url);
         {
-            let tmp = client
-                .chapter()
-                .find_unique(prisma::chapter::UniqueWhereParam::UrlEquals(
-                    url.to_string(),
-                ))
-                .exec()
-                .await;
+            // let tmp = client
+            //     .chapter()
+            //     .find_unique(prisma::chapter::UniqueWhereParam::UrlEquals(
+            //         url.to_string(),
+            //     ))
+            //     .exec()
+            //     .await;
+            let tmp = client.chapter_by_url(url.to_string()).await;
             if tmp.is_err() {
                 continue;
             }
             let tmp = tmp.unwrap();
             if tmp.is_some() {
                 if tmp.unwrap().index != index {
-                    update_chapters.push(client.chapter().update_many(
-                        vec![prisma::chapter::url::equals(url.to_string())],
-                        vec![prisma::chapter::index::set(index)],
+                    // update_chapters.push(client.chapter().update_many(
+                    //     vec![prisma::chapter::url::equals(url.to_string())],
+                    //     vec![prisma::chapter::index::set(index)],
+                    // ));
+                    update_chapters.push(client.daft_update_chapter_by_url(
+                        url.to_string(),
+                        vec![ChapterUpdateField::Index(index.clone())],
                     ));
                 } else {
-                    println!("chapter {} already exists", url);
+                    log::info!("chapter {} already exists", url);
                 }
                 result.push(url.to_string());
                 i += 1;
                 continue;
             }
         }
-        chapters.push(prisma::chapter::create_unchecked(
-            title.to_string(),
-            url.to_string(),
-            comic_id.to_string(),
-            "".to_owned(),
-            vec![prisma::chapter::index::set(index)],
+        // chapters.push(prisma::chapter::create_unchecked(
+        //     title.to_string(),
+        //     url.to_string(),
+        //     comic_id.to_string(),
+        //     "".to_owned(),
+        //     vec![prisma::chapter::index::set(index)],
+        // ));
+        chapters.push(client.create_empty_chapter_dafter(
+            title.clone(),
+            url.clone(),
+            "".to_string(),
+            comic_id.clone(),
+            Some(index.clone()),
         ));
         result.push(url.to_string());
         i += 1;
@@ -141,45 +154,15 @@ pub async fn parse_comic_page(
     if client._batch(update_chapters).await.is_err() {
         return None;
     };
-    if (client.chapter().create_many(chapters))
-        .exec()
-        .await
-        .is_err()
-    {
+    if client.create_many_chapters(chapters).await.is_err() {
         return None;
     };
-
-    if !comic_exec.python_fetch_info {
-        let tmp = client
-            .html()
-            .find_unique(prisma::html::UniqueWhereParam::UrlEquals(url.to_string()))
-            .exec()
-            .await;
-        if tmp.is_err() {
-            return None;
-        }
-        let tmp = tmp.unwrap();
-        if tmp.is_none() {
-            if let Err(_) = client
-                .html()
-                .create(url.to_string(), page.to_string(), vec![])
-                .exec()
-                .await
-            {
-                return None;
-            }
-        }
-    }
 
     Some(result)
 }
 
-pub async fn parse_chapter_page(
-    url: &str,
-    html: &str,
-    client: &PrismaClient,
-) -> Option<Vec<String>> {
-    println!("fetching chapter {}", url);
+pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Option<Vec<String>> {
+    log::info!("fetching chapter {}", url);
     let created_date = {
         let created_date_re = Regex::new(r#"<i>\[Cập nhật lúc:\s+(.+)\]<\/i>"#).unwrap();
         let tmp = created_date_re.captures(html);
@@ -200,18 +183,31 @@ pub async fn parse_chapter_page(
             "cdn": cdn
         }));
     }
-    client
-        .chapter()
-        .update_many(
-            vec![prisma::chapter::url::equals(url.to_string())],
+    // client
+    //     .chapter()
+    //     .update_many(
+    //         vec![prisma::chapter::url::equals(url.to_string())],
+    //         vec![
+    //             prisma::chapter::server_image::set(images_urls),
+    //             prisma::chapter::created_date::set(created_date),
+    //         ],
+    //     )
+    //     .exec()
+    //     .await
+    //     .unwrap();
+    match client
+        .update_chapter_by_url(
+            url.to_string(),
             vec![
-                prisma::chapter::server_image::set(images_urls),
-                prisma::chapter::created_date::set(created_date),
+                ChapterUpdateField::ServerImage(images_urls),
+                ChapterUpdateField::CreatedDate(created_date),
             ],
         )
-        .exec()
         .await
-        .unwrap();
+    {
+        Ok(_) => {}
+        Err(_) => return None,
+    }
     Some(result)
 }
 
@@ -225,7 +221,7 @@ pub fn is_chapter_page(url: &str, _html: &str) -> bool {
     )
     .unwrap();
     if re.is_match(url) {
-        println!("{} is chapter page", url);
+        log::info!("{} is chapter page", url);
         return true;
     } else {
         return false;
@@ -234,12 +230,9 @@ pub fn is_chapter_page(url: &str, _html: &str) -> bool {
 
 pub fn parse_net_truyen_html_page(
     html: &str,
-) -> (
-    HashMap<String, serde_json::Value>,
-    Vec<prisma::comic::SetParam>,
-) {
+) -> (HashMap<String, serde_json::Value>, Vec<UpdateComicDocField>) {
     let mut result = HashMap::new();
-    let mut update_data = vec![prisma::comic::python_fetch_info::set(true)];
+    let mut update_data = vec![UpdateComicDocField::PythonFetchInfo(true)];
     let document = Html::parse_document(html);
 
     // fetch content, thumbnail
@@ -248,7 +241,7 @@ pub fn parse_net_truyen_html_page(
     let content = document.select(&content_selector).next();
     if let Some(content) = content {
         let content = content.inner_html().trim().to_string();
-        update_data.push(prisma::comic::content::set(Some(content.to_string())));
+        update_data.push(UpdateComicDocField::Content(Some(content.to_string())));
         result.insert("content".to_string(), json!(content.to_string()));
     }
     let thumbnail_selector =
@@ -257,7 +250,9 @@ pub fn parse_net_truyen_html_page(
     let thumbnail = document.select(&thumbnail_selector).next();
     if let Some(thumbnail) = thumbnail {
         let thumbnail = thumbnail.value().attr("src").unwrap().trim().to_string();
-        update_data.push(prisma::comic::thumbnail::set(Some(thumbnail.to_string())));
+        update_data.push(UpdateComicDocField::ThumbnailUrl(Some(
+            thumbnail.to_string(),
+        )));
         result.insert("thumbnail".to_string(), json!(thumbnail.to_string()));
     }
 
@@ -275,7 +270,7 @@ pub fn parse_net_truyen_html_page(
             .split(";")
             .map(|s| s.trim().to_string())
             .collect::<Vec<String>>();
-        update_data.push(prisma::comic::another_name::set(another_name.clone()));
+        update_data.push(UpdateComicDocField::AnotherName(another_name.clone()));
         result.insert("another_name".to_string(), json!(another_name.clone()));
     }
 
@@ -292,7 +287,7 @@ pub fn parse_net_truyen_html_page(
             let url = a.value().attr("href").unwrap();
             genre.insert(child_text, url.to_string());
         }
-        update_data.push(prisma::comic::genre::set(json!(genre.clone())));
+        update_data.push(UpdateComicDocField::Genre(json!(genre.clone())));
         result.insert("genre".to_string(), json!(genre));
     }
 
@@ -315,7 +310,7 @@ pub fn parse_net_truyen_html_page(
                 author.insert(a.to_string(), "".to_string());
             }
         }
-        update_data.push(prisma::comic::author::set(json!(author.clone())));
+        update_data.push(UpdateComicDocField::Author(json!(author.clone())));
         result.insert("author".to_string(), json!(author));
     }
 
@@ -338,6 +333,6 @@ mod test {
         let html = html.text().await.unwrap();
         let (result, _) = super::parse_net_truyen_html_page(&html);
         // print out result
-        println!("{:?}", json!(result));
+        log::info!("{:?}", json!(result));
     }
 }
