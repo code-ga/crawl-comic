@@ -16,6 +16,7 @@ mod util;
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
     let client = db::DbUtils::new().await.unwrap();
+
     let num_of_threads = 10;
     let init_url = "https://nettruyenbb.com/tim-truyen".to_string();
     {
@@ -215,7 +216,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     //     .exec()
                     //     .await
                     //     .unwrap();
-                    client.create_url_doc(&url.unwrap().to_string()).await.unwrap();
+                    client
+                        .create_url_doc(&url.unwrap().to_string())
+                        .await
+                        .unwrap();
                 }
 
                 fetching_url.lock().unwrap().remove(&comic_url);

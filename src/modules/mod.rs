@@ -187,13 +187,13 @@ async fn fetch_page_with_reqwest(
             tokio::time::sleep(std::time::Duration::from_secs(5)).await;
         }
 
-        log::info!(
+        log::error!(
             "worker {} failed {} status : {}",
             worker_id,
             url.to_string(),
             resp_unwrap.status()
         );
-        dbg!(&resp_unwrap.text().await);
+        // dbg!(&resp_unwrap.text().await);
         return Err(Box::new(std::io::Error::new(
             std::io::ErrorKind::Other,
             format!("worker {} failed {}", worker_id, url,),
