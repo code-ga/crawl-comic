@@ -1,3 +1,2 @@
 [alias]
 prisma = "run --bin prisma --"
-clear-db = "run --bin clear_db --"

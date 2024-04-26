@@ -12,27 +12,16 @@ ARG APP_NAME=crawl-comic-worker
 ################################################################################
 # Create a stage for building the application.
 
-FROM rust:${RUST_VERSION}-alpine AS build
+FROM rust:${RUST_VERSION} AS build
 ARG APP_NAME
 WORKDIR /app
 
 # Install host build dependencies.
-RUN apk add --no-cache clang lld musl-dev git
-RUN apk add pkgconfig openssl-dev openssl
-ENV OPENSSL_DIR=/usr
+# RUN apk add --no-cache clang lld musl-dev git
+RUN apt-get install -y pkg-config libssl-dev
+# ENV OPENSSL_DIR=/usr
 
-
-# Generate Prisma client
-RUN --mount=type=bind,source=src,target=src \
-    --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
-    --mount=type=bind,source=Cargo.lock,target=Cargo.lock \
-    --mount=type=bind,source=prisma,target=prisma \
-    --mount=type=cache,target=/app/target/ \
-    --mount=type=cache,target=/usr/local/cargo/git/db \
-    cargo build --locked --bin prisma &&\
-    cargo run --locked --bin prisma -- generate
-
-
+COPY src /app/src
 # Build the application.
 # Leverage a cache mount to /usr/local/cargo/registry/
 # for downloaded dependencies, a cache mount to /usr/local/cargo/git/db
@@ -41,13 +30,13 @@ RUN --mount=type=bind,source=src,target=src \
 # Leverage a bind mount to the src directory to avoid having to copy the
 # source code into the container. Once built, copy the executable to an
 # output directory before the cache mounted /app/target is unmounted.
-RUN --mount=type=bind,source=src,target=src \
-    --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
+RUN    --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
     --mount=type=bind,source=Cargo.lock,target=Cargo.lock \
     --mount=type=bind,source=prisma,target=prisma \
     --mount=type=cache,target=/app/target/ \
     --mount=type=cache,target=/usr/local/cargo/git/db \
     --mount=type=cache,target=/usr/local/cargo/registry/ \
+    cargo run --locked --bin prisma -- generate && \
     cargo build --locked --release && \
     cp ./target/release/$APP_NAME /bin/server
 
@@ -61,7 +50,12 @@ RUN --mount=type=bind,source=src,target=src \
 # By specifying the "3.18" tag, it will use version 3.18 of alpine. If
 # reproducability is important, consider using a digest
 # (e.g., alpine@sha256:664888ac9cfd28068e062c991ebcff4b4c7307dc8dd4df9e728bedde5c449d91).
-FROM zenika/alpine-chrome:with-chromedriver AS final
+FROM ubuntu AS final
+
+RUN apt update && apt-get install -y curl
+RUN curl -LO https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
+RUN rm google-chrome-stable_current_amd64.deb 
 
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/

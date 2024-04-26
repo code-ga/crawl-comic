@@ -1,5 +1,5 @@
 generator client {
-  provider = "cargo prisma"
+  provider = "cargo run --bin prisma --"
   output   = "../src/prisma.rs"
 }
 
