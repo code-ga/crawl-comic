@@ -22,6 +22,7 @@ RUN apt-get install -y pkg-config libssl-dev
 # ENV OPENSSL_DIR=/usr
 
 COPY src /app/src
+COPY ./prisma /app/prisma
 # Build the application.
 # Leverage a cache mount to /usr/local/cargo/registry/
 # for downloaded dependencies, a cache mount to /usr/local/cargo/git/db
@@ -31,7 +32,6 @@ COPY src /app/src
 # source code into the container. Once built, copy the executable to an
 # output directory before the cache mounted /app/target is unmounted.
 RUN --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
-    --mount=type=bind,source=prisma,target=prisma \
     --mount=type=cache,target=/app/target/ \
     --mount=type=cache,target=/usr/local/cargo/git/db \
     --mount=type=cache,target=/usr/local/cargo/registry/ \
