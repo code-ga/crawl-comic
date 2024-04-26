@@ -36,8 +36,8 @@ RUN    --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
     --mount=type=cache,target=/app/target/ \
     --mount=type=cache,target=/usr/local/cargo/git/db \
     --mount=type=cache,target=/usr/local/cargo/registry/ \
-    cargo run --locked --bin prisma -- generate && \
-    cargo build --locked --release && \
+    cargo run --bin prisma -- generate && \
+    cargo build --release && \
     cp ./target/release/$APP_NAME /bin/server
 
 ################################################################################
