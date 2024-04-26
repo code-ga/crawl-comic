@@ -503,7 +503,7 @@ pub async fn thread_worker(
             }
             ThreadMessage::Exited(i) => {
                 if i == worker_id {
-                    break;
+                    return ();
                 }
             }
             _ => {}

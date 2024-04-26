@@ -14,6 +14,7 @@ mod types;
 mod util;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    env_logger::init();
     let client = db::DbUtils::new().await.unwrap();
     let num_of_threads = 10;
     let init_url = "https://nettruyenbb.com/tim-truyen".to_string();
@@ -265,10 +266,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .send(types::thread_message::ThreadMessage::Exited(w.id))
             .await;
     }
-    for w in workers {
-        w.join_handle.await.unwrap();
-        log::info!("worker joined");
-    }
+    // for w in workers {
+    //     w.join_handle.await.unwrap();
+    //     log::info!("worker joined");
+    // }
     let _ = async {
         let client = db::DbUtils::new().await.unwrap();
         // update fetched = false for fetching url
