@@ -163,7 +163,6 @@ pub async fn parse_comic_page(
 
 pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Option<Vec<String>> {
     log::info!("fetching chapter {}", url);
-    log::debug!("html: {}", html);
     let created_date = {
         let created_date_re = Regex::new(r#"<i>\[Cập nhật lúc:\s+(.+)\]<\/i>"#).unwrap();
         let tmp = created_date_re.captures(html);
@@ -172,7 +171,6 @@ pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Opti
         }
         tmp.unwrap()[1].to_string()
     };
-    log::debug!("created_date: {}", created_date);
     let result = Vec::new();
 
     let images_url_regex = Regex::new(r#"<img\s+alt="[^"]+"\s+data-index="[^"]+"\s+src="([^"]+)"\s+data-original="[^"]+" data-cdn="([^"]+)"\s+\/>"#).unwrap();
@@ -185,7 +183,6 @@ pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Opti
             "cdn": cdn
         }));
     }
-    log::debug!("images_urls: {:?}", images_urls);
     // client
     //     .chapter()
     //     .update_many(
@@ -209,7 +206,10 @@ pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Opti
         .await
     {
         Ok(_) => {}
-        Err(_) => return None,
+        Err(e) => {
+            log::error!("{:?}", e);
+            return None;
+        },
     }
     Some(result)
 }
