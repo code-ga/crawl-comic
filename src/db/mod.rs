@@ -363,8 +363,8 @@ impl DbUtils {
             .create(
                 name,
                 url,
+                comic_id.to_string(),
                 created_date,
-                prisma::comic::UniqueWhereParam::IdEquals(comic_id.to_string()),
                 {
                     if index.is_none() {
                         vec![]
