@@ -172,6 +172,7 @@ pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Opti
         }
         tmp.unwrap()[1].to_string()
     };
+    log::debug!("created_date: {}", created_date);
     let result = Vec::new();
 
     let images_url_regex = Regex::new(r#"<img\s+alt="[^"]+"\s+data-index="[^"]+"\s+src="([^"]+)"\s+data-original="[^"]+" data-cdn="([^"]+)"\s+\/>"#).unwrap();
@@ -184,6 +185,7 @@ pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Opti
             "cdn": cdn
         }));
     }
+    log::debug!("images_urls: {:?}", images_urls);
     // client
     //     .chapter()
     //     .update_many(
