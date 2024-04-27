@@ -382,7 +382,6 @@ pub async fn thread_worker(
                     }
                 };
 
-                // log::info!("worker {} fetched {}", worker_id, url);
                 let mut result = Vec::new();
                 let re = Regex::new(r#"href=["|']([^"']+)"#).unwrap();
                 for cap in re.captures_iter(&html) {

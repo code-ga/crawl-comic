@@ -58,20 +58,19 @@ RUN rm google-chrome-stable_current_amd64.deb
 
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/go/dockerfile-user-best-practices/
-# ARG UID=10001
-# USER root
-# RUN adduser \
-#     --disabled-password \
-#     --gecos "" \
-#     --home "/nonexistent" \
-#     --shell "/sbin/nologin" \
-#     --uid "${UID}" \
-#     appuser
+ARG UID=10001
+USER root
+RUN adduser \
+    --disabled-password \
+    --gecos "" \
+    --home "/nonexistent" \
+    --shell "/sbin/nologin" \
+    --uid "${UID}" \
+    appuser
 USER appuser
 
 # Copy the executable from the "build" stage.
 COPY --from=build /bin/server /bin/
-RUN mkdir -p ~/.undetected-chromedriver
 
 # Expose the port that the application listens on.
 EXPOSE 8080
