@@ -330,11 +330,11 @@ impl DbUtils {
         &self,
         url: String,
         update_field: Vec<ChapterUpdateField>,
-    ) -> Result<prisma::chapter::Data, prisma_client_rust::queries::QueryError> {
+    ) -> Result<i64, prisma_client_rust::queries::QueryError> {
         self.prisma
             .chapter()
-            .update(
-                prisma::chapter::UniqueWhereParam::UrlEquals(url.to_string()),
+            .update_many(
+                vec![crate::prisma::chapter::url::equals(url.to_string())],
                 update_field.iter().map(|x| x.to_prisma_set()).collect(),
             )
             .exec()
@@ -360,19 +360,13 @@ impl DbUtils {
     ) -> Result<prisma::chapter::Data, prisma_client_rust::queries::QueryError> {
         self.prisma
             .chapter()
-            .create(
-                name,
-                url,
-                comic_id.to_string(),
-                created_date,
-                {
-                    if index.is_none() {
-                        vec![]
-                    } else {
-                        vec![prisma::chapter::index::set(index.unwrap())]
-                    }
-                },
-            )
+            .create(name, url, comic_id.to_string(), created_date, {
+                if index.is_none() {
+                    vec![]
+                } else {
+                    vec![prisma::chapter::index::set(index.unwrap())]
+                }
+            })
             .exec()
             .await
     }

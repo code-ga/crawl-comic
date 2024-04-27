@@ -183,18 +183,26 @@ pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Opti
             "cdn": cdn
         }));
     }
-
+    // client
+    //         .prisma
+    //         .chapter()
+    //         .update_many(
+    //             vec![crate::prisma::chapter::url::equals(url.to_string())],
+    //             vec![
+    //                 crate::prisma::chapter::server_image::set(images_urls),
+    //                 crate::prisma::chapter::created_date::set(created_date),
+    //             ],
+    //         )
+    //         .exec()
+    //         .await;
     match client
-        .prisma
-        .chapter()
-        .update_many(
-            vec![crate::prisma::chapter::url::equals(url.to_string())],
+        .update_chapter_by_url(
+            url.to_string(),
             vec![
-                crate::prisma::chapter::server_image::set(images_urls),
-                crate::prisma::chapter::created_date::set(created_date),
+                ChapterUpdateField::ServerImage(images_urls),
+                ChapterUpdateField::CreatedDate(created_date),
             ],
         )
-        .exec()
         .await
     {
         Ok(_) => {}
