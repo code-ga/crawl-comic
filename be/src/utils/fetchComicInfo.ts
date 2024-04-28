@@ -132,7 +132,7 @@ export function ParseNetTruyenHtmlPage($: cheerio.CheerioAPI): Comic {
     return result
 }
 
-export function processArrayComic(comic: PrismaComic[], meili?: MeiliSearch) {
+export function processArrayComic(comic: PrismaComic[], meili?: MeiliSearch): Promise<PrismaComic[]> {
     return Promise.all(comic.map(async (c) => {
         if (!c.thumbnail) {
             // refetch comic update in db and return
@@ -149,6 +149,17 @@ export function processArrayComic(comic: PrismaComic[], meili?: MeiliSearch) {
                 await index.addDocuments([updated])
             }
         }
-        return c
+        return processComic(c)
     }))
+}
+
+export function isHtml(text: string): boolean {
+    return /<[^>]*>/.test(text)
+}
+export function processComic(comic: PrismaComic) {
+    const result = structuredClone(comic)
+    if (result.content && isHtml(result.content)) {
+        console.log("comic description", cheerio.load(result.content).text())
+    }
+    return result
 }

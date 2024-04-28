@@ -3,17 +3,15 @@
   "version": "1.0.50",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build:bun": "bun build src/index.ts",
-    "start:bun": "bun src/index.ts",
-    "dev:bun": "bun run --watch src/index.ts",
-    "start:node": "tsx src/index.ts",
-    "dev:node": "tsx --watch src/index.ts",
+    "build": "bun build src/index.ts",
+    "start": "bun src/index.ts",
+    "dev": "bun run --watch src/index.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {
     "@elysiajs/cors": "1.0.0",
     "@elysiajs/swagger": "1.0.0",
-    "@prisma/client": "5.10.2",
+    "@prisma/client": "latest",
     "cheerio": "^1.0.0-rc.12",
     "elysia": "1.0.0",
     "meilisearch": "^0.38.0",
@@ -21,7 +19,7 @@
   },
   "devDependencies": {
     "bun-types": "latest",
-    "prisma": "latest"
+    "prisma": "^5.13.0"
   },
   "module": "src/index.js"
 }

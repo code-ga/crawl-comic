@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
 import { prisma } from "../db";
-import { parseComicHtmlPage, processArrayComic } from "../utils/fetchComicInfo";
+import { parseComicHtmlPage, processArrayComic, processComic } from "../utils/fetchComicInfo";
 import { BaseResponse, Chapter, Comic, ComicIncludeChapter } from "../typings";
 import { MeiliSearch } from "meilisearch"
 
@@ -180,7 +180,7 @@ export const apiRoute =
             return {
                 status: 200,
                 message: "Fetched successfully",
-                data: result as any
+                data: processComic(result) as any
             }
         }, {
             params: t.Object({
@@ -498,7 +498,7 @@ export const apiRoute =
             return {
                 status: 200,
                 message: "Fetched successfully",
-                data: result as any
+                data: processComic(result) as any
             }
         }, {
             params: t.Object({
@@ -669,11 +669,11 @@ export const apiRoute =
                 description: "Server will be put Chapter into queue for worker will be fetch after ( Can be very long time for worker refetch )",
             }
         })
-        .get("/add/comic/source", async ({ query, set }) => {
+        .post("/add/comic/source", async ({ body, set }) => {
             const urlDoc = await prisma.urls.findFirst({
                 where: {
                     url: {
-                        equals: query.url
+                        equals: body.url
                     }
                 }
             })
@@ -683,7 +683,7 @@ export const apiRoute =
                     message: "Already added",
                 }
             }
-            const hostname = new URL(query.url).hostname
+            const hostname = new URL(body.url).hostname
             if (!hostname) {
                 set.status = 400
                 return {
@@ -701,7 +701,7 @@ export const apiRoute =
             }
             await prisma.urls.create({
                 data: {
-                    url: query.url
+                    url: body.url
                 }
             })
             return {
@@ -709,7 +709,7 @@ export const apiRoute =
                 message: "Added successfully",
             }
         }, {
-            query: t.Object({
+            body: t.Object({
                 url: t.String()
             }),
             response: {
