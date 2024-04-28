@@ -4,6 +4,7 @@ import { appRoute } from "./router";
 import cors from "@elysiajs/cors";
 import createSubscriber from "pg-listen"
 import { prisma } from "./db";
+import MeiliSearch from "meilisearch";
 
 
 const subscriber = createSubscriber({
@@ -24,11 +25,16 @@ const subscriber = createSubscriber({
   await subscriber.listenTo("new_update_or_create_Comic")
 })();
 
+const meili = process.env.MEILISEARCH_HOST ? new MeiliSearch({
+  host: process.env.MEILISEARCH_HOST,
+  apiKey: process.env.MEILISEARCH_API_KEY,
+}) : undefined
+
 subscriber.notifications.on("new_update_or_create_Comic", async (data) => {
-  // const index = meili?.index("Comic_meilisearch")
-  // if (index) {
-  //   await index.addDocuments([updated])
-  // }
+  const index = meili?.index("Comic_meilisearch")
+  if (index) {
+    await index.addDocuments([data])
+  }
   console.log("new_update_or_create_Comic", data)
 })
 
