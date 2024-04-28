@@ -144,10 +144,6 @@ export function processArrayComic(comic: PrismaComic[], meili?: MeiliSearch): Pr
                 },
                 data: parsed
             })
-            const index = meili?.index("Comic_meilisearch")
-            if (index) {
-                await index.addDocuments([updated])
-            }
         }
         return processComic(c)
     }))

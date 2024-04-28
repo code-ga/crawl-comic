@@ -97,13 +97,6 @@ export const apiRoute =
                         }
                     }
                 })
-                const index = meili?.index("Comic_meilisearch")
-                if (index) {
-                    await index.addDocuments([{
-                        ...comic,
-                        Chapter: undefined
-                    }])
-                }
             }
             console.log(comic)
             if (comic.Chapter.length <= 1) {
@@ -481,13 +474,6 @@ export const apiRoute =
                     }
                 }
             }))
-            const index = meili?.index("Comic_meilisearch")
-            if (index) {
-                await index.addDocuments([{
-                    ...result,
-                    Chapter: undefined
-                }])
-            }
             if (!result) {
                 set.status = 404
                 return {

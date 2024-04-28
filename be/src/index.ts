@@ -20,8 +20,17 @@ const subscriber = createSubscriber({
     }
   })
   await subscriber.connect()
-  await subscriber.listenTo("new_update_or_create")
+  await subscriber.listenTo("new_update_or_create_Urls")
+  await subscriber.listenTo("new_update_or_create_Comic")
 })();
+
+subscriber.notifications.on("new_update_or_create_Comic", async (data) => {
+  // const index = meili?.index("Comic_meilisearch")
+  // if (index) {
+  //   await index.addDocuments([updated])
+  // }
+  console.log("new_update_or_create_Comic", data)
+})
 
 const wsIntervalMap = new Map<string, any>()
 
@@ -60,7 +69,7 @@ const app = new Elysia()
   .ws("/url/fetching", {
     open: (ws) => {
       console.log("open");
-      subscriber.notifications.on("new_update_or_create", (data) => {
+      subscriber.notifications.on("new_update_or_create_Urls", (data) => {
         ws.send(JSON.stringify(data))
       })
       wsIntervalMap.set(ws.id, setInterval(async () => {
