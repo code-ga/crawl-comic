@@ -159,7 +159,7 @@ export function isHtml(text: string): boolean {
 export function processComic(comic: PrismaComic) {
     const result = structuredClone(comic)
     if (result.content && isHtml(result.content)) {
-        console.log("comic description", cheerio.load(result.content).text())
+        result.content = cheerio.load(result.content).text()
     }
     return result
 }
