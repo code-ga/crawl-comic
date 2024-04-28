@@ -24,6 +24,7 @@ model Comic {
   createdDate     DateTime  @default(now())
   updatedDate     DateTime  @updatedAt
   pythonFetchInfo Boolean   @default(false)
+  Chapter         Chapter[]
 
   @@index([url])
 }
@@ -40,6 +41,7 @@ model Chapter {
   previousId  String?
   index       Int      @default(0)
   serverImage Json[]   @default([])
+  Comic       Comic    @relation(fields: [comicId], references: [id])
 
   @@index([comicId, index])
   @@index([url])

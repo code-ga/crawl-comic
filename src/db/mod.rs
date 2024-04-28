@@ -360,13 +360,19 @@ impl DbUtils {
     ) -> Result<prisma::chapter::Data, prisma_client_rust::queries::QueryError> {
         self.prisma
             .chapter()
-            .create(name, url, comic_id.to_string(), created_date, {
-                if index.is_none() {
-                    vec![]
-                } else {
-                    vec![prisma::chapter::index::set(index.unwrap())]
-                }
-            })
+            .create(
+                name,
+                url,
+                created_date,
+                prisma::comic::UniqueWhereParam::IdEquals(comic_id.to_string()),
+                {
+                    if index.is_none() {
+                        vec![]
+                    } else {
+                        vec![prisma::chapter::index::set(index.unwrap())]
+                    }
+                },
+            )
             .exec()
             .await
     }
