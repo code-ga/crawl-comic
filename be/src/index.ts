@@ -33,7 +33,7 @@ const meili = process.env.MEILISEARCH_HOST ? new MeiliSearch({
 subscriber.notifications.on("new_update_or_create_Comic", async (data) => {
   const index = meili?.index("Comic_meilisearch")
   if (index) {
-    await index.addDocuments([data])
+    await index.addDocuments([JSON.parse(data)])
   }
   console.log("new_update_or_create_Comic", data)
 })
