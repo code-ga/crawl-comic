@@ -9,11 +9,11 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@elysiajs/cors": "1.0.0",
-    "@elysiajs/swagger": "1.0.0",
+    "@elysiajs/cors": "^1.0.2",
+    "@elysiajs/swagger": "^1.0.4",
     "@prisma/client": "latest",
     "cheerio": "^1.0.0-rc.12",
-    "elysia": "1.0.0",
+    "elysia": "^1.0.15",
     "meilisearch": "^0.38.0",
     "pg-listen": "^1.7.0"
   },
