@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import { Search } from "../components/Search";
 
 export default function Template({
   children,
@@ -9,7 +10,8 @@ export default function Template({
       <div className="w-full flex justify-between p-3 text-center content-center py-4 mb-4 bg-slate-900">
         {/* navbar */}
         <Link href="/">Back to home here</Link>
-        <h1 className="text-3xl">this is the navbar {"=>>"}</h1>
+        <Search></Search>
+        {/* <h1 className="text-3xl">this is the navbar {"=>>"}</h1> */}
         <div className="text-center">
           <div>viết gì đây</div>
           <div>

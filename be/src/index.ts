@@ -6,7 +6,6 @@ import createSubscriber from "pg-listen"
 import { prisma } from "./db";
 import MeiliSearch from "meilisearch";
 
-
 const subscriber = createSubscriber({
   connectionString: process.env.DATABASE_URL,
 });
@@ -23,6 +22,7 @@ const subscriber = createSubscriber({
   await subscriber.connect()
   await subscriber.listenTo("new_update_or_create_Urls")
   await subscriber.listenTo("new_update_or_create_Comic")
+  await subscriber.listenTo("delete_Comic")
 })();
 
 const meili = process.env.MEILISEARCH_HOST ? new MeiliSearch({
@@ -36,6 +36,14 @@ subscriber.notifications.on("new_update_or_create_Comic", async (data) => {
     await index.addDocuments([data])
   }
   console.log("new_update_or_create_Comic", data)
+})
+
+subscriber.notifications.on("delete_Comic", async (data) => {
+  const index = meili?.index("Comic_meilisearch")
+  if (index) {
+    await index.deleteDocument(data.id)
+  }
+  console.log("delete_Comic", data)
 })
 
 const wsIntervalMap = new Map<string, any>()
@@ -97,7 +105,6 @@ const app = new Elysia()
   })
   .use(appRoute)
   .listen(PORT);
-
 export type App = typeof app
 export * as types from "./typings"
 console.log(
