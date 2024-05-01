@@ -1,5 +1,5 @@
 "use client";
-import { ComicsApiReturn, ElysiaServerApi } from "@/typings";
+import { AppApi, ComicsApiReturn, ElysiaServerApi } from "@/typings";
 import { edenTreaty } from "@elysiajs/eden";
 import { Suspense, useEffect, useState } from "react";
 import { ListComic } from "../components/ListComic";
@@ -11,6 +11,23 @@ import { notFound, useSearchParams } from "next/navigation";
 const comicPerPage = 10;
 export default function Home() {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
+
+  return (
+    <div className="grid grid-cols-4 gap-4 text-center">
+      {/* content */}
+      <div className="hidden md:flex w-full">
+        <Suspense fallback={<Loading />}>
+          <SideBar app={app}></SideBar>
+        </Suspense>
+        <Suspense fallback={<Loading />}>
+          <Comics app={app}></Comics>
+        </Suspense>{" "}
+      </div>
+    </div>
+  );
+}
+
+function Comics({ app }: { app: AppApi }) {
   const [{ comic, error, loading }, setComic] = useState<{
     comic?: ComicsApiReturn[];
     error: any;
@@ -47,15 +64,8 @@ export default function Home() {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
-
   return (
-    <div className="grid grid-cols-4 gap-4 text-center">
-      {/* content */}
-      <div className="hidden md:flex w-full">
-        <Suspense fallback={<Loading />}>
-          <SideBar app={app}></SideBar>
-        </Suspense>
-      </div>
+    <>
       {loading ? (
         <Loading />
       ) : !comic && error ? (
@@ -63,6 +73,6 @@ export default function Home() {
       ) : (
         <ListComic comics={comic!} page={page} />
       )}
-    </div>
+    </>
   );
 }
