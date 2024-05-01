@@ -52,6 +52,7 @@ impl DbUtils {
         &self,
         url: &str,
     ) -> Result<prisma::urls::Data, prisma_client_rust::queries::QueryError> {
+        log::debug!("create url {}", url);
         self.prisma
             .urls()
             .create(url.to_string(), vec![])

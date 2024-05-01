@@ -23,7 +23,7 @@ use nettruyenee::{
     parse_comic_page as parse_nettruyenee_comic_page,
 };
 
-pub static ACCEPTED_HOSTS: [&str; 7] = [
+pub static ACCEPTED_HOSTS: [&str; 9] = [
     "blogtruyenmoi.com",
     "nettruyenee.com",
     "www.nettruyenee.com",
@@ -31,14 +31,18 @@ pub static ACCEPTED_HOSTS: [&str; 7] = [
     "nettruyenff.com",
     "nettruyenbb.com",
     "www.nettruyenbb.com",
+    "www.nettruyenvv.com",
+    "nettruyenvv.com"
 ];
-pub static NETTRUYEN_HOSTS: [&str; 6] = [
+pub static NETTRUYEN_HOSTS: [&str; 8] = [
     "nettruyenee.com",
     "www.nettruyenee.com",
     "nettruyenff.com",
     "www.nettruyenff.com",
     "nettruyenbb.com",
     "www.nettruyenbb.com",
+    "www.nettruyenvv.com",
+    "nettruyenvv.com"
 ];
 
 pub fn process_url(url: &str, now_url: &str) -> Option<String> {
@@ -92,6 +96,7 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
             return None;
         }
         let url_host = url_host.unwrap();
+        log::debug!("url_host: {}", url_host);
         if !NETTRUYEN_HOSTS.contains(&url_host.as_str()) {
             return None;
         }

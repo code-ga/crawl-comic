@@ -12,13 +12,13 @@ ARG APP_NAME=crawl-comic-worker
 ################################################################################
 # Create a stage for building the application.
 
-FROM rust:${RUST_VERSION} AS build
+FROM rust:${RUST_VERSION}-slim AS build
 ARG APP_NAME
 WORKDIR /app
 
 # Install host build dependencies.
 # RUN apk add --no-cache clang lld musl-dev git
-RUN apt-get install -y pkg-config libssl-dev
+RUN apt update && apt-get install -y pkg-config libssl-dev && apt clean && rm -rf /var/lib/apt/lists/*
 # ENV OPENSSL_DIR=/usr
 
 COPY src /app/src
