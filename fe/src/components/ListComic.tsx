@@ -16,7 +16,7 @@ export function ListComic({
         <ComicCard key={comic.id} comic={comic}></ComicCard>
       ))}
       {/* next page */}
-      {page && (
+      {page !== undefined && (
         <div className="flex justify-center content-center mb-3">
           {page > 0 && (
             <Link className="text-center mx-3" href={`/?page=${page - 1}`}>

@@ -18,6 +18,8 @@ export default function Page() {
         <Suspense fallback={<Loading />}>
           <SideBar app={app}></SideBar>
         </Suspense>
+      </div>
+      <div className="col-span-4 md:col-span-3">
         <Suspense fallback={<Loading />}>
           <Comics app={app}></Comics>
         </Suspense>

@@ -19,9 +19,11 @@ export default function Home() {
         <Suspense fallback={<Loading />}>
           <SideBar app={app}></SideBar>
         </Suspense>
+      </div>
+      <div className="col-span-4 md:col-span-3">
         <Suspense fallback={<Loading />}>
           <Comics app={app}></Comics>
-        </Suspense>{" "}
+        </Suspense>
       </div>
     </div>
   );
@@ -65,7 +67,7 @@ function Comics({ app }: { app: AppApi }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
   return (
-    <>
+    <div>
       {loading ? (
         <Loading />
       ) : !comic && error ? (
@@ -73,6 +75,6 @@ function Comics({ app }: { app: AppApi }) {
       ) : (
         <ListComic comics={comic!} page={page} />
       )}
-    </>
+    </div>
   );
 }
