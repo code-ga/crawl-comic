@@ -1,13 +1,9 @@
 "use client";
+import { useRouter } from "next/navigation";
 import React from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 export function Search() {
   const router = useRouter();
-  const path = usePathname();
-  const searchParams = useSearchParams();
-  const [q, setQ] = React.useState(
-    path != "/search" ? "" : searchParams.get("q") || ""
-  );
+  const [q, setQ] = React.useState("");
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     //get search input
