@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
-import { AppApi } from "../typings";
 import { EdenWS } from "@elysiajs/eden/treaty";
+import { useEffect, useRef, useState } from "react";
+import { AppApi } from "../typings";
 
 export const SideBar = ({ app }: { app: AppApi }) => {
   const [fetching, setFetching] = useState(new Set<string>());
@@ -37,7 +37,6 @@ export const SideBar = ({ app }: { app: AppApi }) => {
               pre.delete(data.url);
             }
 
-            
             return new Set(pre);
           });
         });
