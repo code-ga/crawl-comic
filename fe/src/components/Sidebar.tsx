@@ -47,7 +47,6 @@ export const SideBar = ({ app }: { app: AppApi }) => {
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  console.log({ fetching });
   return (
     <div className="text-center sticky top-0 h-dvh overflow-hidden">
       <p>Side Bar</p>

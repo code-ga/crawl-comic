@@ -1,15 +1,15 @@
 "use client";
-import { ComicsApiReturn, ElysiaServerApi } from "@/typings";
 import { edenTreaty } from "@elysiajs/eden";
-import { Suspense, useEffect, useState } from "react";
-import { ListComic } from "../components/ListComic";
-import { Loading } from "../components/loading";
-import { SideBar } from "../components/Sidebar";
-import { beUrl } from "../constant";
 import { notFound, useSearchParams } from "next/navigation";
+import { beUrl } from "../../constant";
+import { ComicsApiReturn, ElysiaServerApi } from "../../typings";
+import { Suspense, useEffect, useState } from "react";
+import { ListComic } from "../../components/ListComic";
+import { Loading } from "../../components/loading";
+import { SideBar } from "../../components/Sidebar";
+import page from "../page";
 
-const comicPerPage = 10;
-export default function Home() {
+export default function Page() {
   const app = edenTreaty<ElysiaServerApi>(beUrl);
   const [{ comic, error, loading }, setComic] = useState<{
     comic?: ComicsApiReturn[];
@@ -21,16 +21,15 @@ export default function Home() {
     loading: true,
   });
   const searchParams = useSearchParams();
-  const page = Number(searchParams.get("page") || 0);
-  if (page < 0) {
+  const q = searchParams.get("q");
+  if (!q) {
     notFound();
   }
-
   useEffect(() => {
     setComic((pre) => ({ ...pre, loading: true }));
-    app.api.news
+    app.api.search
       .get({
-        $query: { skip: page * comicPerPage, take: comicPerPage },
+        $query: { query: q },
       })
       .then((data) => {
         if (data.error) {
@@ -46,8 +45,7 @@ export default function Home() {
         setComic((pre) => ({ ...pre, loading: false }));
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
-
+  }, [q]);
   return (
     <div className="grid grid-cols-4 gap-4 text-center">
       {/* content */}
@@ -61,7 +59,7 @@ export default function Home() {
       ) : !comic && error ? (
         <div>Server have some error</div>
       ) : (
-        <ListComic comics={comic!} page={page} />
+        <ListComic comics={comic!} />
       )}
     </div>
   );
