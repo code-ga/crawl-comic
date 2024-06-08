@@ -18,7 +18,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = db::DbUtils::new().await.unwrap();
 
     let num_of_threads = 10;
-    let init_url = "https://nettruyenbb.com/tim-truyen".to_string();
+    let init_url = "https://blogtruyenmoi.com/33534/moi-tinh-giua-ten-lua-dao-va-nu-canh-sat".to_string();
     {
         // let tmp = client
         //     .urls()

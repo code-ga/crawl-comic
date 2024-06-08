@@ -23,7 +23,7 @@ use nettruyenee::{
     parse_comic_page as parse_nettruyenee_comic_page,
 };
 
-pub static ACCEPTED_HOSTS: [&str; 9] = [
+pub static ACCEPTED_HOSTS: [&str; 11] = [
     "blogtruyenmoi.com",
     "nettruyenee.com",
     "www.nettruyenee.com",
@@ -32,9 +32,11 @@ pub static ACCEPTED_HOSTS: [&str; 9] = [
     "nettruyenbb.com",
     "www.nettruyenbb.com",
     "www.nettruyenvv.com",
-    "nettruyenvv.com"
+    "nettruyenvv.com",
+    "nettruyentt.com",
+    "www.nettruyentt.com",
 ];
-pub static NETTRUYEN_HOSTS: [&str; 8] = [
+pub static NETTRUYEN_HOSTS: [&str; 10] = [
     "nettruyenee.com",
     "www.nettruyenee.com",
     "nettruyenff.com",
@@ -42,7 +44,9 @@ pub static NETTRUYEN_HOSTS: [&str; 8] = [
     "nettruyenbb.com",
     "www.nettruyenbb.com",
     "www.nettruyenvv.com",
-    "nettruyenvv.com"
+    "nettruyenvv.com",
+    "nettruyentt.com",
+    "www.nettruyentt.com",
 ];
 
 pub fn process_url(url: &str, now_url: &str) -> Option<String> {
@@ -256,8 +260,15 @@ async fn fetch_page_with_headless_browser(
     log::info!("fetching with headless {}", url);
     let driver = undetected_chromedriver::chrome().await.unwrap();
     driver.goto(&url).await?;
+    let mut num_of_tries = 0;
     if NETTRUYEN_HOSTS.contains(&hostname) {
         loop {
+            if num_of_tries > 10 {
+                return Err(Box::new(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!("can't try more than 10 times check page {}", url),
+                )));
+            }
             match driver
                 .find(undetected_chromedriver::By::XPath(
                     "/html/body/form/main/div[2]",
@@ -267,6 +278,40 @@ async fn fetch_page_with_headless_browser(
                 Err(e) => match e {
                     undetected_chromedriver::WebDriverError::NoSuchElement(_) => {
                         tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                        num_of_tries += 1;
+                        continue;
+                    }
+                    _ => {
+                        return Err(Box::new(e));
+                    }
+                },
+                Ok(_) => break,
+            }
+        }
+    } else if hostname.contains("blogtruyenmoi.com") {
+        loop {
+            if num_of_tries > 10 {
+                return Err(Box::new(std::io::Error::new(
+                    std::io::ErrorKind::Other,
+                    format!("can't try more than 10 times check page {}", url),
+                )));
+            }
+            match driver
+                .find(undetected_chromedriver::By::XPath(
+                    if url.starts_with("https://blogtruyenmoi.com/c") {
+                        r#"//*[@id="readonline"]/section[1]"#
+                    } else if url.starts_with("https://blogtruyenmoi.com/ajax/Search/") {
+                        "/html/body/div[1]"
+                    } else {
+                        r#"//*[@id="banner"]"#
+                    },
+                ))
+                .await
+            {
+                Err(e) => match e {
+                    undetected_chromedriver::WebDriverError::NoSuchElement(_) => {
+                        tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+                        num_of_tries += 1;
                         continue;
                     }
                     _ => {
@@ -317,7 +362,7 @@ pub async fn thread_worker(
             ThreadMessage::Start(url, i_tries) => {
                 let hostname = get_host(&url).unwrap();
                 if !ACCEPTED_HOSTS.contains(&hostname.as_str())
-                    && !NETTRUYEN_HOSTS.contains(&hostname.as_str())
+                    || !NETTRUYEN_HOSTS.contains(&hostname.as_str())
                 {
                     log::info!("{} is not accepted host", hostname);
                     {
@@ -334,6 +379,35 @@ pub async fn thread_worker(
                         //     )
                         //     .exec()
                         //     .await;
+                        let tmp = client
+                            .lock()
+                            .await
+                            .update_url_doc(
+                                url.clone(),
+                                vec![
+                                    UpdateUrlDocFields::Fetched(true),
+                                    UpdateUrlDocFields::Fetching(false),
+                                ],
+                            )
+                            .await;
+                        if tmp.is_err() {
+                            {
+                                tx.send(ThreadMessage::Retry(url.clone(), i_tries))
+                                    .await
+                                    .unwrap();
+                            }
+                            continue;
+                        }
+                    }
+                    tx.send(ThreadMessage::Done(vec![], url, false))
+                        .await
+                        .unwrap();
+                    continue;
+                }
+
+                if NETTRUYEN_HOSTS.contains(&hostname.as_str()) {
+                    log::info!("{} in time error show we skip that", hostname);
+                    {
                         let tmp = client
                             .lock()
                             .await
