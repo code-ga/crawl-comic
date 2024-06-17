@@ -362,7 +362,7 @@ pub async fn thread_worker(
             ThreadMessage::Start(url, i_tries) => {
                 let hostname = get_host(&url).unwrap();
                 if !ACCEPTED_HOSTS.contains(&hostname.as_str())
-                    || !NETTRUYEN_HOSTS.contains(&hostname.as_str())
+                    && !NETTRUYEN_HOSTS.contains(&hostname.as_str())
                 {
                     log::info!("{} is not accepted host", hostname);
                     {
