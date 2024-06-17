@@ -335,11 +335,12 @@ async fn fetch_page(
     worker_id: usize,
     url: String,
 ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
-    if let Ok(html) = fetch_page_with_reqwest(client, hostname, worker_id, url.clone()).await {
-        return Ok(html);
-    } else {
-        return fetch_page_with_headless_browser(client, hostname, worker_id, url.clone()).await;
-    }
+    // if let Ok(html) = fetch_page_with_reqwest(client, hostname, worker_id, url.clone()).await {
+    //     return Ok(html);
+    // } else {
+    //     return fetch_page_with_headless_browser(client, hostname, worker_id, url.clone()).await;
+    // }
+    return fetch_page_with_reqwest(client, hostname, worker_id, url)
 }
 pub async fn thread_worker(
     tx: async_channel::Sender<ThreadMessage>,
