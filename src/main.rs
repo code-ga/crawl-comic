@@ -18,7 +18,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = db::DbUtils::new().await.unwrap();
 
     let num_of_threads: usize = 5;
-    let init_url = "https://blogtruyenmoi.com/33534/moi-tinh-giua-ten-lua-dao-va-nu-canh-sat".to_string();
+    let init_url =
+        "https://blogtruyenmoi.com/33534/moi-tinh-giua-ten-lua-dao-va-nu-canh-sat".to_string();
     {
         // let tmp = client
         //     .urls()
@@ -288,9 +289,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             ));
         }
         let _ = client._batch(update_data).await;
+        process::exit(0);
     };
-    process::exit(0);
-    // Ok(())
+    Ok(())
 }
 
 mod tests {
