@@ -42,6 +42,7 @@ model Comic {
   createdDate     DateTime  @default(now())
   updatedDate     DateTime
   pythonFetchInfo Boolean   @default(false)
+  hidden          Boolean   @default(false)
   Chapter         Chapter[]
 
   @@index([url])

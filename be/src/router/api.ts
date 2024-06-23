@@ -24,6 +24,9 @@ export const apiRoute =
                     skip: query.skip,
                     take: query.take,
                     orderBy: { createdDate: 'asc' },
+                    where: {
+                        hidden: false
+                    }
                 }), meili) as any
             }
         }, {
@@ -411,6 +414,9 @@ export const apiRoute =
                     skip: query.skip,
                     take: query.take,
                     orderBy: { createdDate: 'desc' },
+                    where: {
+                        hidden: false
+                    }
                 }), meili) as any
             }
         }, {

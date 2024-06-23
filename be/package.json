@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "bun-types": "latest",
-    "prisma": "^5.13.0"
+    "prisma": "latest"
   },
   "module": "src/index.js"
 }
