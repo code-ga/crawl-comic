@@ -17,7 +17,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
     let client = db::DbUtils::new().await.unwrap();
 
-    let num_of_threads: usize = 5;
+    let num_of_threads: usize = std::env::var("NUM_OF_THREADS").unwrap_or("6".to_string()).parse().unwrap();
     let init_url =
         "https://blogtruyenmoi.com/33534/moi-tinh-giua-ten-lua-dao-va-nu-canh-sat".to_string();
     {

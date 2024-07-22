@@ -25,6 +25,7 @@ model Comic {
   updatedDate     DateTime  @updatedAt
   pythonFetchInfo Boolean   @default(false)
   Chapter         Chapter[]
+  hidden          Boolean   @default(false)
 
   @@index([url])
 }
