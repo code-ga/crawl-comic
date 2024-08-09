@@ -1,3 +1,4 @@
+use rand::Rng;
 use regex::Regex;
 pub mod fetch_page;
 
@@ -18,7 +19,8 @@ pub async fn upload_image_to_guilded(
     file: Vec<u8>,
 ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
     let bot_token = std::env::var("GUILDED_BOT_TOKEN")?;
-    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+    let wait_time = rand::thread_rng().gen_range(1..5);
+    tokio::time::sleep(std::time::Duration::from_secs(wait_time)).await;
     let client = reqwest::Client::new();
     let body = reqwest::multipart::Form::new().part("file", reqwest::multipart::Part::bytes(file));
     let resp = client

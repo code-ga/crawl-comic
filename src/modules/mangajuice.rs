@@ -47,7 +47,7 @@ pub async fn parse_comic_page(
         }
     };
     let mut update_field = vec![];
-    let title_regex = Regex::new(r#"<title>\s+(.*?)\s+<\/title>"#).unwrap();
+    let title_regex = Regex::new(r#"<title>(.*?)<\/title>"#).unwrap();
     let title = {
         let tmp = title_regex.captures(page);
         if tmp.is_none() {
@@ -165,8 +165,11 @@ pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Opti
     let mut images_urls = vec![];
     for cap in images_url_regex.captures_iter(&html) {
         let url = cap[1].to_string();
+        log::info!("found image url {}. Uploading...", url);
         // request to get image
         let image = if let Ok(data) = reqwest::get(&url).await {
+            log::info!("request image url {}", url);
+            // get bytes
             if let Ok(byte) = data.bytes().await {
                 byte
             } else {
@@ -174,14 +177,17 @@ pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Opti
                 continue;
             }
         } else {
+            log::info!("failed to request image url {}", url);
             images_urls.push(url);
             continue;
         };
         // upload to guilded
         let cdn_url = util::upload_image_to_guilded(image.to_vec()).await;
         if let Ok(url) = cdn_url {
+            log::info!("uploaded image url {}", url);
             images_urls.push(url);
         } else {
+            log::info!("failed to upload image url {}", url);
             images_urls.push(url);
         }
     }
