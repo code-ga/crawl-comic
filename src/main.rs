@@ -19,7 +19,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let num_of_threads: usize = std::env::var("NUM_OF_THREADS").unwrap_or("6".to_string()).parse().unwrap();
     let init_url =
-        "https://blogtruyenmoi.com/33534/moi-tinh-giua-ten-lua-dao-va-nu-canh-sat".to_string();
+        "https://mangajuice.com/updates/".to_string();
     {
         // let tmp = client
         //     .urls()
@@ -301,17 +301,5 @@ mod tests {
         let client = reqwest::Client::new();
         let resp = client.get("https://nowsecure.nl").send().await;
         assert!(resp.is_ok());
-    }
-    #[tokio::test]
-    async fn test_request_cf_headless_chrome(
-    ) -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
-        use undetected_chromedriver::chrome;
-        let driver = chrome().await?;
-        driver.goto("https://nowsecure.nl").await?;
-        tokio::time::sleep(std::time::Duration::from_secs(2)).await;
-        let png = driver.screenshot_as_png().await?;
-        let image = image::load_from_memory(&png)?;
-        image.save("image.png")?;
-        Ok(())
     }
 }

@@ -1,4 +1,9 @@
 use regex::Regex;
+pub mod fetch_page;
+
+#[allow(dead_code)]
+static UPLOAD_URL: &str =
+    "https://media.guilded.gg/media/upload?dynamicMediaTypeId=ContentMediaGenericFiles";
 
 pub fn get_host(url: &str) -> Option<String> {
     let re = Regex::new(r#"https?://([^/]+)"#).unwrap();
@@ -7,4 +12,27 @@ pub fn get_host(url: &str) -> Option<String> {
         return None;
     }
     return Some(cap.unwrap()[1].to_string());
+}
+
+pub async fn upload_image_to_guilded(
+    file: Vec<u8>,
+) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {
+    let bot_token = std::env::var("GUILDED_BOT_TOKEN")?;
+    tokio::time::sleep(std::time::Duration::from_secs(1)).await;
+    let client = reqwest::Client::new();
+    let body = reqwest::multipart::Form::new().part("file", reqwest::multipart::Part::bytes(file));
+    let resp = client
+        .post(UPLOAD_URL)
+        .bearer_auth(bot_token)
+        .multipart(body)
+        .send()
+        .await?;
+    if resp.status().is_success() {
+        let resp = resp.json::<serde_json::Value>().await?;
+        let regex = Regex::new(r#"https://.*?.amazonaws\.com/www\.guilded\.gg/"#).unwrap();
+        // regex replace with https://cdn.gilcdn.com/
+        let resp = regex.replace_all(&resp["url"].as_str().unwrap(), "https://cdn.gilcdn.com/");
+        return Ok(resp.to_string());
+    }
+    Err("failed to upload image".into())
 }
