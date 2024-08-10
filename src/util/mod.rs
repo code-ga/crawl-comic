@@ -36,5 +36,26 @@ pub async fn upload_image_to_guilded(
         let resp = regex.replace_all(&resp["url"].as_str().unwrap(), "https://cdn.gilcdn.com/");
         return Ok(resp.to_string());
     }
-    Err("failed to upload image".into())
+    log::error!("failed to upload image {:?}", resp.text().await?);
+    Err(format!("failed to upload image {:?}", resp.text().await?).into())
+}
+
+#[cfg(test)]
+mod tests {
+
+    #[tokio::test]
+    async fn test_upload_image_to_guilded() {
+        let image = if let Ok(data) = reqwest::get("https://cdn.readkakegurui.com/file/cdnpog/shikanoko-nokonoko-koshitantan/chapter-1/1.webp").await {
+            // get bytes
+            if let Ok(byte) = data.bytes().await {
+                byte
+            } else {
+                return;
+            }
+        } else {
+            return;
+        };
+        let url = super::upload_image_to_guilded(image.to_vec()).await;
+        dbg!(url);
+    }
 }

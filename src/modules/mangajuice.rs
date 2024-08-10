@@ -165,31 +165,33 @@ pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Opti
     let mut images_urls = vec![];
     for cap in images_url_regex.captures_iter(&html) {
         let url = cap[1].to_string();
-        log::info!("found image url {}. Uploading...", url);
+        // log::info!("found image url {}. Uploading...", url);
         // request to get image
-        let image = if let Ok(data) = reqwest::get(&url).await {
-            log::info!("request image url {}", url);
-            // get bytes
-            if let Ok(byte) = data.bytes().await {
-                byte
-            } else {
-                images_urls.push(url);
-                continue;
-            }
-        } else {
-            log::info!("failed to request image url {}", url);
-            images_urls.push(url);
-            continue;
-        };
-        // upload to guilded
-        let cdn_url = util::upload_image_to_guilded(image.to_vec()).await;
-        if let Ok(url) = cdn_url {
-            log::info!("uploaded image url {}", url);
-            images_urls.push(url);
-        } else {
-            log::info!("failed to upload image url {}", url);
-            images_urls.push(url);
-        }
+        // let image = if let Ok(data) = reqwest::get(&url).await {
+        //     log::info!("request image url {}", url);
+        //     // get bytes
+        //     if let Ok(byte) = data.bytes().await {
+        //         byte
+        //     } else {
+        //         images_urls.push(url);
+        //         continue;
+        //     }
+        // } else {
+        //     log::info!("failed to request image url {}", url);
+        //     images_urls.push(url);
+        //     continue;
+        // };
+        // // upload to guilded
+        // let cdn_url = util::upload_image_to_guilded(image.to_vec()).await;
+        // if let Ok(url) = cdn_url {
+        //     log::info!("uploaded image url {}", url);
+        //     images_urls.push(url);
+        // } else {
+        //     log::info!("failed to upload image url {}", url);
+        //     images_urls.push(url);
+        // }
+
+        images_urls.push(url);
     }
     match client
         .update_chapter_by_url(
