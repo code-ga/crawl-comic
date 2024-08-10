@@ -153,6 +153,9 @@ pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Opti
     //     .exec()
     //     .await
     //     .unwrap();
+    if images_urls.is_empty() {
+        return None;
+    }
     match client
         .update_chapter_by_url(
             url.to_string(),

@@ -197,6 +197,9 @@ pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Opti
 
         images_urls.push(url);
     }
+    if images_urls.len() == 0 {
+        return None;
+    }
     match client
         .update_chapter_by_url(
             url.to_string(),
