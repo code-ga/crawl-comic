@@ -36,7 +36,6 @@ pub async fn upload_image_to_guilded(
         let resp = regex.replace_all(&resp["url"].as_str().unwrap(), "https://cdn.gilcdn.com/");
         return Ok(resp.to_string());
     }
-    log::error!("failed to upload image {:?}", resp.text().await?);
     Err(format!("failed to upload image {:?}", resp.text().await?).into())
 }
 
