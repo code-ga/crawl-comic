@@ -15,6 +15,7 @@ pub fn get_host(url: &str) -> Option<String> {
     return Some(cap.unwrap()[1].to_string());
 }
 
+#[allow(dead_code)]
 pub async fn upload_image_to_guilded(
     file: Vec<u8>,
 ) -> Result<String, Box<dyn std::error::Error + Send + Sync>> {

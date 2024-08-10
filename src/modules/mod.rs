@@ -130,7 +130,7 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
         }
     } else if host.contains("mangajuice.com") {
         let url = url.trim().to_string();
-        if url.starts_with("https://mangajuice.com/manga") {
+        if url.starts_with("https://mangajuice.com/manga") && !url.starts_with("https://mangajuice.com/manga-status/") {
             return Some(url);
         }
         if url.starts_with("https://mangajuice.com/chapter") && !url.ends_with("/feed/") {
