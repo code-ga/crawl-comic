@@ -98,6 +98,10 @@ pub async fn parse_comic_page(
         if url.contains("\" title=") {
             url = url.replace("\" title=\"", "").trim().to_string();
         }
+        if url.ends_with("/feed/") {
+            log::info!("found feed url {}", url);
+            continue;
+        }
         let title = cap[2].to_string().trim().to_string();
         log::info!("found chapter url {}", url);
         {

@@ -133,7 +133,7 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
         if url.starts_with("https://mangajuice.com/manga") {
             return Some(url);
         }
-        if url.starts_with("https://mangajuice.com/chapter") {
+        if url.starts_with("https://mangajuice.com/chapter") && !url.ends_with("/feed/") {
             return Some(url);
         }
         if url.starts_with("https://mangajuice.com/updates") {
