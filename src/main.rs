@@ -17,9 +17,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::init();
     let client = db::DbUtils::new().await.unwrap();
 
-    let num_of_threads: usize = std::env::var("NUM_OF_THREADS").unwrap_or("6".to_string()).parse().unwrap();
-    let init_url =
-        "https://mangajuice.com/updates/".to_string();
+    let num_of_threads: usize = std::env::var("NUM_OF_THREADS")
+        .unwrap_or("6".to_string())
+        .parse()
+        .unwrap();
+    let init_url = "https://mangajuice.com/updates/".to_string();
     {
         // let tmp = client
         //     .urls()
@@ -263,7 +265,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     log::info!("finished");
     while worker_rx.len() > 0 {
-        let _ = dbg!(worker_rx.recv().await);
+        let _ = worker_rx.recv().await;
     }
     for w in &workers {
         let _ = worker_tx

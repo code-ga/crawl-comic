@@ -197,7 +197,7 @@ pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Opti
 
         images_urls.push(url);
     }
-    if images_urls.len() == 0 {
+    if images_urls.is_empty() {
         log::info!("no image found in chapter {}", url);
         return None;
     }
