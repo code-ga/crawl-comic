@@ -265,11 +265,15 @@ export const apiRoute =
                 }
             }
             const filteredImages = []
-            for (const url of chap.images) {
-                if (url.startsWith("https://i")) {
-                    filteredImages.push(url)
-                }
-            };
+            if (chap.url.includes("blogtruyenmoi.com")) {
+                for (const url of chap.images) {
+                    if (url.startsWith("https://i")) {
+                        filteredImages.push(url)
+                    }
+                };
+            } else {
+                filteredImages.push(...chap.images)
+            }
             const filteredServerImages = []
             for (const url of chap.serverImage) {
                 if (!url) continue
