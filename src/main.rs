@@ -21,7 +21,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .unwrap_or("6".to_string())
         .parse()
         .unwrap();
-    let init_url = "https://mangajuice.com/updates/".to_string();
+    let init_url = "https://alyasometimeshidesherfeelings.com/".to_string();
     {
         // let tmp = client
         //     .urls()

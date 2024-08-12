@@ -7,10 +7,7 @@ use serde_json::json;
 use tokio::sync::Mutex;
 // use lazy_static::lazy_static;
 
-use crate::{
-    db::{ChapterUpdateField, DbUtils, UpdateComicDocField},
-    util,
-};
+use crate::db::{ChapterUpdateField, DbUtils, UpdateComicDocField};
 
 pub fn is_comic_page(url: &str, _page: &str) -> bool {
     url.contains("https://mangajuice.com/manga")
