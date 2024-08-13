@@ -25,18 +25,17 @@ use nettruyenee::{
 
 mod mangajuice;
 use mangajuice::{
-    is_chapter_page as is_mangajuice_chapter_page, 
-    is_comic_page as is_mangajuice_comic_page,
+    is_chapter_page as is_mangajuice_chapter_page, is_comic_page as is_mangajuice_comic_page,
     parse_chapter_page as parse_mangajuice_chapter_page,
     parse_comic_page as parse_mangajuice_comic_page,
 };
 
 mod alyasometimeshidesherfeelings;
 use alyasometimeshidesherfeelings::{
-    is_comic_page as is_alyasometimeshidesherfeelings_comic_page,
-    parse_comic_page as parse_alyasometimeshidesherfeelings_comic_page,
     is_chapter_page as is_alyasometimeshidesherfeelings_chapter_page,
+    is_comic_page as is_alyasometimeshidesherfeelings_comic_page,
     parse_chapter_page as parse_alyasometimeshidesherfeelings_chapter_page,
+    parse_comic_page as parse_alyasometimeshidesherfeelings_comic_page,
 };
 
 pub static ACCEPTED_HOSTS: [&str; 13] = [
@@ -157,10 +156,13 @@ pub fn process_url(url: &str, now_url: &str) -> Option<String> {
     } else if host.contains("alyasometimeshidesherfeelings.com") {
         // by @thedtvn request
         let url = url.trim().to_string();
+        if url.ends_with("/feed/") {
+            return None;
+        }
         if url.eq("https://alyasometimeshidesherfeelings.com/") {
             return Some(url);
         }
-        if url.starts_with("https://alyasometimeshidesherfeelings.com/manga/"){
+        if url.starts_with("https://alyasometimeshidesherfeelings.com/manga/") {
             return Some(url);
         }
     }
@@ -381,11 +383,14 @@ pub async fn thread_worker(
                         };
                         result.extend(pending_url_comic.clone());
                     }
-                }else if hostname.contains("alyasometimeshidesherfeelings.com"){
+                } else if hostname.contains("alyasometimeshidesherfeelings.com") {
                     if is_alyasometimeshidesherfeelings_chapter_page(&url, &html) {
                         let client = client.lock().await;
                         let pending_url_chapter = {
-                            let tmp = parse_alyasometimeshidesherfeelings_chapter_page(&url, &html, &client).await;
+                            let tmp = parse_alyasometimeshidesherfeelings_chapter_page(
+                                &url, &html, &client,
+                            )
+                            .await;
                             if tmp.is_none() {
                                 log::info!("failed to parse chapter page {}", url);
                                 tx.send(ThreadMessage::Retry(url.clone(), i_tries))
@@ -399,8 +404,12 @@ pub async fn thread_worker(
                     }
                     if is_alyasometimeshidesherfeelings_comic_page(&url, &html) {
                         let pending_url_comic = {
-                            let tmp =
-                                parse_alyasometimeshidesherfeelings_comic_page(&html, &url, client.clone()).await;
+                            let tmp = parse_alyasometimeshidesherfeelings_comic_page(
+                                &html,
+                                &url,
+                                client.clone(),
+                            )
+                            .await;
                             if tmp.is_none() {
                                 log::info!("failed to parse comic page {}", url);
                                 tx.send(ThreadMessage::Retry(url.clone(), i_tries))

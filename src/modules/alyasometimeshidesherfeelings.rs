@@ -8,7 +8,7 @@ use tokio::sync::Mutex;
 use crate::db::{ChapterUpdateField, DbUtils, UpdateComicDocField};
 
 pub fn is_comic_page(url: &str, _page: &str) -> bool {
-    url.contains("https://alyasometimeshidesherfeelings.com/")
+    url.eq("https://alyasometimeshidesherfeelings.com/")
 }
 
 pub async fn parse_comic_page(
