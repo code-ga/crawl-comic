@@ -252,7 +252,7 @@ pub fn parse_alyasometimeshidesherfeelings_moi_html_page(
             }
             if child_text.starts_with("Description:") {
                 let description = child_text.replace("Description:", "").trim().to_string();
-                update_data.push(UpdateComicDocField::Description(description.clone()));
+                update_data.push(UpdateComicDocField::Content(Some(description.clone())));
                 result.insert("description".to_string(), json!(description));
             }
         }
