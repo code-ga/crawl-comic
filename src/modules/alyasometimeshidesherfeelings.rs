@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, vec};
 
 use prisma_client_rust::chrono::{self, Utc};
 use regex::Regex;
@@ -84,6 +84,9 @@ pub async fn parse_comic_page(
             .to_string();
         let title = cap[2].to_string().trim().to_string();
         let date = {
+            if cap[3].is_empty() || cap[3].contains("🔥") {
+                continue;
+            }
             let tmp = cap[3].to_string().replace("ago", "").trim().to_string();
             let mut time = Utc::now();
             if tmp.contains("year"){
@@ -203,123 +206,58 @@ pub fn parse_alyasometimeshidesherfeelings_moi_html_page(
     let mut update_data = vec![UpdateComicDocField::PythonFetchInfo(true)];
     let document = Html::parse_document(html);
 
-    // fetch content, thumbnail
-    // title fetch before
-    let content_selector = Selector::parse(
-        "#wrapper > section.main-content > div > div.col-md-8 > section > div.detail > div.content",
-    )
-    .unwrap();
-    let content = document.select(&content_selector).next();
-    if let Some(content) = content {
-        let content = content.inner_html().trim().to_string();
-        update_data.push(UpdateComicDocField::Content(Some(content.to_string())));
-        result.insert("content".to_string(), json!(content.to_string()));
-    }
-    let thumbnail_selector = Selector::parse(
-        "#wrapper > section.main-content > div > div.col-md-8 > section > div.thumbnail > img",
-    )
-    .unwrap();
+    let thumbnail_selector = Selector::parse("#content > div > div.left-column > img").unwrap();
     let thumbnail = document.select(&thumbnail_selector).next();
     if let Some(thumbnail) = thumbnail {
-        let thumbnail = thumbnail.value().attr("src").unwrap().trim().to_string();
-        update_data.push(UpdateComicDocField::ThumbnailUrl(Some(
-            thumbnail.to_string(),
-        )));
-        result.insert("thumbnail".to_string(), json!(thumbnail.to_string()));
+        let thumbnail = thumbnail.value().attr("src").unwrap();
+        update_data.push(UpdateComicDocField::ThumbnailUrl(Some(thumbnail.to_string())));
+        result.insert("thumbnail".to_string(), json!(thumbnail));
     }
 
-    // fetch another information
-    let description_selector = Selector::parse(
-        "#wrapper > section.main-content > div > div.col-md-8 > section > div.description",
-    )
-    .unwrap();
-    let description = document.select(&description_selector).next();
-    if let Some(description) = description {
-        let p_selector = Selector::parse("p").unwrap();
-        let ps = description.select(&p_selector);
-        for p in ps {
-            let child_text = p.text().collect::<String>().trim().to_string();
-            if child_text.starts_with("Tên khác:") {
-                // remove prefix "Tên khác:" from string
-                let another_name = {
-                    let temp = child_text.to_string();
-                    let split_child_text = temp.split(":").collect::<Vec<&str>>();
-                    split_child_text.clone()[1..]
-                        .join(":")
-                        .split(",")
-                        .map(|x| x.trim().to_string())
-                        .collect::<Vec<_>>()
-                        .clone()
-                };
+    let comic_info_list_selector = Selector::parse(
+        "#content > div > div.right-column > div > ul").unwrap();
+    let comic_info_list = document.select(&comic_info_list_selector).next();
+    if let Some(comic_info_list) = comic_info_list {
+        let li_selector = Selector::parse("li").unwrap();
+        let li_list = comic_info_list.select(&li_selector);
+        for li in li_list {
+            let child_text = li.text().collect::<String>();
+            if child_text.starts_with("Alternate Name(s):") {
+                let another_name = vec![child_text.replace("Alternate Name(s):", "").trim().to_string()];    
                 update_data.push(UpdateComicDocField::AnotherName(another_name.clone()));
-                result.insert("anotherName".to_string(), json!(another_name));
-            } else if child_text.starts_with("Tác giả:") {
-                let author_list_selector = Selector::parse("a").unwrap();
-                let author_list = p.select(&author_list_selector);
-                let mut author = HashMap::new();
-                for a in author_list {
-                    let child_text = a.text().collect::<String>();
-                    let url = a.value().attr("href").unwrap();
-                    author.insert(child_text, url.to_string());
+                result.insert("another_name".to_string(), json!(another_name));
+            }
+            if child_text.starts_with("Author(s):"){
+                let mut author_list = HashMap::new();
+                for author in child_text.replace("Author(s):", "").trim().to_string().split(",") {
+                    let author_name = author.trim().to_string();
+                    author_list.insert(author_name, "".to_string());
                 }
-                update_data.push(UpdateComicDocField::Author(json!(author.clone())));
-                result.insert("author".to_string(), json!(author));
-            } else if child_text.starts_with("Nguồn:") {
-                let source_list_selector = Selector::parse("a").unwrap();
-                let source_list = p.select(&source_list_selector);
-                let mut source = HashMap::new();
-                for a in source_list {
-                    let child_text = a.text().collect::<String>();
-                    let url = a.value().attr("href").unwrap();
-                    source.insert(child_text, url.to_string());
-                }
-                update_data.push(UpdateComicDocField::Source(json!(source.clone())));
-                result.insert("source".to_string(), json!(source));
-            } else if child_text.starts_with("Nhóm dịch:") {
-                let translator_link_selector = Selector::parse("a").unwrap();
-                let translator_link = p.select(&translator_link_selector);
-                let mut translator = HashMap::new();
-                for a in translator_link {
-                    let child_text = a.text().collect::<String>();
-                    let url = a.value().attr("href").unwrap();
-                    translator.insert(child_text, url.to_string());
-                }
-                update_data.push(UpdateComicDocField::TranslatorTeam(json!(
-                    translator.clone()
-                )));
-                result.insert("translatorTeam".to_string(), json!(translator));
-            } else if child_text.starts_with("Đăng bởi:") {
-                let posted_by_list_selector = Selector::parse("a").unwrap();
-                let posted_by_list = p.select(&posted_by_list_selector);
-                let mut posted_by = HashMap::new();
-                for a in posted_by_list {
-                    let child_text = a.text().collect::<String>();
-                    let url = a.value().attr("href").unwrap();
-                    posted_by.insert(child_text, url.to_string());
-                }
-                update_data.push(UpdateComicDocField::PostedBy(json!(posted_by.clone())));
-                result.insert("postedBy".to_string(), json!(posted_by));
-                let status_selector = Selector::parse("span").unwrap();
-                let status = p.select(&status_selector).next();
-                if let Some(status) = status {
-                    let status = status.text().collect::<String>();
-                    update_data.push(UpdateComicDocField::Status(status.trim().to_string()));
-                    result.insert("status".to_string(), json!(status.trim().to_string()));
-                }
-            } else if child_text.starts_with("Thể loại:") {
-                let genre_list_selector = Selector::parse("a").unwrap();
-                let genre_list = p.select(&genre_list_selector);
+                update_data.push(UpdateComicDocField::Author(json!(author_list)));
+                result.insert("author".to_string(), json!(author_list));
+            }
+            if child_text.starts_with("Genre(s):") {
                 let mut genre = HashMap::new();
-                for a in genre_list {
-                    let child_text = a.text().collect::<String>();
-                    let url = a.value().attr("href").unwrap();
-                    genre.insert(child_text, url.to_string());
+                for genre_name in child_text.replace("Genre(s):", "").trim().to_string().split(",") {
+                    let genre_name = genre_name.trim().to_string();
+                    genre.insert(genre_name, "".to_string());
                 }
-                update_data.push(UpdateComicDocField::Genre(json!(genre.clone())));
+                update_data.push(UpdateComicDocField::Genre(json!(genre)));
                 result.insert("genre".to_string(), json!(genre));
+            }
+            if child_text.starts_with("Status:") {
+                let status = child_text.replace("Status:", "").trim().to_string();
+                update_data.push(UpdateComicDocField::Status(status.clone()));
+                result.insert("status".to_string(), json!(status));
+            }
+            if child_text.starts_with("Description:") {
+                let description = child_text.replace("Description:", "").trim().to_string();
+                update_data.push(UpdateComicDocField::Description(description.clone()));
+                result.insert("description".to_string(), json!(description));
             }
         }
     }
+
     (result, update_data)
 }
 
@@ -331,9 +269,8 @@ mod test {
     async fn test_parse_alyasometimeshidesherfeelings_moi_html_page() {
         let client = reqwest::Client::new();
         let html = client
-            .get("https://blogtruyenmoi.com/34464/kiyota-san-muon-bi-vay-ban")
+            .get("https://alyasometimeshidesherfeelings.com/manga/")
             .header("User-Agent", "Mozilla/5.0")
-            .header("Referrer", "https://blogtruyenmoi.com/")
             .send()
             .await
             .unwrap();
