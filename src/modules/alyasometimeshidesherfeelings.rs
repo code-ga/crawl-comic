@@ -212,12 +212,14 @@ pub fn parse_alyasometimeshidesherfeelings_moi_html_page(
     let mut update_data = vec![UpdateComicDocField::PythonFetchInfo(true)];
     let document = Html::parse_document(html);
 
-    let thumbnail_selector = Selector::parse("#content > div > div.left-column > img").unwrap();
-    let thumbnail = document.select(&thumbnail_selector).next();
-    if let Some(thumbnail) = thumbnail {
-        let thumbnail = thumbnail.value().attr("src").unwrap();
-        update_data.push(UpdateComicDocField::ThumbnailUrl(Some(thumbnail.to_string())));
-        result.insert("thumbnail".to_string(), json!(thumbnail));
+    
+    // get thumbnail from meta tag og:image
+    let og_image_selector = Selector::parse("meta[property='og:image']").unwrap();
+    let og_image = document.select(&og_image_selector).next();
+    if let Some(og_image) = og_image {
+        let og_image = og_image.value().attr("content").unwrap();
+        update_data.push(UpdateComicDocField::Thumbnail(og_image.to_string()));
+        result.insert("thumbnail".to_string(), json!(og_image));
     }
 
     let comic_info_list_selector = Selector::parse(
