@@ -154,11 +154,13 @@ pub async fn parse_comic_page(
     Some(result)
 }
 
+// const IMAGES_EXTENSIONS = ["jpg", "jpeg", "png", "gif","webp"];
+
 pub async fn parse_chapter_page(url: &str, html: &str, client: &DbUtils) -> Option<Vec<String>> {
     log::info!("fetching chapter {}", url);
     let result = Vec::new();
 
-    let images_url_regex = Regex::new(r#"src="([^"]+)"#).unwrap();
+    let images_url_regex = Regex::new(r#"<img.+src="([^"]+)"#).unwrap();
     let mut images_urls = vec![];
     for cap in images_url_regex.captures_iter(&html) {
         let url = cap[1].to_string();
