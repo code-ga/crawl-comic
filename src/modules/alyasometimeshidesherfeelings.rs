@@ -82,6 +82,10 @@ pub async fn parse_comic_page(
         let url = cap[1].to_string()
             .trim()
             .to_string();
+        if url.ends_with("/feed/") {
+            log::info!("found feed url {}", url);
+            continue;
+        }
         let title = cap[2].to_string().trim().to_string();
         let date = {
             if cap[3].is_empty() || cap[3].contains("🔥") {
