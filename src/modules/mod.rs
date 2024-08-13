@@ -39,7 +39,7 @@ use alyasometimeshidesherfeelings::{
     parse_chapter_page as parse_alyasometimeshidesherfeelings_chapter_page,
 };
 
-pub static ACCEPTED_HOSTS: [&str; 12] = [
+pub static ACCEPTED_HOSTS: [&str; 13] = [
     "blogtruyenmoi.com",
     "nettruyenee.com",
     "www.nettruyenee.com",
@@ -52,6 +52,7 @@ pub static ACCEPTED_HOSTS: [&str; 12] = [
     "nettruyentt.com",
     "www.nettruyentt.com",
     "mangajuice.com",
+    "alyasometimeshidesherfeelings.com",
 ];
 pub static NETTRUYEN_HOSTS: [&str; 10] = [
     "nettruyenee.com",
