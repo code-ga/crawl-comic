@@ -218,7 +218,7 @@ pub fn parse_alyasometimeshidesherfeelings_moi_html_page(
     let og_image = document.select(&og_image_selector).next();
     if let Some(og_image) = og_image {
         let og_image = og_image.value().attr("content").unwrap();
-        update_data.push(UpdateComicDocField::Thumbnail(og_image.to_string()));
+        update_data.push(UpdateComicDocField::ThumbnailUrl(Some(og_image.to_string())));
         result.insert("thumbnail".to_string(), json!(og_image));
     }
 
